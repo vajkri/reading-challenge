@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Baloo_2, Nunito } from "next/font/google";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 // Display font — used for headings/branding (maps to --font-display token).
@@ -19,6 +20,11 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Læseudfordring",
   description: "En læseudfordring der motiverer børn til at læse.",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Læseudfordring" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F6A623",
 };
 
 export default function RootLayout({
@@ -29,7 +35,10 @@ export default function RootLayout({
       lang="da"
       className={`${baloo.variable} ${nunito.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <ServiceWorkerRegister />
+      </body>
     </html>
   );
 }
