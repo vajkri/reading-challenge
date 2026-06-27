@@ -57,6 +57,10 @@
   from { transform: translateY(14px); opacity: 0 }
   to { transform: translateY(0); opacity: 1 }
 }
+@keyframes sk-shimmer {
+  0%, 100% { opacity: .45 }
+  50% { opacity: .9 }
+}
 
 /* ---------------------------------------------------------------------------
    REDUCED MOTION

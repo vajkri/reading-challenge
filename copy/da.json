@@ -3,6 +3,9 @@
     "name": "Læseudfordring",
     "description": "En læseudfordring der motiverer børn til at læse."
   },
+  "loading": {
+    "label": "Indlæser"
+  },
   "nav": {
     "progress": "Fremgang",
     "log": "Læselog",
