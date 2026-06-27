@@ -100,3 +100,31 @@ input::placeholder {
   opacity: 1;
   font-weight: 600;
 }
+
+/* ---------------------------------------------------------------------------
+   PROGRESS SCREEN — short-viewport fit (#4)
+   The app shell is locked to 100dvh with a pinned footer (see #2), so the
+   document never scrolls and Safari keeps its chrome visible — meaning the
+   Progress hero must FIT the visible height rather than rely on scroll.
+   These tokens shrink the hero on short viewports and stay at today's sizes
+   on tall ones (the values below are the ceilings). --mascot-scale is stepped
+   by max-height because CSS transform: scale() needs a unitless number (it
+   can't take dvh); the ring + type scale continuously via clamp(.., dvh, ..).
+--------------------------------------------------------------------------- */
+.progress-screen {
+  --mascot-scale: 1;     /* face transform multiplier (ceiling 1 = 150x162) */
+  --hero-gap: 14px;      /* caption / ring / deadline vertical rhythm        */
+  --pad-top: 14px;       /* section top padding                              */
+}
+@media (max-height: 760px) {
+  .progress-screen { --mascot-scale: 0.92; --hero-gap: 11px; --pad-top: 10px; }
+}
+@media (max-height: 680px) {
+  .progress-screen { --mascot-scale: 0.82; --hero-gap: 9px; }
+}
+@media (max-height: 600px) {
+  .progress-screen { --mascot-scale: 0.72; --hero-gap: 7px; --pad-top: 6px; }
+}
+@media (max-height: 540px) {
+  .progress-screen { --mascot-scale: 0.64; --hero-gap: 6px; --pad-top: 4px; }
+}
