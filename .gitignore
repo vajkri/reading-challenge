@@ -39,6 +39,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude code worktrees (native EnterWorktree default location)
+/.claude/worktrees/
+
+# gsd planning workspace (local-only)
+/.planning/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
