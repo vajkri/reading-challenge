@@ -1,0 +1,121 @@
+{
+  "app": {
+    "name": "Læseudfordring"
+  },
+  "nav": {
+    "progress": "Fremgang",
+    "log": "Læselog",
+    "settings": "Indstillinger"
+  },
+  "progress": {
+    "readyHeading": "Klar til en udfordring?",
+    "startSub": "{name} keder sig lidt. Sæt et mål og kom i gang!",
+    "startBtn": "Start en udfordring",
+    "captions": [
+      "{name} keder sig lidt... skal vi læse en bog?",
+      "{name} er vågnet – kom i gang med at læse!",
+      "Godt begyndt! {name} begynder at smile.",
+      "Det går rigtig godt – bliv ved!",
+      "Wow! {name} har taget festhat på.",
+      "Så fin! {name} har fået butterfly på.",
+      "Du gjorde det – 100%! {name} jubler!",
+      "FEST! Du er en ægte superlæser!"
+    ],
+    "unit": "min",
+    "completedBadge": "Udfordring fuldført",
+    "completedHeading": "Sådan! I nåede målet",
+    "doneSub": "Du læste dig helt i mål – {name} er superstolt!",
+    "minutesRead": "minutter læst",
+    "bookSingular": "bog læst",
+    "bookPlural": "bøger læst",
+    "newChallengeBtn": "Start en ny udfordring",
+    "deadline": {
+      "daysLeft": "{count} dage tilbage",
+      "oneDay": "1 dag tilbage",
+      "lastDay": "Sidste dag!",
+      "expired": "Tiden er udløbet"
+    }
+  },
+  "log": {
+    "title": "Læselog",
+    "totalSuffix": "min i alt",
+    "addBtn": "Tilføj læsning",
+    "quickPickPrompt": "Læser du videre i en bog?",
+    "addHeading": "Ny læsning",
+    "editHeading": "Ret læsning",
+    "labels": {
+      "title": "Titel",
+      "author": "Forfatter",
+      "date": "Dato",
+      "minutes": "Minutter"
+    },
+    "placeholders": {
+      "title": "fx Vitello",
+      "author": "fx Kim Fupz Aakeson",
+      "minutes": "20"
+    },
+    "cancel": "Fortryd",
+    "save": "Gem læsning",
+    "saveEdit": "Gem ændringer",
+    "emptyLine1": "Ingen læsninger endnu.",
+    "emptyLine2Prefix": "Tryk på ",
+    "emptyLine2Bold": "+ Tilføj læsning",
+    "emptyLine2Suffix": " for at komme i gang!",
+    "deleteConfirm": "Slet denne læsning?",
+    "delete": "Slet",
+    "keep": "Behold",
+    "edit": "Ret",
+    "flashEdited": "Rettet!",
+    "unknownAuthor": "Ukendt forfatter",
+    "bylinePrefix": "af",
+    "minutesSuffix": "min"
+  },
+  "settings": {
+    "title": "Indstillinger",
+    "lock": {
+      "lockedTitle": "Indstillinger er låst",
+      "lockedSub": "Bed en voksen om at låse op for at ændre.",
+      "unlockBtn": "Lås op",
+      "openTitle": "Indstillinger er åbne",
+      "openSub": "Lås, så de ikke ændres ved et uheld.",
+      "lockBtn": "Lås"
+    },
+    "mascot": {
+      "heading": "Vælg maskot",
+      "sub": "Hvilket dyr skal følge jer på udfordringen?",
+      "cat": "Kat",
+      "dog": "Hund",
+      "saved": "✓ Maskot valgt!"
+    },
+    "name": {
+      "heading": "Maskottens navn",
+      "sub": "Hvad skal jeres maskot hedde?",
+      "placeholder": "Max",
+      "save": "Gem",
+      "saved": "✓ Navnet er gemt!"
+    },
+    "goal": {
+      "heading": "Læsemål",
+      "sub": "Hvor mange minutter vil I gerne læse i alt?",
+      "unit": "min",
+      "save": "Gem",
+      "saved": "✓ Målet er gemt!"
+    },
+    "deadline": {
+      "heading": "Slutdato",
+      "sub": "Hvornår skal udfordringen være færdig?",
+      "save": "Gem",
+      "saved": "✓ Slutdato er gemt!"
+    },
+    "startBtn": "Start udfordringen",
+    "footer": "Al fremgang gemmes på denne enhed.",
+    "unlock": {
+      "heading": "Kun for voksne",
+      "sub": "Løs regnestykket for at låse op.",
+      "placeholder": "?",
+      "error": "Prøv igen!",
+      "cancel": "Annuller",
+      "submit": "Lås op"
+    }
+  }
+}

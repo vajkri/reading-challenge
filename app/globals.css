@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   COLOR TOKENS
+   Plain @theme block so Tailwind generates utilities like bg-app, text-ink,
+   bg-accent, etc. These map to the palette pulled from the design prototype.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-accent: #F6A623;
+  --color-cat: #F4A35C;
+  --color-app: #FFF6E9;
+  --color-body: #E9DAC4;
+  --color-ink: #4F4034;
+  --color-ink-2: #8A7559;
+  --color-ink-3: #A9967E;
+  --color-muted: #BBA98F;
+  --color-nav-inactive: #C9B79C;
+  --color-field-border: #F2DEBE;
+  --color-flash: #E4F1D8;
+  --color-badge: #5C8A3F;
+  --color-deadline: #C98A2B;
+  --color-easy-bg: #E4F1D8;
+  --color-easy-fg: #5C8A3F;
+  --color-med-bg: #FBEAD2;
+  --color-med-fg: #B5803A;
+  --color-hard-bg: #F8DDD3;
+  --color-hard-fg: #C45B40;
 }
 
+/* ---------------------------------------------------------------------------
+   FONT TOKENS (inline)
+   @theme inline so these reference the runtime next/font CSS variables that
+   next/font/google injects on <html>. Generates font-display / font-body.
+--------------------------------------------------------------------------- */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-baloo);
+  --font-body: var(--font-nunito);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------------------------------------------------------------------------
+   KEYFRAMES (copied verbatim from the prototype's <style> block)
+--------------------------------------------------------------------------- */
+@keyframes mons-bob {
+  0%, 100% { transform: translateY(0) }
+  50% { transform: translateY(-5px) }
+}
+@keyframes mons-fall {
+  0% { transform: translateY(-14px) rotate(0); opacity: 0 }
+  14% { opacity: 1 }
+  100% { transform: translateY(150px) rotate(300deg); opacity: 0 }
+}
+@keyframes mons-pulse {
+  0%, 100% { opacity: .4; transform: scale(1) }
+  50% { opacity: .85; transform: scale(1.04) }
+}
+@keyframes mons-sheet {
+  from { transform: translateY(14px); opacity: 0 }
+  to { transform: translateY(0); opacity: 1 }
 }
 
+/* ---------------------------------------------------------------------------
+   RESET / BASE
+--------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: #E9DAC4;
+  font-family: var(--font-nunito), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  font-family: inherit;
+}
+input {
+  font-family: inherit;
+}
+input::placeholder {
+  color: #D8C7AC;
+  opacity: 1;
+  font-weight: 600;
 }
