@@ -44,6 +44,22 @@ test("ongoing challenge renders the ring percentage", async ({ page, context }) 
   await expect(page.getByText("Det går rigtig godt", { exact: false })).toBeVisible();
 });
 
+test("reload of a saved ongoing challenge never flickers the none-state (#11)", async ({ page, context }) => {
+  await seed(context, {
+    goal: "1000",
+    challenge: "ongoing",
+    name: "Max",
+    deadline: iso(20),
+    entries: [{ id: "a", title: "Vitello", author: "Kim Fupz", date: iso(-1), minutes: 500, created: 1 }],
+  });
+  await page.goto("./");
+  // The skeleton occupies the hydration window, so the gloomy none-state heading
+  // must never paint — not even for a frame. toHaveCount(0) polls, catching a late flash.
+  await expect(page.getByText("Klar til en udfordring?")).toHaveCount(0);
+  // ...and the real ongoing content lands in its place.
+  await expect(page.getByText("500 / 1000 min")).toBeVisible();
+});
+
 test("start a challenge from settings → ongoing + auto-locked", async ({ page }) => {
   await page.goto("./");
   await page.getByRole("button", { name: "Start en udfordring" }).click();
