@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#
+# pick-up-task.sh — pick an open `feedback` issue, create an issue-linked
+# branch, and spin up a sibling git worktree ready to plan/implement.
+#
+# Usage:
+#   scripts/pick-up-task.sh [issue-number]
+#
+# With no argument it lists open `feedback` issues and lets you choose one
+# (fzf if installed, otherwise a numbered menu). The worktree is created as a
+# sibling dir: ../<repo>-<slug>. The branch is git-linked to the issue, so the
+# PR you open later auto-links and (with "Closes #N" in the body) auto-closes it.
+
+set -euo pipefail
+
+LABEL="feedback"
+BASE="main"
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+# --- pick the issue -----------------------------------------------------------
+issue="${1:-}"
+
+if [[ -z "$issue" ]]; then
+  list="$(gh issue list --label "$LABEL" --state open \
+            --json number,title --jq '.[] | "\(.number)\t\(.title)"')"
+
+  if [[ -z "$list" ]]; then
+    echo "No open '$LABEL' issues. File some first: gh issue create --label $LABEL" >&2
+    exit 1
+  fi
+
+  if command -v fzf >/dev/null 2>&1; then
+    chosen="$(printf '%s\n' "$list" | fzf --prompt='feedback › ' --with-nth=1,2)"
+  else
+    echo "Open $LABEL issues:" >&2
+    printf '%s\n' "$list" | awk -F'\t' '{printf "  %s  %s\n", $1, $2}' >&2
+    printf 'Issue number: ' >&2
+    read -r picked
+    chosen="$(printf '%s\n' "$list" | awk -F'\t' -v n="$picked" '$1==n')"
+  fi
+
+  issue="$(printf '%s' "$chosen" | cut -f1)"
+fi
+
+[[ -n "$issue" ]] || { echo "No issue selected." >&2; exit 1; }
+
+# --- derive a slug from the issue title --------------------------------------
+title="$(gh issue view "$issue" --json title --jq .title)"
+slug="$(printf '%s' "$title" \
+  | tr '[:upper:]' '[:lower:]' \
+  | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' \
+  | cut -c1-40)"
+branch="feat/${issue}-${slug}"
+# Native EnterWorktree default location (gitignored). See .claude/rules/git-worktrees.md
+worktree="${repo_root}/.claude/worktrees/${branch}"
+
+# --- create issue-linked branch + worktree -----------------------------------
+echo "→ issue #$issue: $title" >&2
+echo "→ branch:   $branch" >&2
+echo "→ worktree: $worktree" >&2
+
+# gh issue develop creates a branch git-linked to the issue (no checkout here).
+# Idempotent-ish: ignore failure if the linked branch already exists.
+gh issue develop "$issue" --name "$branch" --base "$BASE" >/dev/null 2>&1 || true
+
+# Make sure the branch exists locally before adding the worktree.
+git fetch origin "$branch" >/dev/null 2>&1 || true
+if ! git show-ref --verify --quiet "refs/heads/$branch"; then
+  git branch "$branch" "$BASE" >/dev/null 2>&1 || true
+fi
+
+if [[ -d "$worktree" ]]; then
+  echo "Worktree already exists: $worktree" >&2
+else
+  git worktree add "$worktree" "$branch"
+fi
+
+# .planning/ is gitignored (local-only), so worktrees don't inherit GSD state.
+# Symlink it so every worktree shares ONE GSD workspace (single source of truth).
+if [[ -d "$repo_root/.planning" && ! -e "$worktree/.planning" ]]; then
+  ln -s "$repo_root/.planning" "$worktree/.planning"
+  echo "→ linked .planning → $repo_root/.planning (shared GSD workspace)" >&2
+fi
+
+echo >&2
+echo "Ready. Next:" >&2
+echo "  in-session: EnterWorktree path=$worktree" >&2
+echo "  or shell:   cd $worktree" >&2
+echo "  then:       /gsd-plan-phase  (or /gsd-quick)" >&2
+
+# Print the path on stdout so you can:  cd \"\$(scripts/pick-up-task.sh 3)\"
+printf '%s\n' "$worktree"
