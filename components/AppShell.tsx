@@ -15,8 +15,11 @@ export default function AppShell() {
   const { state } = useApp();
 
   return (
-    <div className="relative mx-auto flex min-h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-app">
-      <header className="flex items-center gap-2 px-5 py-4">
+    <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-app">
+      <header
+        className="flex items-center gap-2 px-5 py-4"
+        style={{ borderBottom: "1.5px solid #F2E6D2" }}
+      >
         <svg width="34" height="34" viewBox="0 0 100 100" aria-hidden>
           <rect x="2" y="2" width="96" height="96" rx="24" fill="#FFF1DD" />
           <rect x="26" y="32" width="48" height="15" rx="4.5" fill="#F6A623" />
