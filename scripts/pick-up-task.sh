@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 #
-# pick-up-task.sh — pick an open `feedback` issue, create an issue-linked
+# pick-up-task.sh — pick an open issue, create an issue-linked
 # branch, and spin up a sibling git worktree ready to plan/implement.
 #
 # Usage:
 #   scripts/pick-up-task.sh [issue-number]
 #
-# With no argument it lists open `feedback` issues and lets you choose one
+# Label filter for the picker defaults to `enhancement`; override with
+# PICKUP_LABEL=<label>. With no argument it lists matching open issues and lets you choose one
 # (fzf if installed, otherwise a numbered menu). The worktree is created as a
 # sibling dir: ../<repo>-<slug>. The branch is git-linked to the issue, so the
 # PR you open later auto-links and (with "Closes #N" in the body) auto-closes it.
 
 set -euo pipefail
 
-LABEL="feedback"
+LABEL="${PICKUP_LABEL:-enhancement}"
 BASE="main"
 
 repo_root="$(git rev-parse --show-toplevel)"
