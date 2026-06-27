@@ -65,10 +65,11 @@ export default function ProgressScreen(): React.ReactElement {
   return (
     <section
       data-screen-label="Fremgang"
+      className="progress-screen"
       style={{
         flex: "1 1 auto",
         overflowY: "auto",
-        padding: "14px 22px 24px",
+        padding: "var(--pad-top) 22px calc(var(--pad-top) + 10px)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -76,12 +77,16 @@ export default function ProgressScreen(): React.ReactElement {
     >
       <h2 className="sr-only">{copy.nav.progress}</h2>
 
-      {/* mascot hero (head only) — confetti burst is scoped to this container */}
+      {/* mascot hero (head only) — confetti burst is scoped to this container.
+          The face is a fixed 150x162 px render (MascotFace stays pure), so it
+          shrinks on short viewports via transform: scale(--mascot-scale). The
+          wrapper's layout box is calc'd to the scaled size (transform-origin
+          top-center) so it reserves no dead space. */}
       <div
         style={{
           position: "relative",
-          width: 200,
-          height: 172,
+          width: "calc(200px * var(--mascot-scale))",
+          height: "calc(172px * var(--mascot-scale))",
           marginTop: 6,
           display: "flex",
           alignItems: "flex-end",
@@ -89,8 +94,26 @@ export default function ProgressScreen(): React.ReactElement {
         }}
       >
         <ConfettiBurst active={derived.showConfetti} />
-        <div style={{ position: "relative", width: 150, height: 162 }}>
-          <MascotFace animal={state.mascot} stage={derived.joy} confetti={false} />
+        <div
+          style={{
+            position: "relative",
+            width: "calc(150px * var(--mascot-scale))",
+            height: "calc(162px * var(--mascot-scale))",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 150,
+              height: 162,
+              transform: "scale(var(--mascot-scale))",
+              transformOrigin: "top left",
+            }}
+          >
+            <MascotFace animal={state.mascot} stage={derived.joy} confetti={false} />
+          </div>
         </div>
       </div>
 
@@ -99,7 +122,7 @@ export default function ProgressScreen(): React.ReactElement {
         <div
           style={{
             ...display,
-            marginTop: 14,
+            marginTop: "var(--hero-gap)",
             textAlign: "center",
             fontWeight: 600,
             fontSize: 17,
@@ -177,7 +200,14 @@ export default function ProgressScreen(): React.ReactElement {
             width: "100%",
           }}
         >
-          <div style={{ position: "relative", width: 236, height: 236, marginTop: 8 }}>
+          <div
+            style={{
+              position: "relative",
+              width: "clamp(168px, 30dvh, 236px)",
+              aspectRatio: "1 / 1",
+              marginTop: "var(--hero-gap)",
+            }}
+          >
             <svg
               viewBox="0 0 280 280"
               style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}
@@ -218,10 +248,10 @@ export default function ProgressScreen(): React.ReactElement {
             >
               <div
                 className="text-ink"
-                style={{ ...display, fontWeight: 800, fontSize: 58, lineHeight: 1 }}
+                style={{ ...display, fontWeight: 800, fontSize: "clamp(40px, 8.5dvh, 58px)", lineHeight: 1 }}
               >
                 {derived.pct}
-                <span style={{ fontSize: 26, verticalAlign: "super" }}>%</span>
+                <span style={{ fontSize: "0.45em", verticalAlign: "super" }}>%</span>
               </div>
               <div
                 className="text-ink-3"
@@ -235,7 +265,7 @@ export default function ProgressScreen(): React.ReactElement {
           {derived.showDeadline && (
             <div
               style={{
-                marginTop: 16,
+                marginTop: "var(--hero-gap)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 7,
