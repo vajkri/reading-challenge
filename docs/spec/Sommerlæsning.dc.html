@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="app-icon.svg">
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font-family:'Nunito',system-ui,sans-serif;background:#E9DAC4;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input{font-family:inherit}
+  input::placeholder{color:#D8C7AC;opacity:1;font-weight:600}
+  @keyframes mons-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes mons-fall{0%{transform:translateY(-14px) rotate(0);opacity:0}14%{opacity:1}100%{transform:translateY(150px) rotate(300deg);opacity:0}}
+  @keyframes mons-pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.85;transform:scale(1.04)}}
+  @keyframes mons-sheet{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+<div ref="{{ setRoot }}" style="width:100%;max-width:430px;height:100vh;margin:0 auto;background:#FFF6E9;display:flex;flex-direction:column;overflow:hidden;position:relative;box-shadow:0 24px 60px rgba(80,55,25,.18)">
+
+  <!-- ============ HEADER ============ -->
+  <div style="flex:0 0 auto;padding:18px 22px 12px;display:flex;align-items:center;gap:10px">
+    <svg width="34" height="34" viewBox="0 0 100 100" style="flex:0 0 auto;filter:drop-shadow(0 2px 4px rgba(80,55,25,.16))">
+      <rect x="2" y="2" width="96" height="96" rx="24" fill="#FFF1DD"></rect>
+      <rect x="26" y="32" width="48" height="15" rx="4.5" fill="var(--accent,#F6A623)"></rect>
+      <rect x="33" y="32" width="5" height="15" fill="#FFFBF2" opacity=".55"></rect>
+      <rect x="26" y="49" width="48" height="15" rx="4.5" fill="#7FC8A9"></rect>
+      <rect x="33" y="49" width="5" height="15" fill="#FFFBF2" opacity=".55"></rect>
+      <g transform="rotate(-4 50 73)"><rect x="28" y="66" width="48" height="15" rx="4.5" fill="#F2705A"></rect><rect x="35" y="66" width="5" height="15" fill="#FFFBF2" opacity=".55"></rect></g>
+    </svg>
+    <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:21px;color:#4F4034;letter-spacing:.2px">Læseudfordring</div>
+  </div>
+
+  <!-- ============ PROGRESS SCREEN ============ -->
+  <sc-if value="{{ isProgress }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="Fremgang" style="flex:1 1 auto;overflow-y:auto;padding:14px 22px 24px;display:flex;flex-direction:column;align-items:center">
+
+    <!-- cat hero (head only) -->
+    <div style="position:relative;width:200px;height:172px;margin-top:6px;display:flex;align-items:flex-end;justify-content:center">
+
+      <!-- confetti (plays ~3s then stops) -->
+      <sc-if value="{{ showConfetti }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:-6px;left:0;right:0;height:0;pointer-events:none;z-index:6">
+          <span style="position:absolute;left:8%;width:8px;height:13px;background:var(--accent,#F6A623);border-radius:2px;animation:mons-fall 1.4s ease-in 2 forwards"></span>
+          <span style="position:absolute;left:22%;width:7px;height:11px;background:#F39A8B;border-radius:2px;animation:mons-fall 1.5s .3s ease-in 2 forwards"></span>
+          <span style="position:absolute;left:36%;width:9px;height:9px;background:#7FC8A9;border-radius:50%;animation:mons-fall 1.3s .15s ease-in 2 forwards"></span>
+          <span style="position:absolute;left:50%;width:7px;height:12px;background:#BBA7E0;border-radius:2px;animation:mons-fall 1.45s .45s ease-in 2 forwards"></span>
+          <span style="position:absolute;left:64%;width:8px;height:8px;background:var(--accent,#F6A623);border-radius:50%;animation:mons-fall 1.35s .2s ease-in 2 forwards"></span>
+          <span style="position:absolute;left:78%;width:7px;height:13px;background:#F39A8B;border-radius:2px;animation:mons-fall 1.5s .5s ease-in 2 forwards"></span>
+          <span style="position:absolute;left:90%;width:9px;height:9px;background:#7FC8A9;border-radius:50%;animation:mons-fall 1.4s .35s ease-in 2 forwards"></span>
+        </div>
+      </sc-if>
+
+      <div style="position:relative;width:150px;height:162px">{{ mascotFace }}</div>
+    </div>
+
+    <!-- caption (ongoing) -->
+    <sc-if value="{{ isOngoing }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:14px;text-align:center;font-family:'Baloo 2',cursive;font-weight:600;font-size:17px;color:#6B5444;min-height:44px;max-width:290px;line-height:1.3;text-wrap:balance">{{ caption }}</div>
+    </sc-if>
+
+    <!-- NO CHALLENGE: start CTA -->
+    <sc-if value="{{ isNone }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-top:18px;display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px">
+      <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:22px;color:#4F4034">Klar til en udfordring?</div>
+      <div style="margin-top:8px;font-size:15px;font-weight:600;color:#8A7559;line-height:1.45">{{ startSub }}</div>
+      <button onClick="{{ goStart }}" style="margin-top:22px;padding:16px 28px;border-radius:16px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 10px 24px rgba(246,166,35,.34)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 5.5 C5 4.7 5.7 4 6.5 4 H18 C18.5 4 19 4.5 19 5 V19 C19 19.5 18.5 20 18 20 H6.5 C5.7 20 5 19.3 5 18.5 Z" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"></path><path d="M9 8.5 H15 M9 12 H14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"></path></svg>
+        Start en udfordring
+      </button>
+    </div>
+    </sc-if>
+
+    <!-- ONGOING: ring + deadline -->
+    <sc-if value="{{ isOngoing }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%">
+      <div style="position:relative;width:236px;height:236px;margin-top:8px">
+        <svg viewBox="0 0 280 280" style="width:100%;height:100%;transform:rotate(-90deg)">
+          <circle cx="140" cy="140" r="118" fill="none" stroke="#FBE6BD" stroke-width="20"></circle>
+          <sc-if value="{{ isOver }}" hint-placeholder-val="{{ false }}">
+            <circle cx="140" cy="140" r="118" fill="none" stroke="#7FC8A9" stroke-width="20" style="animation:mons-pulse 2.4s ease-in-out infinite"></circle>
+          </sc-if>
+          <circle cx="140" cy="140" r="118" fill="none" stroke-linecap="round" stroke-width="20" stroke-dasharray="{{ ringC }}" stroke-dashoffset="{{ ringOffset }}" style="stroke:var(--accent,#F6A623);transition:stroke-dashoffset .8s cubic-bezier(.34,1.2,.5,1)"></circle>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:58px;line-height:1;color:#4F4034">{{ pct }}<span style="font-size:26px;vertical-align:super">%</span></div>
+          <div style="margin-top:6px;font-weight:700;font-size:15px;color:#A9967E">{{ total }} / {{ goal }} min</div>
+        </div>
+      </div>
+      <sc-if value="{{ showDeadline }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:16px;display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:999px;background:#FBEFDB;color:#C98A2B;font-weight:800;font-size:14px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2.2"></circle><path d="M12 9.5 V13 L14.5 14.5 M9 3.5 H15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></svg>
+          {{ deadlineLabel }}
+        </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- COMPLETED: celebration + stats -->
+    <sc-if value="{{ isCompleted }}" hint-placeholder-val="{{ false }}">
+    <div style="margin-top:16px;display:flex;flex-direction:column;align-items:center;width:100%;max-width:320px">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:999px;background:#E4F1D8;color:#5C8A3F;font-weight:800;font-size:14px">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#5C8A3F"></circle><path d="M7.5 12.5 L10.5 15.5 L16.5 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        Udfordring fuldført
+      </div>
+      <div style="margin-top:14px;font-family:'Baloo 2',cursive;font-weight:800;font-size:24px;color:#4F4034;text-align:center;line-height:1.2">Sådan! I nåede målet</div>
+      <div style="margin-top:6px;font-size:15px;font-weight:600;color:#8A7559;text-align:center;line-height:1.45">{{ doneSub }}</div>
+
+      <div style="margin-top:18px;display:flex;gap:12px;width:100%">
+        <div style="flex:1;background:#fff;border-radius:18px;padding:16px 12px;box-shadow:0 6px 16px rgba(80,55,25,.08);text-align:center">
+          <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:26px;color:var(--accent,#F6A623)">{{ total }}</div>
+          <div style="font-size:12px;font-weight:700;color:#A9967E;margin-top:2px">minutter læst</div>
+        </div>
+        <div style="flex:1;background:#fff;border-radius:18px;padding:16px 12px;box-shadow:0 6px 16px rgba(80,55,25,.08);text-align:center">
+          <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:26px;color:var(--accent,#F6A623)">{{ bookCount }}</div>
+          <div style="font-size:12px;font-weight:700;color:#A9967E;margin-top:2px">{{ bookWord }}</div>
+        </div>
+      </div>
+
+      <button onClick="{{ goNewChallenge }}" style="margin-top:22px;width:100%;padding:16px;border-radius:16px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(246,166,35,.34)">
+        <span style="font-size:22px;line-height:1;margin-top:-2px">+</span> Start en ny udfordring
+      </button>
+    </div>
+    </sc-if>
+
+  </section>
+  </sc-if>
+
+  <!-- ============ LOG SCREEN ============ -->
+  <sc-if value="{{ isLog }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Læselog" style="flex:1 1 auto;overflow-y:auto;padding:6px 22px 24px">
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:20px;color:#4F4034">Læselog</div>
+      <div style="font-weight:700;font-size:14px;color:#A9967E">{{ total }} min i alt</div>
+    </div>
+
+    <sc-if value="{{ formClosed }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ openAdd }}" style="width:100%;padding:14px;border-radius:16px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 18px rgba(246,166,35,.32)">
+        <span style="font-size:22px;line-height:1;margin-top:-2px">+</span> Tilføj læsning
+      </button>
+    </sc-if>
+
+    <sc-if value="{{ formAddOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border-radius:20px;padding:18px;box-shadow:0 10px 28px rgba(80,55,25,.12);animation:mons-sheet .25s ease both">
+        <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;color:#4F4034;margin-bottom:14px">{{ formTitle }}</div>
+
+        <sc-if value="{{ hasRecentBooks }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px">
+            <div style="font-size:13px;font-weight:700;color:#A9967E;margin-bottom:8px">Læser du videre i en bog?</div>
+            <div style="display:flex;gap:9px;overflow-x:auto;padding-bottom:4px;margin:0 -18px;padding-left:18px;padding-right:18px;-webkit-overflow-scrolling:touch">
+              <sc-for list="{{ recentBooks }}" as="book" hint-placeholder-count="0">
+                <button onClick="{{ book.pick }}" style="flex:0 0 auto;max-width:180px;text-align:left;padding:10px 14px;border-radius:14px;border:2px solid {{ book.borderColor }};background:{{ book.bgColor }};display:flex;flex-direction:column;gap:1px">
+                  <span style="font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;color:#4F4034;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:152px">{{ book.title }}</span>
+                  <span style="font-size:11px;font-weight:600;color:#A9967E;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:152px">{{ book.byline }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Titel</label>
+        <input value="{{ form.title }}" onInput="{{ setTitle }}" placeholder="fx Vitello" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none;margin-bottom:12px">
+
+        <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Forfatter</label>
+        <input value="{{ form.author }}" onInput="{{ setAuthor }}" placeholder="fx Kim Fupz Aakeson" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none;margin-bottom:12px">
+
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="flex:1">
+            <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Dato</label>
+            <input type="date" value="{{ form.date }}" onInput="{{ setDate }}" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none">
+          </div>
+          <div style="flex:1">
+            <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Minutter</label>
+            <input type="number" min="1" value="{{ form.minutes }}" onInput="{{ setMinutes }}" placeholder="20" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ closeForm }}" style="flex:0 0 auto;padding:13px 18px;border-radius:13px;background:#F4EADb;color:#8A7559;font-weight:700;font-size:15px">Fortryd</button>
+          <button onClick="{{ saveEntry }}" style="flex:1;padding:13px;border-radius:13px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;opacity:{{ saveOpacity }}">{{ saveLabel }}</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ noEntries }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;padding:48px 20px;color:#BBA98F">
+        <div style="font-size:15px;font-weight:600;line-height:1.5">Ingen læsninger endnu.<br>Tryk på <b style="color:#8A7559">+ Tilføj læsning</b> for at komme i gang!</div>
+      </div>
+    </sc-if>
+
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:11px">
+      <sc-for list="{{ viewEntries }}" as="entry" hint-placeholder-count="0">
+        <sc-if value="{{ entry.editing }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border-radius:20px;padding:18px;box-shadow:0 10px 28px rgba(80,55,25,.12);animation:mons-sheet .25s ease both">
+            <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;color:#4F4034;margin-bottom:14px">Ret læsning</div>
+
+            <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Titel</label>
+            <input value="{{ form.title }}" onInput="{{ setTitle }}" placeholder="fx Vitello" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none;margin-bottom:12px">
+
+            <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Forfatter</label>
+            <input value="{{ form.author }}" onInput="{{ setAuthor }}" placeholder="fx Kim Fupz Aakeson" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none;margin-bottom:12px">
+
+            <div style="display:flex;gap:12px;margin-bottom:16px">
+              <div style="flex:1">
+                <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Dato</label>
+                <input type="date" value="{{ form.date }}" onInput="{{ setDate }}" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none">
+              </div>
+              <div style="flex:1">
+                <label style="display:block;font-size:13px;font-weight:700;color:#A9967E;margin-bottom:5px">Minutter</label>
+                <input type="number" min="1" value="{{ form.minutes }}" onInput="{{ setMinutes }}" placeholder="20" style="width:100%;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:15px;color:#4F4034;outline:none">
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px">
+              <button onClick="{{ closeForm }}" style="flex:0 0 auto;padding:13px 18px;border-radius:13px;background:#F4EADb;color:#8A7559;font-weight:700;font-size:15px">Fortryd</button>
+              <button onClick="{{ saveEntry }}" style="flex:1;padding:13px;border-radius:13px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;opacity:{{ saveOpacity }}">Gem ændringer</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ entry.notEditing }}" hint-placeholder-val="{{ true }}">
+        <div style="background:{{ entry.cardBg }};border-radius:18px;padding:15px 16px;box-shadow:0 6px 16px rgba(80,55,25,.08);transition:background .5s ease">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div style="min-width:0">
+              <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:#4F4034;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ entry.title }}</div>
+              <div style="font-size:13px;color:#A9967E;margin-top:2px">{{ entry.byline }} · {{ entry.dateLabel }}</div>
+            </div>
+            <div style="flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:#FBEFDB;color:#C98A2B;font-weight:800;font-size:14px">{{ entry.minutes }} min</div>
+          </div>
+
+          <sc-if value="{{ entry.confirming }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:12px;display:flex;align-items:center;gap:10px;background:#FCEDEA;border-radius:12px;padding:10px 12px">
+              <span style="flex:1;font-size:13px;font-weight:700;color:#C0584A">Slet denne læsning?</span>
+              <button onClick="{{ entry.doDelete }}" style="padding:7px 14px;border-radius:9px;background:#E06A57;color:#fff;font-weight:700;font-size:13px">Slet</button>
+              <button onClick="{{ cancelDelete }}" style="padding:7px 12px;border-radius:9px;color:#A9967E;font-weight:700;font-size:13px">Behold</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ entry.notConfirming }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:11px;display:flex;align-items:center;gap:8px;border-top:1.5px solid #F4EADb;padding-top:11px">
+              <button onClick="{{ entry.doEdit }}" style="font-size:13px;font-weight:700;color:#8A7559;padding:4px 8px">Ret</button>
+              <button onClick="{{ entry.askDelete }}" style="font-size:13px;font-weight:700;color:#C98074;padding:4px 8px">Slet</button>
+              <sc-if value="{{ entry.flashing }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#5C8A3F;font-weight:800;font-size:13px">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#5C8A3F"></circle><path d="M7.5 12.5 L10.5 15.5 L16.5 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Rettet!
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+        </sc-if>
+      </sc-for>
+    </div>
+
+  </section>
+  </sc-if>
+
+  <!-- ============ SETTINGS SCREEN ============ -->
+  <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Indstillinger" style="flex:1 1 auto;overflow-y:auto;padding:6px 22px 24px">
+
+    <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:20px;color:#4F4034;margin-bottom:14px">Indstillinger</div>
+
+    <!-- lock status bar (only after a challenge is started) -->
+    <sc-if value="{{ challengeStarted }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ locked }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:13px;background:#FBEFDB;border:1.5px solid #F2DEBE;border-radius:18px;padding:15px 16px;margin-bottom:16px">
+        <div style="flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:#F6E2BE;display:flex;align-items:center;justify-content:center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.6" fill="#B5803A"></rect><path d="M7.5 10.5 V8 a4.5 4.5 0 0 1 9 0 V10.5" stroke="#B5803A" stroke-width="2.3" fill="none"></path><circle cx="12" cy="15.3" r="1.7" fill="#FBEFDB"></circle></svg>
+        </div>
+        <div style="flex:1 1 auto;min-width:0">
+          <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:15px;color:#4F4034">Indstillinger er låst</div>
+          <div style="font-size:12px;color:#A9967E;line-height:1.4;margin-top:1px">Bed en voksen om at låse op for at ændre.</div>
+        </div>
+        <button onClick="{{ openUnlock }}" style="flex:0 0 auto;padding:11px 16px;border-radius:12px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px">Lås op</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ unlocked }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:13px;background:#fff;border-radius:18px;padding:15px 16px;margin-bottom:16px;box-shadow:0 6px 16px rgba(80,55,25,.08)">
+        <div style="flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:#E4F1D8;display:flex;align-items:center;justify-content:center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.6" fill="#5C8A3F"></rect><path d="M7.5 10.5 V8 a4.5 4.5 0 0 1 9 0" stroke="#5C8A3F" stroke-width="2.3" fill="none"></path><circle cx="12" cy="15.3" r="1.7" fill="#E4F1D8"></circle></svg>
+        </div>
+        <div style="flex:1 1 auto;min-width:0">
+          <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:15px;color:#4F4034">Indstillinger er åbne</div>
+          <div style="font-size:12px;color:#A9967E;line-height:1.4;margin-top:1px">Lås, så de ikke ændres ved et uheld.</div>
+        </div>
+        <button onClick="{{ doLock }}" style="flex:0 0 auto;padding:11px 16px;border-radius:12px;background:#F2E6D2;color:#8A7559;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px">Lås</button>
+      </div>
+    </sc-if>
+    </sc-if>
+
+    <div style="pointer-events:{{ lockedPE }};opacity:{{ lockedOpacity }};transition:opacity .25s">
+
+    <div style="background:#fff;border-radius:20px;padding:18px;box-shadow:0 6px 16px rgba(80,55,25,.08);margin-bottom:14px">
+      <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:#4F4034">Vælg maskot</div>
+      <div style="font-size:13px;color:#A9967E;margin-top:4px;line-height:1.45">Hvilket dyr skal følge jer på udfordringen?</div>
+
+      <div style="display:flex;gap:12px;margin-top:14px">
+        <button onClick="{{ pickCat }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px 12px;border-radius:16px;border:2.5px solid {{ catBorder }};background:{{ catBg }};transition:border-color .2s,background .2s">
+          <div style="position:relative;width:96px;height:104px">
+            <div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%) scale(.62);transform-origin:bottom center">{{ catPreview }}</div>
+          </div>
+          <span style="font-family:'Baloo 2',cursive;font-weight:700;font-size:15px;color:#4F4034">Kat</span>
+        </button>
+        <button onClick="{{ pickDog }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px 12px;border-radius:16px;border:2.5px solid {{ dogBorder }};background:{{ dogBg }};transition:border-color .2s,background .2s">
+          <div style="position:relative;width:96px;height:104px">
+            <div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%) scale(.62);transform-origin:bottom center">{{ dogPreview }}</div>
+          </div>
+          <span style="font-family:'Baloo 2',cursive;font-weight:700;font-size:15px;color:#4F4034">Hund</span>
+        </button>
+      </div>
+
+      <sc-if value="{{ mascotSaved }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:12px;font-size:13px;font-weight:700;color:#5FA886">✓ Maskot valgt!</div>
+      </sc-if>
+    </div>
+
+    <div style="background:#fff;border-radius:20px;padding:18px;box-shadow:0 6px 16px rgba(80,55,25,.08);margin-bottom:14px">
+      <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:#4F4034">Maskottens navn</div>
+      <div style="font-size:13px;color:#A9967E;margin-top:4px;line-height:1.45">Hvad skal jeres maskot hedde?</div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <input value="{{ nameDraft }}" onInput="{{ setNameDraft }}" placeholder="Max" maxlength="20" style="flex:1;min-width:0;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:16px;font-weight:700;color:#4F4034;outline:none">
+        <button onClick="{{ saveName }}" style="flex:0 0 auto;padding:12px 20px;border-radius:12px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:15px">Gem</button>
+      </div>
+
+      <sc-if value="{{ nameSaved }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:12px;font-size:13px;font-weight:700;color:#5FA886">✓ Navnet er gemt!</div>
+      </sc-if>
+    </div>
+
+    <div style="background:#fff;border-radius:20px;padding:18px;box-shadow:0 6px 16px rgba(80,55,25,.08);margin-bottom:14px">
+      <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:#4F4034">Læsemål</div>
+      <div style="font-size:13px;color:#A9967E;margin-top:4px;line-height:1.45">Hvor mange minutter vil I gerne læse i alt?</div>
+
+      <div style="display:flex;gap:8px;margin:16px 0 14px">
+        <button onClick="{{ presetEasy }}" style="flex:1;padding:11px;border-radius:11px;background:#E4F1D8;color:#5C8A3F;font-weight:800;font-size:15px">300</button>
+        <button onClick="{{ presetMedium }}" style="flex:1;padding:11px;border-radius:11px;background:#FBEAD2;color:#B5803A;font-weight:800;font-size:15px">450</button>
+        <button onClick="{{ presetHard }}" style="flex:1;padding:11px;border-radius:11px;background:#F8DDD3;color:#C45B40;font-weight:800;font-size:15px">600</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="number" min="1" value="{{ goalDraft }}" onInput="{{ setGoalDraft }}" style="flex:1;min-width:0;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:16px;font-weight:700;color:#4F4034;outline:none">
+        <span style="font-weight:700;color:#A9967E;font-size:14px">min</span>
+        <button onClick="{{ saveGoal }}" style="flex:0 0 auto;padding:12px 20px;border-radius:12px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:15px">Gem</button>
+      </div>
+
+      <sc-if value="{{ goalSaved }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:12px;font-size:13px;font-weight:700;color:#5FA886">✓ Målet er gemt!</div>
+      </sc-if>
+    </div>
+
+    <div style="background:#fff;border-radius:20px;padding:18px;box-shadow:0 6px 16px rgba(80,55,25,.08);margin-top:14px">
+      <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;color:#4F4034">Slutdato</div>
+      <div style="font-size:13px;color:#A9967E;margin-top:4px;line-height:1.45">Hvornår skal udfordringen være færdig?</div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <input type="date" value="{{ deadlineDraft }}" onInput="{{ setDeadlineDraft }}" style="flex:1;min-width:0;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:16px;font-weight:700;color:#4F4034;outline:none">
+        <button onClick="{{ saveDeadline }}" style="flex:0 0 auto;padding:12px 20px;border-radius:12px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:15px">Gem</button>
+      </div>
+
+      <sc-if value="{{ deadlineSaved }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:12px;font-size:13px;font-weight:700;color:#5FA886">✓ Slutdato er gemt!</div>
+      </sc-if>
+    </div>
+
+    </div>
+
+    <sc-if value="{{ isNone }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ startChallenge }}" style="width:100%;margin-top:14px;padding:16px;border-radius:16px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(246,166,35,.34)">Start udfordringen</button>
+    </sc-if>
+
+    <div style="text-align:center;font-size:12px;color:#C2B299;margin-top:22px;line-height:1.5">Al fremgang gemmes på denne enhed.</div>
+
+    <!-- parent gate -->
+    <sc-if value="{{ unlockOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;inset:0;background:rgba(60,42,22,.42);display:flex;align-items:center;justify-content:center;padding:24px;z-index:50" onClick="{{ closeUnlock }}">
+        <div onClick="{{ stop }}" style="width:100%;max-width:320px;background:#fff;border-radius:24px;padding:24px;box-shadow:0 18px 50px rgba(60,42,22,.3);text-align:center">
+          <div style="width:54px;height:54px;border-radius:16px;background:#FBEFDB;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.6" fill="#B5803A"></rect><path d="M7.5 10.5 V8 a4.5 4.5 0 0 1 9 0 V10.5" stroke="#B5803A" stroke-width="2.3" fill="none"></path><circle cx="12" cy="15.3" r="1.7" fill="#FBEFDB"></circle></svg>
+          </div>
+          <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:18px;color:#4F4034">Kun for voksne</div>
+          <div style="font-size:13px;color:#A9967E;margin-top:5px;line-height:1.45">Løs regnestykket for at låse op.</div>
+          <div style="font-family:'Baloo 2',cursive;font-weight:800;font-size:30px;color:#4F4034;margin:18px 0 14px">{{ uA }} + {{ uB }} = ?</div>
+          <input type="number" inputmode="numeric" value="{{ unlockInput }}" onInput="{{ setUnlockInput }}" placeholder="?" style="width:120px;text-align:center;padding:12px;border-radius:12px;border:2px solid #F2DEBE;font-size:20px;font-weight:800;color:#4F4034;outline:none">
+          <sc-if value="{{ unlockError }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px;font-size:13px;font-weight:700;color:#C45B40">Prøv igen!</div>
+          </sc-if>
+          <div style="display:flex;gap:10px;margin-top:18px">
+            <button onClick="{{ closeUnlock }}" style="flex:1;padding:13px;border-radius:13px;background:#F2E6D2;color:#8A7559;font-family:'Baloo 2',cursive;font-weight:700;font-size:15px">Annuller</button>
+            <button onClick="{{ submitUnlock }}" style="flex:1;padding:13px;border-radius:13px;background:var(--accent,#F6A623);color:#fff;font-family:'Baloo 2',cursive;font-weight:700;font-size:15px">Lås op</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </section>
+  </sc-if>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav style="flex:0 0 auto;display:flex;background:#fff;border-top:1.5px solid #F2E6D2;padding:9px 14px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(80,55,25,.05)">
+    <button onClick="{{ goProgress }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;color:{{ progColor }};font-weight:700;font-size:12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="2.4"></circle><path d="M12 12 L12 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path><path d="M12 12 L16 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path></svg>
+      Fremgang
+    </button>
+    <button onClick="{{ goLog }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;color:{{ logColor }};font-weight:700;font-size:12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 5.5 C5 4.7 5.7 4 6.5 4 H18 C18.5 4 19 4.5 19 5 V19 C19 19.5 18.5 20 18 20 H6.5 C5.7 20 5 19.3 5 18.5 Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"></path><path d="M9 8.5 H15 M9 12 H14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></svg>
+      Læselog
+    </button>
+    <button onClick="{{ goSettings }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;color:{{ setColor }};font-weight:700;font-size:12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 8 H19 M5 16 H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path><circle cx="9" cy="8" r="2.6" fill="#fff" stroke="currentColor" stroke-width="2.2"></circle><circle cx="15" cy="16" r="2.6" fill="#fff" stroke="currentColor" stroke-width="2.2"></circle></svg>
+      Indstillinger
+    </button>
+  </nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:880},&quot;demoState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Auto&quot;,&quot;options&quot;:[&quot;Auto&quot;,&quot;No challenge&quot;,&quot;Ongoing challenge&quot;,&quot;Challenge completed&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#F6A623&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;catColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#F4A35C&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;startGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1000,&quot;min&quot;:60,&quot;max&quot;:5000,&quot;step&quot;:60,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state = {
+      screen: 'progress',
+      challengeStatus: 'none',
+      entries: [],
+      goal: 1000,
+      name: 'Max',
+      nameDraft: 'Max',
+      nameSaved: false,
+      mascot: 'cat',
+      mascotSaved: false,
+      deadline: '',
+      deadlineDraft: '',
+      deadlineSaved: false,
+      loaded: false,
+      formOpen: false,
+      editId: null,
+      confirmId: null,
+      goalDraft: '1000',
+      goalSaved: false,
+      locked: false,
+      unlockOpen: false,
+      unlockInput: '',
+      unlockError: false,
+      uA: 3, uB: 4,
+      form: { title:'', author:'', date: this._todayISO(), minutes:'' }
+    };
+  }
+
+  _todayISO(){
+    const d = new Date();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${d.getFullYear()}-${m}-${day}`;
+  }
+  _fmtDate(iso){
+    if(!iso) return '';
+    const p = iso.split('-').map(Number);
+    if(p.length<3) return iso;
+    const dt = new Date(p[0], p[1]-1, p[2]);
+    return dt.toLocaleDateString('da-DK', { day:'numeric', month:'short' });
+  }
+
+  componentDidMount(){
+    let entries = [], goal = null, name = null, deadline = '';
+    try {
+      const raw = localStorage.getItem('sommerlaesning.v1.entries');
+      if(raw) entries = JSON.parse(raw) || [];
+      const g = localStorage.getItem('sommerlaesning.v1.goal');
+      if(g != null && g !== '') goal = Number(g);
+      const n = localStorage.getItem('sommerlaesning.v1.name');
+      if(n != null && n.trim() !== '') name = n;
+      const dl = localStorage.getItem('sommerlaesning.v1.deadline');
+      if(dl != null) deadline = dl;
+    } catch(e){}
+    let locked = false;
+    try { locked = localStorage.getItem('sommerlaesning.v1.locked') === '1'; } catch(e){}
+    let mascot = 'cat';
+    try { const ms = localStorage.getItem('sommerlaesning.v1.mascot'); if(ms) mascot = ms; } catch(e){}
+    if(goal == null || !(goal > 0)) goal = Number(this.props.startGoal) > 0 ? Number(this.props.startGoal) : 1000;
+    if(name == null) name = 'Max';
+
+    // challenge status (with migration for existing users)
+    let challengeStatus = null;
+    try { const c = localStorage.getItem('sommerlaesning.v1.challenge'); if(c) challengeStatus = c; } catch(e){}
+    if(challengeStatus == null){
+      challengeStatus = (entries.length > 0 || locked) ? 'ongoing' : 'none';
+      try { localStorage.setItem('sommerlaesning.v1.challenge', challengeStatus); } catch(e){}
+    }
+    // auto-complete if an ongoing challenge already met its goal
+    const total0 = entries.reduce((s,e)=> s + (Number(e.minutes)||0), 0);
+    if(challengeStatus === 'ongoing' && total0 >= goal){
+      challengeStatus = 'completed';
+      try { localStorage.setItem('sommerlaesning.v1.challenge', 'completed'); } catch(e){}
+    }
+
+    this.setState({ entries, goal, name, nameDraft: name, deadline, deadlineDraft: deadline, goalDraft: String(goal), locked, mascot, challengeStatus, loaded: true });
+    this._applyTheme();
+  }
+  componentDidUpdate(){ this._applyTheme(); }
+
+  _applyTheme(){
+    if(!this.rootEl) return;
+    if(this.props.accentColor) this.rootEl.style.setProperty('--accent', this.props.accentColor);
+    if(this.props.catColor) this.rootEl.style.setProperty('--cat', this.props.catColor);
+  }
+
+  _save(entries, goal){
+    try {
+      localStorage.setItem('sommerlaesning.v1.entries', JSON.stringify(entries != null ? entries : this.state.entries));
+      localStorage.setItem('sommerlaesning.v1.goal', String(goal != null ? goal : this.state.goal));
+    } catch(e){}
+  }
+
+  // joy stages: 0 sad | 1 neutral | 2 gentle | 3 big-smile+blush | 4 hat | 5 bowtie | 6 100% | 7 101%+
+  _joy(p){
+    if(p>=101) return 7;
+    if(p>=100) return 6;
+    if(p>=90) return 5;
+    if(p>=75) return 4;
+    if(p>=50) return 3;
+    if(p>=25) return 2;
+    if(p>=10) return 1;
+    return 0;
+  }
+
+  // ===================================================================
+  // PARAMETRIC MASCOT RENDERER (ported from Maskot-forslag.dc.html)
+  // Every drawn face line is an SVG path with uniform weight + round
+  // caps (no border/border-radius line tricks — they taper). Faces are
+  // React.createElement, so they are NOT click-editable in the editor.
+  // Cat color follows the catColor prop; bowtie follows accentColor.
+  // ===================================================================
+  STROKE = 2.6;        // uniform weight for eyes + mouths
+  BROW = 4;            // eyebrows stay heavier
+  _svg(children){
+    return React.createElement('svg', { key:'s'+(this._sk=(this._sk||0)+1), width:150, height:162, style:{position:'absolute',left:0,top:0,overflow:'visible',zIndex:5,pointerEvents:'none'} }, children);
+  }
+  _arc(cx, cy, w, h, color, weight, dir){
+    const x0 = cx - w/2, x1 = cx + w/2;
+    let d;
+    if(dir==='frown')      d = 'M'+x0+' '+cy+' Q'+cx+' '+(cy-h)+' '+x1+' '+cy;
+    else if(dir==='smile') d = 'M'+x0+' '+cy+' Q'+cx+' '+(cy+h)+' '+x1+' '+cy;
+    else                   d = 'M'+x0+' '+cy+' L'+x1+' '+cy;
+    return this._svg(React.createElement('path', { d, fill:'none', stroke:color, strokeWidth:weight, strokeLinecap:'round', strokeLinejoin:'round' }));
+  }
+  _line(cx, cy, len, angleDeg, color, weight){
+    const r = angleDeg*Math.PI/180, dx = Math.cos(r)*len/2, dy = Math.sin(r)*len/2;
+    const d = 'M'+(cx-dx)+' '+(cy-dy)+' L'+(cx+dx)+' '+(cy+dy);
+    return this._svg(React.createElement('path', { d, fill:'none', stroke:color, strokeWidth:weight, strokeLinecap:'round' }));
+  }
+  _eyes(b, stage, a){
+    const o = a.eye, col = o.color, out = [];
+    if(o.disc){
+      const r = o.discR || 21;
+      [o.cx1,o.cx2].forEach(cx=>{
+        out.push(b({position:'absolute',top:(o.cy-r)+'px',left:(cx-r)+'px',width:(r*2)+'px',height:(r*2)+'px',borderRadius:'50%',background:'#fff',border:'3px solid #AE7C45',zIndex:4}));
+      });
+    }
+    const E=[o.cx1,o.cx2], W=this.STROKE;
+    if(stage===0){
+      E.forEach(cx=> out.push(this._arc(cx, o.cy, o.size*2, o.size, col, W, 'smile')));
+    } else if(stage>=5){
+      E.forEach(cx=> out.push(this._arc(cx, o.cy+o.size, o.size*2, o.size, col, W, 'frown')));
+    } else {
+      E.forEach((cx,i)=>{
+        const st={position:'absolute',top:o.cy+'px',left:(cx-o.size/2)+'px',width:o.size+'px',height:(o.size*1.25)+'px',background:col,borderRadius:'50%',zIndex:5};
+        if(o.tilt) st.transform='rotate('+(i===0?o.tilt:-o.tilt)+'deg)';
+        out.push(b(st,[
+          b({position:'absolute',top:'3px',right:'2px',width:'5px',height:'5px',background:'#fff',borderRadius:'50%'})
+        ]));
+      });
+    }
+    if(o.brows && stage>0){
+      const hard = stage>=2;
+      out.push(this._line(o.cx1-4, o.cy-11, 16, hard?-14:-5, '#7A5230', this.BROW));
+      out.push(this._line(o.cx2+4, o.cy-11, 16, hard?14:5, '#7A5230', this.BROW));
+    }
+    return out;
+  }
+  _mouth(b, stage, a){
+    const o=a.mouth, col=o.color, cx=o.cx, cy=o.cy, z=5, W=this.STROKE;
+    if(stage===0) return [this._arc(cx, cy+5, 22, 7, col, W, 'frown')];
+    if(stage===1) return [this._arc(cx, cy+5, 18, 0, col, W, 'flat')];
+    if(stage<=4){
+      const small = stage===2;
+      if(o.twin){
+        const d = small?6:8, w = small?11:16, h = small?5:8;
+        return [this._arc(cx-d, cy, w, h, col, W, 'smile'), this._arc(cx+d, cy, w, h, col, W, 'smile')];
+      }
+      const w = small?18:30, h = small?7:13;
+      const smile = this._arc(cx, cy, w, h, col, W, 'smile');
+      if(o.tongue && stage>=3){
+        return [smile, b({position:'absolute',top:(cy+6)+'px',left:(cx-6)+'px',width:'12px',height:'13px',background:'#F39A8B',borderRadius:'0 0 9px 9px',zIndex:z-1},[
+          b({position:'absolute',top:0,left:'50%',transform:'translateX(-50%)',width:'2px',height:'7px',background:'#E0857A',borderRadius:'2px'})
+        ])];
+      }
+      return [smile];
+    }
+    return [b({position:'absolute',top:(cy-2)+'px',left:(cx-15)+'px',width:'30px',height:'19px',background:'#6B4636',borderRadius:'7px 7px 17px 17px',overflow:'hidden',zIndex:z},[
+      b({position:'absolute',bottom:0,left:'50%',transform:'translateX(-50%)',width:'17px',height:'10px',background:'#F39A8B',borderRadius:'11px 11px 0 0'})
+    ])];
+  }
+  _owlBeak(b, stage){
+    if(stage>=5){
+      return [
+        b({position:'absolute',top:'84px',left:'67px',width:0,height:0,borderLeft:'8px solid transparent',borderRight:'8px solid transparent',borderTop:'12px solid #F2A93C',zIndex:6}),
+        b({position:'absolute',top:'95px',left:'68px',width:'14px',height:'14px',background:'#E8912E',borderRadius:'14% 14% 50% 50% / 14% 14% 90% 90%',overflow:'hidden',zIndex:6},[
+          b({position:'absolute',bottom:0,left:'50%',transform:'translateX(-50%)',width:'9px',height:'6px',background:'#F39A8B',borderRadius:'9px 9px 0 0'})
+        ])
+      ];
+    }
+    return [
+      b({position:'absolute',top:'88px',left:'66px',width:0,height:0,borderLeft:'9px solid transparent',borderRight:'9px solid transparent',borderTop:'19px solid #E8A23C',zIndex:6}),
+      b({position:'absolute',top:'88px',left:'69px',width:0,height:0,borderLeft:'6px solid transparent',borderRight:'6px solid transparent',borderTop:'11px solid #CC7F26',zIndex:6})
+    ];
+  }
+  _blush(b, a){
+    const o=a.blush;
+    return [
+      b({position:'absolute',top:o.cy+'px',left:o.lx+'px',width:'19px',height:'11px',background:'#F6A6A0',borderRadius:'50%',opacity:.8,zIndex:5}),
+      b({position:'absolute',top:o.cy+'px',left:o.rx+'px',width:'19px',height:'11px',background:'#F6A6A0',borderRadius:'50%',opacity:.8,zIndex:5})
+    ];
+  }
+  _bowtieTop(animal){ return {cat:142, dog:134, owl:142, horse:142, fox:142}[animal] ?? 142; }
+  _acc(b, stage, animal){
+    const out=[];
+    const AC = this.props.accentColor || '#F6A623';
+    if(stage>=4 && stage<=6){
+      out.push(b({position:'absolute',top:'-15px',left:'50%',transform:'translateX(-50%) rotate(-8deg)',width:'48px',height:'52px',zIndex:7},[
+        b({position:'absolute',inset:0,clipPath:'polygon(50% 0,100% 100%,0% 100%)',background:'repeating-linear-gradient(125deg,#F39A8B 0 11px,#7FC8A9 11px 22px)'}),
+        b({position:'absolute',top:'-7px',left:'50%',transform:'translateX(-50%)',width:'14px',height:'14px',borderRadius:'50%',background:'#FFCE52'})
+      ]));
+    }
+    if(stage>=7){
+      out.push(b({position:'absolute',top:'6px',left:'50%',transform:'translateX(-50%)',width:'54px',height:'30px',background:'#FFCE52',clipPath:'polygon(0% 100%,0% 32%,21% 60%,50% 0%,79% 60%,100% 32%,100% 100%)',zIndex:7}));
+      out.push(b({position:'absolute',top:'4px',left:'50%',transform:'translateX(-50%)',width:'7px',height:'7px',borderRadius:'50%',background:'#F39A8B',zIndex:8}));
+    }
+    if(stage>=5){
+      out.push(b({position:'absolute',top:this._bowtieTop(animal)+'px',left:'50%',transform:'translateX(-50%)',display:'flex',alignItems:'center',zIndex:6},[
+        b({width:0,height:0,borderTop:'11px solid transparent',borderBottom:'11px solid transparent',borderLeft:'15px solid '+AC}),
+        b({width:'10px',height:'13px',borderRadius:'4px',background:'#D98612',margin:'0 -2px'}),
+        b({width:0,height:0,borderTop:'11px solid transparent',borderBottom:'11px solid transparent',borderRight:'15px solid '+AC})
+      ]));
+    }
+    return out;
+  }
+  _confetti(b){
+    const dots=[['#F6A623',12,4,8,12],['#7FC8A9',132,8,9,0],['#F39A8B',30,-2,7,11],['#BBA7E0',118,0,7,12],['#FFCE52',74,-8,8,8]];
+    return dots.map(d=> b({position:'absolute',left:d[1]+'px',top:d[2]+'px',width:d[3]+'px',height:d[4]+'px',background:d[0],borderRadius: d[4]===d[3]?'50%':'2px',transform:'rotate(18deg)',zIndex:8}));
+  }
+  _anchor(animal){
+    switch(animal){
+      case 'cat':   return {eye:{cx1:54,cx2:96,cy:62,size:15,color:'#4A3A30'}, mouth:{cx:75,cy:108,color:'#6B5444',twin:true}, blush:{cy:86,lx:22,rx:109}};
+      case 'dog':   return {eye:{cx1:53,cx2:97,cy:58,size:18,color:'#3A2E26',brows:true}, mouth:{cx:75,cy:102,color:'#5B4636',tongue:true}, blush:{cy:80,lx:18,rx:113}};
+      case 'owl':   return {eye:{cx1:50,cx2:100,cy:58,size:18,color:'#3A2E26',disc:true,discR:20}, mouth:{cx:75,cy:96,color:'#9A6A3A'}, blush:{cy:96,lx:16,rx:115}};
+      case 'horse': return {eye:{cx1:57,cx2:93,cy:56,size:12,color:'#3A2E26'}, mouth:{cx:75,cy:130,color:'#7A5A3E'}, blush:{cy:102,lx:42,rx:89}};
+      case 'fox':   return {eye:{cx1:54,cx2:96,cy:60,size:12,color:'#2E2620',tilt:12}, mouth:{cx:75,cy:116,color:'#6B5444'}, blush:{cy:88,lx:24,rx:107}};
+    }
+  }
+  _base(b, animal){
+    if(animal==='cat'){
+      const H=(this.props.catColor)||'#F4A35C';
+      return [
+        b({position:'absolute',top:'10.4px',left:'20.7px',width:0,height:0,borderLeft:'21.6px solid transparent',borderRight:'21.6px solid transparent',borderBottom:'45.6px solid '+H,transform:'rotate(-26deg)',zIndex:1}),
+        b({position:'absolute',top:'10.4px',right:'20.7px',width:0,height:0,borderLeft:'21.6px solid transparent',borderRight:'21.6px solid transparent',borderBottom:'45.6px solid '+H,transform:'rotate(26deg)',zIndex:1}),
+        b({position:'absolute',top:'22.4px',left:'30.4px',width:0,height:0,borderLeft:'10.8px solid transparent',borderRight:'10.8px solid transparent',borderBottom:'21.6px solid #F7B7A8',transform:'rotate(-26deg)',zIndex:1}),
+        b({position:'absolute',top:'22.4px',right:'30.4px',width:0,height:0,borderLeft:'10.8px solid transparent',borderRight:'10.8px solid transparent',borderBottom:'21.6px solid #F7B7A8',transform:'rotate(26deg)',zIndex:1}),
+        b({position:'absolute',top:'34px',left:'15px',width:'120px',height:'108px',background:H,borderRadius:'46% 46% 47% 47% / 42% 42% 56% 56%',zIndex:2,boxShadow:'inset 0 -6px 0 rgba(0,0,0,.04)'}),
+        b({position:'absolute',top:'94px',left:'36px',width:'78px',height:'46px',background:'#FFE3C2',borderRadius:'50%',zIndex:3}),
+        b({position:'absolute',top:'92px',left:'66px',width:0,height:0,borderLeft:'9px solid transparent',borderRight:'9px solid transparent',borderTop:'11px solid #E08977',zIndex:5}),
+        b({position:'absolute',top:'102px',left:'74px',width:'2px',height:'8px',background:'#6B5444',borderRadius:'2px',zIndex:5}),
+        b({position:'absolute',top:'98px',left:'6px',width:'28px',height:'2px',background:'#E9C9A6',borderRadius:'2px',transform:'rotate(6deg)',zIndex:4}),
+        b({position:'absolute',top:'106px',left:'8px',width:'26px',height:'2px',background:'#E9C9A6',borderRadius:'2px',transform:'rotate(-4deg)',zIndex:4}),
+        b({position:'absolute',top:'98px',right:'6px',width:'28px',height:'2px',background:'#E9C9A6',borderRadius:'2px',transform:'rotate(-6deg)',zIndex:4}),
+        b({position:'absolute',top:'106px',right:'8px',width:'26px',height:'2px',background:'#E9C9A6',borderRadius:'2px',transform:'rotate(4deg)',zIndex:4})
+      ];
+    }
+    if(animal==='dog'){
+      const H='#D7A05E', EAR='#B5793C';
+      return [
+        b({position:'absolute',top:'42px',left:'2px',width:'40px',height:'72px',background:EAR,borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%',transform:'rotate(12deg)',zIndex:1}),
+        b({position:'absolute',top:'42px',right:'2px',width:'40px',height:'72px',background:EAR,borderRadius:'50% 50% 50% 50% / 40% 40% 60% 60%',transform:'rotate(-12deg)',zIndex:1}),
+        b({position:'absolute',top:'30px',left:'18px',width:'114px',height:'104px',background:H,borderRadius:'48% 48% 47% 47% / 44% 44% 56% 56%',zIndex:2}),
+        b({position:'absolute',top:'40px',left:'26px',width:'40px',height:'40px',background:'rgba(120,80,40,.16)',borderRadius:'50%',zIndex:2}),
+        b({position:'absolute',top:'84px',left:'40px',width:'70px',height:'50px',background:'#F0D3A8',borderRadius:'50%',zIndex:3}),
+        b({position:'absolute',top:'80px',left:'63px',width:'24px',height:'18px',background:'#3A2E26',borderRadius:'50%',zIndex:5},[
+          b({position:'absolute',top:'3px',left:'5px',width:'6px',height:'4px',background:'rgba(255,255,255,.55)',borderRadius:'50%'})
+        ])
+      ];
+    }
+    if(animal==='owl'){
+      const H='#B98A52';
+      return [
+        b({position:'absolute',top:'4px',left:'34px',width:0,height:0,borderLeft:'14px solid transparent',borderRight:'10px solid transparent',borderBottom:'34px solid '+H,transform:'rotate(-22deg)',zIndex:1}),
+        b({position:'absolute',top:'4px',right:'34px',width:0,height:0,borderLeft:'10px solid transparent',borderRight:'14px solid transparent',borderBottom:'34px solid '+H,transform:'rotate(22deg)',zIndex:1}),
+        b({position:'absolute',top:'24px',left:'11px',width:'128px',height:'118px',background:H,borderRadius:'48% 48% 47% 47% / 47% 47% 53% 53%',zIndex:2}),
+        b({position:'absolute',top:'38px',left:'20px',width:'110px',height:'80px',background:'#ECD6AC',border:'2px solid #AC8852',borderRadius:'48% 48% 46% 46% / 44% 44% 56% 56%',zIndex:3})
+      ];
+    }
+    if(animal==='horse'){
+      const H='#C29156', SN='#E0BC8C', MANE='#6E4628';
+      return [
+        b({position:'absolute',top:'8px',left:'42px',width:'20px',height:'40px',background:H,borderRadius:'50% 50% 45% 45% / 62% 62% 38% 38%',transform:'rotate(-16deg)',zIndex:1}),
+        b({position:'absolute',top:'8px',right:'42px',width:'20px',height:'40px',background:H,borderRadius:'50% 50% 45% 45% / 62% 62% 38% 38%',transform:'rotate(16deg)',zIndex:1}),
+        b({position:'absolute',top:'13px',left:'47px',width:'9px',height:'24px',background:'#E7C79B',borderRadius:'50%',transform:'rotate(-16deg)',zIndex:2}),
+        b({position:'absolute',top:'13px',right:'47px',width:'9px',height:'24px',background:'#E7C79B',borderRadius:'50%',transform:'rotate(16deg)',zIndex:2}),
+        b({position:'absolute',top:'30px',left:'38px',width:'18px',height:'40px',background:MANE,borderRadius:'60% 40% 50% 50%',transform:'rotate(-12deg)',zIndex:1}),
+        b({position:'absolute',top:'30px',right:'38px',width:'18px',height:'40px',background:MANE,borderRadius:'40% 60% 50% 50%',transform:'rotate(12deg)',zIndex:1}),
+        b({position:'absolute',top:'30px',left:'47px',width:'56px',height:'104px',background:H,borderRadius:'46% 46% 44% 44% / 34% 34% 66% 66%',zIndex:2}),
+        b({position:'absolute',top:'106px',left:'43px',width:'64px',height:'44px',background:SN,borderRadius:'46% 46% 48% 48% / 36% 36% 64% 64%',zIndex:3}),
+        b({position:'absolute',top:'20px',left:'62px',width:'26px',height:'30px',background:MANE,borderRadius:'50% 50% 60% 40% / 50% 50% 60% 40%',transform:'rotate(4deg)',zIndex:4}),
+        b({position:'absolute',top:'44px',left:'69px',width:'12px',height:'80px',background:'#F3E7D0',borderRadius:'8px',zIndex:4}),
+        b({position:'absolute',top:'126px',left:'55px',width:'9px',height:'12px',background:'#9A7142',borderRadius:'50%',zIndex:5}),
+        b({position:'absolute',top:'126px',right:'55px',width:'9px',height:'12px',background:'#9A7142',borderRadius:'50%',zIndex:5})
+      ];
+    }
+    const H='#E8915A', CH='#FBEFDD';
+    return [
+      b({position:'absolute',top:'2px',left:'20px',width:0,height:0,borderLeft:'17px solid transparent',borderRight:'13px solid transparent',borderBottom:'54px solid '+H,transform:'rotate(-12deg)',zIndex:1}),
+      b({position:'absolute',top:'2px',right:'20px',width:0,height:0,borderLeft:'13px solid transparent',borderRight:'17px solid transparent',borderBottom:'54px solid '+H,transform:'rotate(12deg)',zIndex:1}),
+      b({position:'absolute',top:'4px',left:'26px',width:0,height:0,borderLeft:'9px solid transparent',borderRight:'7px solid transparent',borderBottom:'26px solid #2E2620',transform:'rotate(-12deg)',zIndex:2}),
+      b({position:'absolute',top:'4px',right:'26px',width:0,height:0,borderLeft:'7px solid transparent',borderRight:'9px solid transparent',borderBottom:'26px solid #2E2620',transform:'rotate(12deg)',zIndex:2}),
+      b({position:'absolute',top:'38px',left:'25px',width:'100px',height:'88px',background:H,borderRadius:'48% 48% 50% 50% / 40% 40% 76% 76%',zIndex:2}),
+      b({position:'absolute',top:'82px',left:'10px',width:0,height:0,borderTop:'9px solid transparent',borderBottom:'9px solid transparent',borderRight:'20px solid '+H,transform:'rotate(-18deg)',zIndex:1}),
+      b({position:'absolute',top:'82px',right:'10px',width:0,height:0,borderTop:'9px solid transparent',borderBottom:'9px solid transparent',borderLeft:'20px solid '+H,transform:'rotate(18deg)',zIndex:1}),
+      b({position:'absolute',top:'62px',left:'40px',width:'70px',height:'82px',background:CH,borderRadius:'50% 50% 50% 50% / 34% 34% 92% 92%',zIndex:3}),
+      b({position:'absolute',top:'44px',left:'66px',width:'18px',height:'26px',background:CH,borderRadius:'50% 50% 0 0',zIndex:3}),
+      b({position:'absolute',top:'104px',left:'68px',width:0,height:0,borderLeft:'7px solid transparent',borderRight:'7px solid transparent',borderTop:'10px solid #3A2E26',zIndex:5})
+    ];
+  }
+  _faceEl(animal, stage, opts){
+    opts = opts || {};
+    const withConfetti = opts.confetti !== false;
+    const withBob = opts.bob !== false;
+    const C = React.createElement;
+    let k = 0;
+    const b = (style, kids) => C('div', { key:'k'+(k++), style }, kids);
+    const a = this._anchor(animal);
+    const parts = this._base(b, animal);
+    if(stage>=3) parts.push(...this._blush(b, a));
+    parts.push(...this._eyes(b, stage, a));
+    parts.push(...(animal==='owl' ? this._owlBeak(b, stage) : this._mouth(b, stage, a)));
+    parts.push(...this._acc(b, stage, animal));
+    if(withConfetti && stage>=6) parts.push(...this._confetti(b));
+    const innerStyle = { position:'absolute', inset:0 };
+    if(withBob) innerStyle.animation = 'mons-bob 3.4s ease-in-out infinite';
+    const inner = C('div', { key:'inner', style:innerStyle }, parts);
+    return C('div', { key:animal+stage, style:{position:'relative',width:'150px',height:'162px'} }, [inner]);
+  }
+
+  renderVals(){
+    const { entries, goal, screen, form } = this.state;
+    const nm = (this.state.name && this.state.name.trim()) || 'Max';
+    const safeGoal = goal > 0 ? goal : 1000;
+    const total = entries.reduce((s,e)=> s + (Number(e.minutes)||0), 0);
+    const pct = Math.round(total / safeGoal * 100);
+
+    // effective challenge status (demoState tweak overrides the real state)
+    const demo = this.props.demoState || 'Auto';
+    let status = this.state.challengeStatus || 'none';
+    if(demo === 'No challenge') status = 'none';
+    else if(demo === 'Ongoing challenge') status = 'ongoing';
+    else if(demo === 'Challenge completed') status = 'completed';
+    const challengeStarted = status !== 'none';
+
+    // mascot joy: gloomy when no challenge, crown when completed, else progress-driven
+    let joy;
+    if(status === 'none') joy = 0;
+    else if(status === 'completed') joy = 7;
+    else joy = this._joy(pct);
+
+    const effLocked = challengeStarted && this.state.locked;
+
+    const captions = [
+      nm + ' keder sig lidt... skal vi læse en bog?',
+      nm + ' er vågnet – kom i gang med at læse!',
+      'Godt begyndt! ' + nm + ' begynder at smile.',
+      'Det går rigtig godt – bliv ved!',
+      'Wow! ' + nm + ' har taget festhat på.',
+      'Så fin! ' + nm + ' har fået butterfly på.',
+      'Du gjorde det – 100%! ' + nm + ' jubler!',
+      'FEST! Du er en ægte superlæser!'
+    ];
+
+    const R = 118;
+    const C = 2 * Math.PI * R;
+    const ringOffset = C * (1 - Math.min(pct, 100) / 100);
+
+    const sorted = [...entries].sort((a,b)=>{
+      const d = (b.date||'').localeCompare(a.date||'');
+      if(d !== 0) return d;
+      return (b.created||0) - (a.created||0);
+    });
+    const viewEntries = sorted.map(e => ({
+      ...e,
+      byline: e.author ? ('af ' + e.author) : 'Ukendt forfatter',
+      dateLabel: this._fmtDate(e.date),
+      confirming: e.id === this.state.confirmId,
+      notConfirming: e.id !== this.state.confirmId,
+      editing: e.id === this.state.editId,
+      notEditing: e.id !== this.state.editId,
+      flashing: e.id === this.state.flashId,
+      cardBg: e.id === this.state.flashId ? '#E4F1D8' : '#fff',
+      doEdit: () => this._openEdit(e),
+      askDelete: () => this.setState({ confirmId: e.id }),
+      doDelete: () => this._delete(e.id)
+    }));
+
+    const valid = String(form.title).trim().length > 0 && Number(form.minutes) > 0;
+
+    // unique previously-read books (newest first), for the quick-pick row
+    const seenBooks = new Set();
+    const recentBooks = [];
+    const curKey = String(form.title).trim().toLowerCase() + '|' + String(form.author).trim().toLowerCase();
+    for(const e of sorted){
+      const t = (e.title||'').trim();
+      if(!t) continue;
+      const a = (e.author||'').trim();
+      const key = t.toLowerCase() + '|' + a.toLowerCase();
+      if(seenBooks.has(key)) continue;
+      seenBooks.add(key);
+      const active = key === curKey;
+      recentBooks.push({
+        id: key,
+        title: t,
+        byline: a || 'Ukendt forfatter',
+        bgColor: active ? '#FBEFDB' : '#FFFBF3',
+        borderColor: active ? 'var(--accent,#F6A623)' : '#F2DEBE',
+        pick: () => this.setState(s => ({ form: { ...s.form, title: t, author: a } }))
+      });
+      if(recentBooks.length >= 8) break;
+    }
+
+    // distinct books read (for the completion stats)
+    const allBookKeys = new Set();
+    for(const e of entries){
+      const t = (e.title||'').trim();
+      if(t) allBookKeys.add(t.toLowerCase() + '|' + (e.author||'').trim().toLowerCase());
+    }
+    const bookCount = allBookKeys.size;
+
+    // deadline countdown
+    let showDeadline = false, deadlineLabel = '';
+    if(this.state.deadline){
+      const p = this.state.deadline.split('-').map(Number);
+      if(p.length === 3){
+        const end = new Date(p[0], p[1]-1, p[2]);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const days = Math.round((end - today) / 86400000);
+        showDeadline = status === 'ongoing';
+        if(days > 1) deadlineLabel = days + ' dage tilbage';
+        else if(days === 1) deadlineLabel = '1 dag tilbage';
+        else if(days === 0) deadlineLabel = 'Sidste dag!';
+        else deadlineLabel = 'Tiden er udløbet';
+      }
+    }
+
+    return {
+      setRoot: (el) => { this.rootEl = el; this._applyTheme(); },
+
+      isProgress: screen === 'progress',
+      isLog: screen === 'log',
+      isSettings: screen === 'settings',
+      goProgress: () => this.setState({ screen:'progress' }),
+      goLog: () => this.setState({ screen:'log' }),
+      goSettings: () => this.setState({ screen:'settings', goalDraft:String(safeGoal), goalSaved:false, nameDraft:nm, nameSaved:false, deadlineDraft:this.state.deadline }),
+      progColor: screen === 'progress' ? 'var(--accent,#F6A623)' : '#C9B79C',
+      logColor: screen === 'log' ? 'var(--accent,#F6A623)' : '#C9B79C',
+      setColor: screen === 'settings' ? 'var(--accent,#F6A623)' : '#C9B79C',
+
+      pct, total, goal: safeGoal,
+      ringC: C, ringOffset,
+      isOver: pct >= 100,
+      caption: captions[joy],
+      showDeadline, deadlineLabel,
+
+      // challenge status views
+      isNone: status === 'none',
+      isOngoing: status === 'ongoing',
+      isCompleted: status === 'completed',
+      challengeStarted,
+      startSub: nm + ' keder sig lidt. Sæt et mål og kom i gang!',
+      doneSub: 'Du læste dig helt i mål – ' + nm + ' er superstolt!',
+      bookCount,
+      bookWord: bookCount === 1 ? 'bog læst' : 'bøger læst',
+      goStart: () => this.setState({ screen:'settings', goalDraft:String(safeGoal), goalSaved:false, nameDraft:nm, nameSaved:false, deadlineDraft:this.state.deadline }),
+      goNewChallenge: () => this._newChallenge(),
+      startChallenge: () => this._startChallenge(),
+
+      sadEyes: joy === 0,
+      openEyes: joy >= 1 && joy <= 5,
+      happyEyes: joy >= 6,
+      moodFrown: joy === 0,
+      moodNeutral: joy === 1,
+      moodSmallSmile: joy === 2,
+      moodBigSmile: joy >= 3 && joy <= 5,
+      moodOpen: joy >= 6,
+      showBlush: joy >= 3,
+      showHat: joy >= 4 && joy <= 6,
+      showBowtie: joy >= 5,
+      showCrown: joy >= 7,
+      showConfetti: joy >= 6,
+
+      formOpen: this.state.formOpen,
+      formAddOpen: this.state.formOpen && !this.state.editId,
+      formClosed: !this.state.formOpen,
+      formTitle: this.state.editId ? 'Ret læsning' : 'Ny læsning',
+      saveLabel: this.state.editId ? 'Gem ændringer' : 'Gem læsning',
+      saveOpacity: valid ? 1 : 0.5,
+      form,
+      openAdd: () => this.setState({ formOpen:true, editId:null, form:{ title:'', author:'', date:this._todayISO(), minutes:'' } }),
+      closeForm: () => this.setState({ formOpen:false, editId:null }),
+      setTitle: (e) => this.setState(s => ({ form:{ ...s.form, title:e.target.value } })),
+      setAuthor: (e) => this.setState(s => ({ form:{ ...s.form, author:e.target.value } })),
+      setDate: (e) => this.setState(s => ({ form:{ ...s.form, date:e.target.value } })),
+      setMinutes: (e) => this.setState(s => ({ form:{ ...s.form, minutes:e.target.value } })),
+      saveEntry: () => this._saveEntry(),
+
+      recentBooks,
+      hasRecentBooks: recentBooks.length > 0,
+
+      viewEntries,
+      noEntries: entries.length === 0 && !this.state.formOpen,
+      cancelDelete: () => this.setState({ confirmId:null }),
+
+      goalDraft: this.state.goalDraft,
+      goalSaved: this.state.goalSaved,
+      setGoalDraft: (e) => this.setState({ goalDraft: e.target.value, goalSaved:false }),
+      deadlineDraft: this.state.deadlineDraft,
+      deadlineSaved: this.state.deadlineSaved,
+      setDeadlineDraft: (e) => this.setState({ deadlineDraft: e.target.value, deadlineSaved:false }),
+      saveDeadline: () => this._saveDeadline(),
+      presetEasy: () => this.setState({ goalDraft:'300', goalSaved:false }),
+      presetMedium: () => this.setState({ goalDraft:'450', goalSaved:false }),
+      presetHard: () => this.setState({ goalDraft:'600', goalSaved:false }),
+      saveGoal: () => this._saveGoal(),
+
+      // mascot (parametric face + picker)
+      mascotFace: this._faceEl(this.state.mascot, joy, { confetti:false }),
+      catPreview: this._faceEl('cat', 3, { confetti:false, bob:false }),
+      dogPreview: this._faceEl('dog', 3, { confetti:false, bob:false }),
+      mascot: this.state.mascot,
+      mascotSaved: this.state.mascotSaved,
+      pickCat: () => this._pickMascot('cat'),
+      pickDog: () => this._pickMascot('dog'),
+      catBorder: this.state.mascot === 'cat' ? 'var(--accent,#F6A623)' : '#F2DEBE',
+      dogBorder: this.state.mascot === 'dog' ? 'var(--accent,#F6A623)' : '#F2DEBE',
+      catBg: this.state.mascot === 'cat' ? '#FBEFDB' : '#FFFBF3',
+      dogBg: this.state.mascot === 'dog' ? '#FBEFDB' : '#FFFBF3',
+
+      catName: nm,
+      nameDraft: this.state.nameDraft,
+      nameSaved: this.state.nameSaved,
+      setNameDraft: (e) => this.setState({ nameDraft: e.target.value, nameSaved:false }),
+      saveName: () => this._saveName(),
+
+      locked: effLocked,
+      unlocked: challengeStarted && !effLocked,
+      lockedPE: effLocked ? 'none' : 'auto',
+      lockedOpacity: effLocked ? 0.5 : 1,
+      doLock: () => this._lock(),
+      openUnlock: () => this._openUnlock(),
+      closeUnlock: () => this.setState({ unlockOpen:false }),
+      submitUnlock: () => this._submitUnlock(),
+      setUnlockInput: (e) => this.setState({ unlockInput: e.target.value, unlockError:false }),
+      unlockOpen: this.state.unlockOpen,
+      unlockInput: this.state.unlockInput,
+      unlockError: this.state.unlockError,
+      uA: this.state.uA, uB: this.state.uB,
+      stop: (e) => e.stopPropagation()
+    };
+  }
+
+  _startChallenge(){
+    // commit whatever is in the settings drafts, then start + auto-lock
+    const g = Math.max(1, Math.round(Number(this.state.goalDraft) || this.state.goal || 1000));
+    const n = (this.state.nameDraft || '').trim() || 'Max';
+    const dl = this.state.deadlineDraft || '';
+    this.setState({
+      goal:g, goalDraft:String(g), name:n, nameDraft:n, deadline:dl, deadlineDraft:dl,
+      challengeStatus:'ongoing', locked:true, screen:'progress'
+    });
+    try {
+      localStorage.setItem('sommerlaesning.v1.goal', String(g));
+      localStorage.setItem('sommerlaesning.v1.name', n);
+      localStorage.setItem('sommerlaesning.v1.deadline', dl);
+      localStorage.setItem('sommerlaesning.v1.challenge', 'ongoing');
+      localStorage.setItem('sommerlaesning.v1.locked', '1');
+    } catch(e){}
+  }
+
+  _newChallenge(){
+    // back to setup so a new goal/deadline can be configured, then started again
+    this.setState({
+      challengeStatus:'none', locked:false, screen:'settings',
+      goalDraft:String(this.state.goal), nameDraft:this.state.name, deadlineDraft:this.state.deadline,
+      goalSaved:false, nameSaved:false, deadlineSaved:false
+    });
+    try {
+      localStorage.setItem('sommerlaesning.v1.challenge', 'none');
+      localStorage.setItem('sommerlaesning.v1.locked', '0');
+    } catch(e){}
+  }
+
+  _lock(){
+    this.setState({ locked:true, unlockOpen:false });
+    try { localStorage.setItem('sommerlaesning.v1.locked', '1'); } catch(e){}
+  }
+  _openUnlock(){
+    const uA = 2 + Math.floor(Math.random()*8);
+    const uB = 2 + Math.floor(Math.random()*8);
+    this.setState({ unlockOpen:true, unlockInput:'', unlockError:false, uA, uB });
+  }
+  _submitUnlock(){
+    if(Number(this.state.unlockInput) === this.state.uA + this.state.uB){
+      this.setState({ locked:false, unlockOpen:false, unlockInput:'', unlockError:false });
+      try { localStorage.setItem('sommerlaesning.v1.locked', '0'); } catch(e){}
+    } else {
+      const uA = 2 + Math.floor(Math.random()*8);
+      const uB = 2 + Math.floor(Math.random()*8);
+      this.setState({ unlockError:true, unlockInput:'', uA, uB });
+    }
+  }
+
+  _pickMascot(m){
+    this.setState({ mascot:m, mascotSaved:true });
+    try { localStorage.setItem('sommerlaesning.v1.mascot', m); } catch(e){}
+    clearTimeout(this._mt);
+    this._mt = setTimeout(()=> this.setState({ mascotSaved:false }), 2200);
+  }
+
+  _saveName(){
+    const n = (this.state.nameDraft || '').trim() || 'Max';
+    this.setState({ name:n, nameDraft:n, nameSaved:true });
+    try { localStorage.setItem('sommerlaesning.v1.name', n); } catch(e){}
+    clearTimeout(this._nt);
+    this._nt = setTimeout(()=> this.setState({ nameSaved:false }), 2200);
+  }
+
+  _saveGoal(){
+    const g = Math.max(1, Math.round(Number(this.state.goalDraft)||0));
+    this.setState({ goal:g, goalDraft:String(g), goalSaved:true });
+    this._save(null, g);
+    clearTimeout(this._gt);
+    this._gt = setTimeout(()=> this.setState({ goalSaved:false }), 2200);
+  }
+
+  _saveDeadline(){
+    const dl = this.state.deadlineDraft || '';
+    this.setState({ deadline:dl, deadlineSaved:true });
+    try { localStorage.setItem('sommerlaesning.v1.deadline', dl); } catch(e){}
+    clearTimeout(this._dt);
+    this._dt = setTimeout(()=> this.setState({ deadlineSaved:false }), 2200);
+  }
+
+  _openEdit(e){
+    this.setState({
+      formOpen:true, editId:e.id, confirmId:null,
+      form:{ title:e.title||'', author:e.author||'', date:e.date||this._todayISO(), minutes:String(e.minutes||'') }
+    });
+  }
+
+  _saveEntry(){
+    const f = this.state.form;
+    if(!String(f.title).trim() || !(Number(f.minutes) > 0)) return;
+    let entries;
+    if(this.state.editId){
+      entries = this.state.entries.map(e => e.id === this.state.editId
+        ? { ...e, title:f.title.trim(), author:f.author.trim(), date:f.date, minutes:Math.round(Number(f.minutes)) }
+        : e);
+    } else {
+      const item = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+        created: Date.now(),
+        title: f.title.trim(), author: f.author.trim(),
+        date: f.date || this._todayISO(), minutes: Math.round(Number(f.minutes))
+      };
+      entries = [item, ...this.state.entries];
+    }
+    const editedId = this.state.editId;
+    // auto-complete an ongoing challenge once its goal is reached
+    const newTotal = entries.reduce((s,e)=> s + (Number(e.minutes)||0), 0);
+    const completing = this.state.challengeStatus === 'ongoing' && newTotal >= (this.state.goal > 0 ? this.state.goal : 1000);
+    const patch = { entries, formOpen:false, editId:null, flashId: editedId || null };
+    if(completing){
+      patch.challengeStatus = 'completed';
+      patch.screen = 'progress';
+      try { localStorage.setItem('sommerlaesning.v1.challenge', 'completed'); } catch(e){}
+    }
+    this.setState(patch);
+    this._save(entries, null);
+    if(editedId){
+      clearTimeout(this._ft);
+      this._ft = setTimeout(()=> this.setState({ flashId:null }), 1500);
+    }
+  }
+
+  _delete(id){
+    const entries = this.state.entries.filter(e => e.id !== id);
+    this.setState({ entries, confirmId:null });
+    this._save(entries, null);
+  }
+}
+</script>
+</body>
+</html>
