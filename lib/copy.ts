@@ -19,6 +19,12 @@ import da from "@/copy/da.json";
 export const LOCALE = "da";
 
 /**
+ * Locale tag for date formatting (part of the locale config). A future
+ * copy/en.json locale would set its own, e.g. "en-GB".
+ */
+export const DATE_LOCALE = "da-DK";
+
+/**
  * Locale → dictionary map. Adding a locale = add one import + one entry here.
  * Typed against `da` so every future locale is structurally checked at compile time.
  */

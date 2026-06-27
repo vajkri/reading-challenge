@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Nunito } from "next/font/google";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { copy, LOCALE } from "@/lib/copy";
 import "./globals.css";
 
 // Display font — used for headings/branding (maps to --font-display token).
@@ -18,9 +19,9 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Læseudfordring",
-  description: "En læseudfordring der motiverer børn til at læse.",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "Læseudfordring" },
+  title: copy.app.name,
+  description: copy.app.description,
+  appleWebApp: { capable: true, statusBarStyle: "default", title: copy.app.name },
 };
 
 export const viewport: Viewport = {
@@ -32,7 +33,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="da"
+      lang={LOCALE}
       className={`${baloo.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full">

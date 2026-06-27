@@ -28,7 +28,7 @@ export default function LogScreen() {
           marginBottom: 14,
         }}
       >
-        <div
+        <h2
           style={{
             fontFamily: "var(--font-display)",
             fontWeight: 700,
@@ -37,7 +37,7 @@ export default function LogScreen() {
           }}
         >
           {copy.log.title}
-        </div>
+        </h2>
         <div style={{ fontWeight: 700, fontSize: 14, color: "var(--color-ink-3)" }}>
           {derived.total} {copy.log.totalSuffix}
         </div>

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BASE_PATH } from "@/lib/config";
+import { copy, LOCALE } from "@/lib/copy";
 
 // Next emits a static /manifest.webmanifest and auto-injects
 // <link rel="manifest" href="${basePath}/manifest.webmanifest">. The icon `src`
@@ -8,16 +9,16 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Læseudfordring",
-    short_name: "Læseudfordring",
-    description: "En læseudfordring der motiverer børn til at læse.",
+    name: copy.app.name,
+    short_name: copy.app.name,
+    description: copy.app.description,
     start_url: `${BASE_PATH}/`,
     scope: `${BASE_PATH}/`,
     display: "standalone",
     orientation: "portrait",
     background_color: "#FFF6E9",
     theme_color: "#F6A623",
-    lang: "da",
+    lang: LOCALE,
     icons: [
       { src: `${BASE_PATH}/icons/icon-192.png`, sizes: "192x192", type: "image/png", purpose: "any" },
       { src: `${BASE_PATH}/icons/icon-512.png`, sizes: "512x512", type: "image/png", purpose: "any" },

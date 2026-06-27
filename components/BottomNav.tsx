@@ -34,8 +34,8 @@ function Tab({
 }
 
 const iconProps = {
-  width: 26,
-  height: 26,
+  width: 24,
+  height: 24,
   viewBox: "0 0 24 24",
   fill: "none",
   stroke: "currentColor",
@@ -52,27 +52,26 @@ export default function BottomNav() {
   return (
     <nav
       className="sticky bottom-0 z-20 flex bg-white"
-      style={{ borderTop: "1px solid #F0E2CC", paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{ borderTop: "1.5px solid #F2E6D2", paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <Tab active={s === "progress"} label={copy.nav.progress} onClick={actions.goProgress}>
-        <svg {...iconProps}>
-          <circle cx="12" cy="12" r="9" opacity="0.3" />
-          <path d="M12 3a9 9 0 0 1 8.5 6.1" />
-          <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+        <svg {...iconProps} strokeWidth={2.4}>
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 12 L12 7" />
+          <path d="M12 12 L16 14" />
         </svg>
       </Tab>
       <Tab active={s === "log"} label={copy.nav.log} onClick={actions.goLog}>
         <svg {...iconProps}>
-          <path d="M4 5.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-1.8H4z" />
-          <path d="M20 5.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-1.8h6z" />
+          <path d="M5 5.5 C5 4.7 5.7 4 6.5 4 H18 C18.5 4 19 4.5 19 5 V19 C19 19.5 18.5 20 18 20 H6.5 C5.7 20 5 19.3 5 18.5 Z" />
+          <path d="M9 8.5 H15 M9 12 H14" />
         </svg>
       </Tab>
       <Tab active={s === "settings"} label={copy.nav.settings} onClick={actions.goSettings}>
         <svg {...iconProps}>
-          <line x1="4" y1="8" x2="20" y2="8" />
-          <line x1="4" y1="16" x2="20" y2="16" />
-          <circle cx="9" cy="8" r="2.6" fill="white" />
-          <circle cx="15" cy="16" r="2.6" fill="white" />
+          <path d="M5 8 H19 M5 16 H19" />
+          <circle cx="9" cy="8" r="2.6" fill="none" />
+          <circle cx="15" cy="16" r="2.6" fill="none" />
         </svg>
       </Tab>
     </nav>

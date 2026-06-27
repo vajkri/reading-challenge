@@ -59,6 +59,21 @@
 }
 
 /* ---------------------------------------------------------------------------
+   REDUCED MOTION
+   Neutralizes looping/entrance animations (mons-bob, mons-fall, mons-pulse,
+   mons-sheet) and transitions for users who prefer reduced motion.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    RESET / BASE
 --------------------------------------------------------------------------- */
 * {

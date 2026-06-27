@@ -5,6 +5,7 @@
 // state.unlockOpen. Backdrop click closes; the inner card stops propagation
 // and uses the `mons-sheet` entrance animation.
 
+import { useEffect, useRef } from "react";
 import { useApp } from "@/lib/store";
 import { copy } from "@/lib/copy";
 
@@ -20,8 +21,62 @@ function ClosedPadlock({ size = 26 }: { size?: number }) {
 }
 
 export default function UnlockModal() {
-  const { state, actions } = useApp();
+  const { state } = useApp();
+  // Mount the dialog only while open so its focus-management effects run on
+  // open and clean up on close/unmount.
   if (!state.unlockOpen) return null;
+  return <UnlockDialog />;
+}
+
+function UnlockDialog() {
+  const { state, actions } = useApp();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Element focused before the modal opened, to restore on close.
+  const openerRef = useRef<Element | null>(null);
+
+  // Capture the opener, focus the input on mount, restore focus on unmount.
+  useEffect(() => {
+    openerRef.current = document.activeElement;
+    inputRef.current?.focus();
+    return () => {
+      const opener = openerRef.current;
+      if (opener instanceof HTMLElement && opener.isConnected) {
+        opener.focus();
+      }
+    };
+  }, []);
+
+  // Escape closes; Tab / Shift+Tab cycle focus within the dialog.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        actions.closeUnlock();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusable = dialog.querySelectorAll<HTMLElement>(
+        'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey) {
+        if (active === first || !dialog.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !dialog.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [actions]);
 
   return (
     <div
@@ -38,6 +93,7 @@ export default function UnlockModal() {
       }}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={copy.settings.unlock.heading}
@@ -90,6 +146,7 @@ export default function UnlockModal() {
         </div>
 
         <input
+          ref={inputRef}
           type="number"
           inputMode="numeric"
           value={state.unlockInput}
@@ -99,7 +156,6 @@ export default function UnlockModal() {
           }}
           placeholder={copy.settings.unlock.placeholder}
           aria-label={`${state.uA} + ${state.uB}`}
-          autoFocus
           style={{
             width: 120,
             textAlign: "center",

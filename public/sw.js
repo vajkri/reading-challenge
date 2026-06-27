@@ -8,9 +8,16 @@
 // BASE is hardcoded to match next.config.ts `basePath`. This file lives in
 // public/ and is NOT processed by the bundler, so it cannot read env vars.
 const BASE = "/reading-challenge";
-const CACHE = "laeseudfordring-v1";
+
+// BUILD_ID and PRECACHE_ASSETS are rewritten in the BUILT out/sw.js by the
+// postbuild script scripts/inject-sw-assets.mjs. The defaults below keep the
+// dev copy (public/sw.js) valid and runnable on their own.
+const BUILD_ID = "dev";
+const PRECACHE_ASSETS = [];
+
+const CACHE = `laeseudfordring-${BUILD_ID}`;
 const APP_SHELL = `${BASE}/`;
-const PRECACHE = [APP_SHELL, `${BASE}/manifest.webmanifest`];
+const PRECACHE = [APP_SHELL, `${BASE}/manifest.webmanifest`, ...PRECACHE_ASSETS];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -44,8 +51,10 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(request)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(request, copy));
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(request, copy));
+          }
           return res;
         })
         .catch(() => caches.match(request).then((c) => c || caches.match(APP_SHELL))),
@@ -59,8 +68,10 @@ self.addEventListener("fetch", (event) => {
       (cached) =>
         cached ||
         fetch(request).then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(request, copy));
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(request, copy));
+          }
           return res;
         }),
     ),

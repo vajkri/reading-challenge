@@ -157,12 +157,10 @@ function MascotTile({
 function PresetChip({
   value,
   tier,
-  selected,
   onClick,
 }: {
   value: string;
   tier: "easy" | "med" | "hard";
-  selected: boolean;
   onClick: () => void;
 }) {
   const bg = tier === "easy" ? "bg-easy-bg" : tier === "med" ? "bg-med-bg" : "bg-hard-bg";
@@ -171,7 +169,6 @@ function PresetChip({
     <button
       type="button"
       onClick={onClick}
-      aria-pressed={selected}
       className={`${bg} ${fg} ${FOCUS_RING}`}
       style={{
         flex: 1,
@@ -179,9 +176,6 @@ function PresetChip({
         borderRadius: 11,
         fontWeight: 800,
         fontSize: 15,
-        border: selected ? "2px solid currentColor" : "2px solid transparent",
-        boxShadow: selected ? "0 2px 8px rgba(80,55,25,.12)" : "none",
-        transition: "border-color .15s, box-shadow .15s",
       }}
     >
       {value}
@@ -201,7 +195,7 @@ export default function SettingsScreen() {
       data-screen-label="Indstillinger"
       style={{ flex: "1 1 auto", overflowY: "auto", padding: "6px 22px 24px" }}
     >
-      <h1
+      <h2
         style={{
           fontFamily: "var(--font-display)",
           fontWeight: 700,
@@ -211,7 +205,7 @@ export default function SettingsScreen() {
         }}
       >
         {copy.settings.title}
-      </h1>
+      </h2>
 
       {/* Lock status bar — only once a challenge has been started. */}
       {derived.challengeStarted &&
@@ -325,6 +319,7 @@ export default function SettingsScreen() {
 
       {/* Gating wrapper — dims + disables the four cards while locked. */}
       <div
+        inert={derived.effLocked || undefined}
         style={{
           pointerEvents: derived.lockedPE,
           opacity: derived.lockedOpacity,
@@ -383,24 +378,9 @@ export default function SettingsScreen() {
           <div style={CARD_SUB}>{copy.settings.goal.sub}</div>
 
           <div style={{ display: "flex", gap: 8, margin: "16px 0 14px" }}>
-            <PresetChip
-              value="300"
-              tier="easy"
-              selected={String(state.goal) === "300"}
-              onClick={() => actions.presetGoal("300")}
-            />
-            <PresetChip
-              value="450"
-              tier="med"
-              selected={String(state.goal) === "450"}
-              onClick={() => actions.presetGoal("450")}
-            />
-            <PresetChip
-              value="600"
-              tier="hard"
-              selected={String(state.goal) === "600"}
-              onClick={() => actions.presetGoal("600")}
-            />
+            <PresetChip value="300" tier="easy" onClick={() => actions.presetGoal("300")} />
+            <PresetChip value="450" tier="med" onClick={() => actions.presetGoal("450")} />
+            <PresetChip value="600" tier="hard" onClick={() => actions.presetGoal("600")} />
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

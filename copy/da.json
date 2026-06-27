@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "Læseudfordring"
+    "name": "Læseudfordring",
+    "description": "En læseudfordring der motiverer børn til at læse."
   },
   "nav": {
     "progress": "Fremgang",

@@ -37,7 +37,7 @@ import {
   totalMinutes,
 } from "@/lib/storage";
 import { joyForPct, pctFor, ringOffset, deadlineInfo } from "@/lib/joy";
-import { copy, interp } from "@/lib/copy";
+import { copy, interp, DATE_LOCALE } from "@/lib/copy";
 
 // ---------------------------------------------------------------------------
 // State
@@ -117,7 +117,7 @@ function fmtDate(iso: string): string {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString("da-DK", { day: "numeric", month: "short" });
+  return d.toLocaleDateString(DATE_LOCALE, { day: "numeric", month: "short" });
 }
 
 function bookKey(title: string, author: string): string {
@@ -188,7 +188,7 @@ function reducer(state: State, action: Action): State {
 
     case "START_CHALLENGE": {
       // Commit the Settings drafts, start the challenge, auto-lock, go to Fremgang.
-      const parsed = parseInt(state.goalDraft, 10);
+      const parsed = Math.round(Number(state.goalDraft));
       const goal = parsed >= 1 ? parsed : state.goal;
       const name = state.nameDraft.trim() || state.name;
       return {
@@ -252,7 +252,7 @@ function reducer(state: State, action: Action): State {
 
     case "SAVE_ENTRY": {
       const title = state.form.title.trim();
-      const minutes = Number(state.form.minutes) || 0;
+      const minutes = Math.round(Number(state.form.minutes)) || 0;
       if (!title || minutes <= 0) return state; // invalid → no-op (button is dimmed)
 
       const author = state.form.author.trim();
@@ -324,8 +324,7 @@ function reducer(state: State, action: Action): State {
       return { ...state, goalDraft: action.value, goalSaved: false };
 
     case "SAVE_GOAL": {
-      const parsed = parseInt(state.goalDraft, 10);
-      const goal = parsed >= 1 ? parsed : state.goal;
+      const goal = Math.max(1, Math.round(Number(state.goalDraft) || 0));
       return { ...state, goal, goalSaved: true };
     }
 

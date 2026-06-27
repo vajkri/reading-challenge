@@ -8,13 +8,56 @@ import { RING } from "@/lib/joy";
 
 const display: React.CSSProperties = { fontFamily: "var(--font-display)" };
 
+const CONFETTI_COLORS = ["#F6A623", "#7FC8A9", "#F39A8B", "#BBA7E0", "#FFCE52"];
+
+// Deterministic confetti pieces (no Math.random → pure render). Scattered via
+// index arithmetic so the burst still looks irregular.
+const PIECES = Array.from({ length: 16 }, (_, i) => ({
+  left: ((i * 61 + 7) % 96) + "%",
+  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+  size: 7 + (i % 4) * 2,
+  delay: ((i % 5) * 0.12).toFixed(2) + "s",
+  dur: (1.2 + (i % 3) * 0.2).toFixed(2) + "s",
+  round: i % 2 === 0,
+}));
+
+/**
+ * Falling-confetti burst, scoped over the mascot hero. CSS-only: the pieces
+ * mount when `active` flips true (the mascot reaches a celebratory stage,
+ * joy >= 6) and play the mons-fall animation twice, then rest invisible — no
+ * JS timers or state. Positioned absolutely + pointer-events:none + aria-hidden.
+ */
+function ConfettiBurst({ active }: { active: boolean }) {
+  if (!active) return null;
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+      {PIECES.map((p, i) => (
+        <span
+          key={i}
+          style={{
+            position: "absolute",
+            top: -14,
+            left: p.left,
+            width: p.size,
+            height: p.size,
+            background: p.color,
+            borderRadius: p.round ? "50%" : "2px",
+            animation: `mons-fall ${p.dur} linear ${p.delay} 2 both`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 /**
  * Fremgang (Progress) screen.
  *
- * Returns only the inner scrollable column — the app frame, header, bottom nav
- * and confetti overlay are owned by <AppShell/>. Branches on the challenge
- * lifecycle (derived.isNone / isOngoing / isCompleted); the mascot hero is
- * always at the top. Ports Sommerlæsning.dc.html lines ~44–136 faithfully.
+ * Returns only the inner scrollable column — the app frame, header and bottom
+ * nav are owned by <AppShell/>. Branches on the challenge lifecycle
+ * (derived.isNone / isOngoing / isCompleted); the mascot hero is always at the
+ * top, with the celebratory confetti scoped over it. Ports
+ * Sommerlæsning.dc.html lines ~44–136 faithfully.
  */
 export default function ProgressScreen(): React.ReactElement {
   const { state, derived, actions } = useApp();
@@ -31,7 +74,9 @@ export default function ProgressScreen(): React.ReactElement {
         alignItems: "center",
       }}
     >
-      {/* mascot hero (head only) */}
+      <h2 className="sr-only">{copy.nav.progress}</h2>
+
+      {/* mascot hero (head only) — confetti burst is scoped to this container */}
       <div
         style={{
           position: "relative",
@@ -43,6 +88,7 @@ export default function ProgressScreen(): React.ReactElement {
           justifyContent: "center",
         }}
       >
+        <ConfettiBurst active={derived.showConfetti} />
         <div style={{ position: "relative", width: 150, height: 162 }}>
           <MascotFace animal={state.mascot} stage={derived.joy} confetti={false} />
         </div>
