@@ -106,10 +106,41 @@ const INITIAL: State = {
 // Small pure helpers
 // ---------------------------------------------------------------------------
 
-function todayISO(): string {
+// When the challenge is "none", the Settings form seeds its drafts with these
+// sensible defaults instead of the persisted DEFAULTS (goal 1000 / empty deadline).
+// Drafts only — never persisted; the +N-day deadline is computed at seed time.
+const NONE_DEFAULT_GOAL = 450;
+const NONE_DEFAULT_DEADLINE_DAYS = 30;
+
+/** Local-time `YYYY-MM-DD`, shifted `days` forward from today (zero-padded). */
+function isoPlusDays(days: number): string {
   const d = new Date();
+  d.setDate(d.getDate() + days);
   const p = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function todayISO(): string {
+  return isoPlusDays(0);
+}
+
+/**
+ * Seed the Settings goal/deadline drafts. When the challenge is "none" the form
+ * pre-fills the none-defaults (450 / today+30); otherwise it mirrors the saved
+ * goal/deadline so an ongoing/completed challenge shows its real values.
+ */
+function seedDrafts(
+  challenge: ChallengeStatus,
+  goal: number,
+  deadline: string,
+): { goalDraft: string; deadlineDraft: string } {
+  if (challenge === "none") {
+    return {
+      goalDraft: String(NONE_DEFAULT_GOAL),
+      deadlineDraft: isoPlusDays(NONE_DEFAULT_DEADLINE_DAYS),
+    };
+  }
+  return { goalDraft: String(goal), deadlineDraft: deadline };
 }
 
 /** Danish short date, e.g. "27. jun". Empty for blank/invalid input. */
@@ -165,9 +196,8 @@ function reducer(state: State, action: Action): State {
         ...state,
         ...action.payload,
         hydrated: true,
-        goalDraft: String(action.payload.goal),
+        ...seedDrafts(action.payload.challenge, action.payload.goal, action.payload.deadline),
         nameDraft: action.payload.name,
-        deadlineDraft: action.payload.deadline,
       };
 
     case "SET_SCREEN":
@@ -177,9 +207,8 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         screen: "settings",
-        goalDraft: String(state.goal),
+        ...seedDrafts(state.challenge, state.goal, state.deadline),
         nameDraft: state.name,
-        deadlineDraft: state.deadline,
         goalSaved: false,
         nameSaved: false,
         deadlineSaved: false,
@@ -212,9 +241,8 @@ function reducer(state: State, action: Action): State {
         challenge: "none",
         locked: false,
         screen: "settings",
-        goalDraft: String(state.goal),
+        ...seedDrafts("none", state.goal, state.deadline),
         nameDraft: state.name,
-        deadlineDraft: state.deadline,
         goalSaved: false,
         nameSaved: false,
         deadlineSaved: false,

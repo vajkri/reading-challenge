@@ -55,6 +55,26 @@ test("start a challenge from settings → ongoing + auto-locked", async ({ page 
   await expect(page.getByText("Indstillinger er låst")).toBeVisible();
 });
 
+test("none state: Settings pre-fills 450 goal + today+30 deadline defaults", async ({ page }) => {
+  await page.goto("./");
+  await page.getByRole("button", { name: "Start en udfordring" }).click();
+  await expect(page.getByLabel("Læsemål")).toHaveValue("450");
+  await expect(page.getByLabel("Slutdato")).toHaveValue(iso(30));
+});
+
+test("ongoing challenge keeps its real saved goal + deadline (defaults not applied)", async ({ page, context }) => {
+  await seed(context, {
+    goal: "1000",
+    challenge: "ongoing",
+    name: "Max",
+    deadline: iso(20),
+  });
+  await page.goto("./");
+  await page.getByRole("button", { name: "Indstillinger" }).click();
+  await expect(page.getByLabel("Læsemål")).toHaveValue("1000");
+  await expect(page.getByLabel("Slutdato")).toHaveValue(iso(20));
+});
+
 test("add a reading updates the log list and total", async ({ page, context }) => {
   await seed(context, { goal: "1000", challenge: "ongoing", name: "Max" });
   await page.goto("./");
