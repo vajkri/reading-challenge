@@ -8,6 +8,7 @@ import { useApp } from "@/lib/store";
 import { copy } from "@/lib/copy";
 import BottomNav from "@/components/BottomNav";
 import ProgressScreen from "@/components/ProgressScreen";
+import SkeletonProgress from "@/components/SkeletonProgress";
 import LogScreen from "@/components/LogScreen";
 import SettingsScreen from "@/components/SettingsScreen";
 
@@ -40,9 +41,15 @@ export default function AppShell() {
       </header>
 
       <main className="flex-1 overflow-y-auto px-5 pb-6">
-        {state.screen === "progress" && <ProgressScreen />}
-        {state.screen === "log" && <LogScreen />}
-        {state.screen === "settings" && <SettingsScreen />}
+        {!state.hydrated ? (
+          <SkeletonProgress />
+        ) : (
+          <>
+            {state.screen === "progress" && <ProgressScreen />}
+            {state.screen === "log" && <LogScreen />}
+            {state.screen === "settings" && <SettingsScreen />}
+          </>
+        )}
       </main>
 
       <BottomNav />
