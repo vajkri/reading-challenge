@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Læsemål · indsats efter slutdato</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --accent:#F6A623;--app:#FFF6E9;--body:#E9DAC4;--ink:#4F4034;--muted:#A9967E;--faint:#C2B299;
+    --field-border:#F2DEBE;
+    --easy-bg:#E4F1D8;--easy-fg:#5C8A3F;--med-bg:#FBEAD2;--med-fg:#B5803A;--hard-bg:#F8DDD3;--hard-fg:#C45B40;
+    --card-shadow:0 6px 16px rgba(80,55,25,.08);
+    --display:'Baloo 2',system-ui,sans-serif;--bodyfont:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--bodyfont);
+    background:radial-gradient(1200px 600px at 15% -10%,#FFEFD2 0%,transparent 55%),
+      radial-gradient(1000px 700px at 110% 10%,#FCE3C0 0%,transparent 50%),var(--body);
+    color:var(--ink);min-height:100vh;padding:40px 20px 80px;-webkit-font-smoothing:antialiased}
+  .head{max-width:1240px;margin:0 auto 26px;text-align:center}
+  .head .eyebrow{font-family:var(--display);font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    font-size:12px;color:var(--med-fg);background:#fff;display:inline-block;padding:6px 14px;border-radius:999px;
+    box-shadow:var(--card-shadow);margin-bottom:16px}
+  .head h1{font-family:var(--display);font-weight:800;font-size:30px}
+  .head p{color:#8c7a62;font-size:15px;margin-top:8px;line-height:1.5}
+  .head code{background:#fff;border:1px solid var(--field-border);border-radius:6px;padding:1px 6px;font-size:13px}
+
+  .driver{max-width:760px;margin:0 auto 30px;background:#fff;border-radius:20px;padding:18px 20px;
+    box-shadow:var(--card-shadow);display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;border:2px dashed #F0D9B0}
+  .driver .lead{display:flex;align-items:center;gap:11px}
+  .driver .cal{width:42px;height:42px;border-radius:13px;background:#FBEFDB;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .driver .lead .t{font-family:var(--display);font-weight:700;font-size:15px}
+  .driver .lead .s{font-size:12.5px;color:var(--muted)}
+  .driver .opts{display:flex;gap:8px}
+  .driver .opt{padding:9px 15px;border-radius:11px;border:2px solid var(--field-border);background:#FFFBF3;
+    font-family:var(--display);font-weight:700;font-size:14px;color:var(--muted);transition:.15s}
+  .driver .opt[aria-pressed="true"]{border-color:var(--accent);background:#FBEFDB;color:var(--ink)}
+  .driver .now{font-size:12.5px;color:var(--muted)}.driver .now b{font-family:var(--display);color:var(--ink)}
+
+  .grid{max-width:1240px;margin:0 auto;display:grid;gap:26px;grid-template-columns:repeat(3,1fr)}
+  @media (max-width:1080px){.grid{grid-template-columns:1fr;max-width:430px}}
+  .col{display:flex;flex-direction:column;gap:14px}
+  .col-head{padding:0 4px}
+  .col-head .tag{font-family:var(--display);font-weight:800;font-size:13px;color:var(--accent)}
+  .col-head .tag.fav{color:var(--easy-fg)}
+  .col-head h2{font-family:var(--display);font-weight:700;font-size:19px;margin-top:2px}
+  .col-head .why{font-size:13px;color:#8c7a62;margin-top:5px;line-height:1.45}
+
+  .phone{background:var(--app);border-radius:30px;padding:18px 16px 22px;
+    box-shadow:0 18px 40px rgba(80,55,25,.18),inset 0 0 0 1px rgba(255,255,255,.6)}
+  .phone.fav{box-shadow:0 18px 40px rgba(92,138,63,.22),inset 0 0 0 2px #BcdCA8}
+  .phone-top{display:flex;align-items:center;gap:8px;padding:0 4px 14px;color:var(--faint);
+    font-family:var(--display);font-weight:700;font-size:13px}
+  .phone-top .dot{width:8px;height:8px;border-radius:50%;background:#F2DEBE}
+  .card{background:#fff;border-radius:20px;padding:18px;box-shadow:var(--card-shadow)}
+  .card-h{font-family:var(--display);font-weight:700;font-size:16px;color:var(--ink)}
+  .card-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
+
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .num{font-family:var(--display);font-weight:800;line-height:1;letter-spacing:-.01em}
+  .slider{position:relative;height:30px;touch-action:none}
+  .track{position:absolute;top:11px;left:0;right:0;height:8px;border-radius:999px;background:#F2DEBE}
+  .fill{position:absolute;top:11px;left:0;height:8px;border-radius:999px;background:linear-gradient(90deg,#FBD089,var(--accent))}
+  .thumb{position:absolute;top:-2px;width:34px;height:34px;border-radius:50%;background:#fff;
+    box-shadow:0 4px 12px rgba(80,55,25,.25),inset 0 0 0 4px var(--accent);transform:translateX(-50%);transition:left .1s}
+  .commit{width:100%;margin-top:16px;padding:15px;border-radius:16px;background:var(--accent);color:#fff;
+    font-family:var(--display);font-weight:700;font-size:16px;box-shadow:0 10px 24px rgba(246,166,35,.34)}
+
+  .eff{display:inline-flex;align-items:center;gap:7px;font-family:var(--display);font-weight:700;font-size:13px;
+    padding:5px 12px;border-radius:999px;transition:.2s}
+  .eff .swatch{width:9px;height:9px;border-radius:50%}
+  .eff.lille{background:var(--easy-bg);color:var(--easy-fg)} .eff.lille .swatch{background:var(--easy-fg)}
+  .eff.mellem{background:var(--med-bg);color:var(--med-fg)} .eff.mellem .swatch{background:var(--med-fg)}
+  .eff.stor{background:var(--hard-bg);color:var(--hard-fg)} .eff.stor .swatch{background:var(--hard-fg)}
+
+  /* ZONES (favorit) */
+  .z-read{display:flex;align-items:baseline;gap:8px;margin:16px 0 12px}
+  .z-read .num{font-size:44px}.z-read .u{font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted)}
+  .z-read .pd{margin-left:auto;font-size:12.5px;color:var(--muted);text-align:right;line-height:1.3}
+  .z-read .pd b{font-family:var(--display);color:var(--ink);font-size:15px}
+  .z-cap{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:center;margin-bottom:5px}
+  .zones{position:relative;height:20px;margin-bottom:8px}
+  .zone-lbl{position:absolute;transform:translateX(-50%);font-family:var(--display);font-weight:700;font-size:13px;
+    color:var(--faint);transition:left .2s,color .2s,opacity .2s;white-space:nowrap}
+  .zone-lbl.hide{opacity:0}
+  .zone-lbl.on{transform:translateX(-50%) scale(1.06)}
+  .zone-lbl.on[data-b="lille"]{color:var(--easy-fg)}
+  .zone-lbl.on[data-b="mellem"]{color:var(--med-fg)}
+  .zone-lbl.on[data-b="stor"]{color:var(--hard-fg)}
+  .zdiv{position:absolute;top:8px;width:2px;height:14px;background:#fff;opacity:.7;transform:translateX(-50%);transition:left .2s,opacity .2s}
+
+  /* B cards */
+  .b-read{display:flex;align-items:center;justify-content:space-between;margin:16px 0 12px}
+  .b-read .l{display:flex;align-items:baseline;gap:7px}.b-read .num{font-size:36px}
+  .b-read .u{font-family:var(--display);font-weight:700;font-size:14px;color:var(--muted)}
+  .pcards{display:flex;gap:8px}
+  .pcard{flex:1;border:2px solid var(--field-border);background:#FFFBF3;border-radius:14px;padding:10px 6px;text-align:center;transition:.18s}
+  .pcard .big{font-family:var(--display);font-weight:800;font-size:21px;color:var(--ink)}
+  .pcard .pd{font-size:11px;color:var(--faint);font-weight:700;margin-top:2px}
+  .pcard .d{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+  .pcard[aria-pressed="true"]{border-color:var(--accent);background:#FBEFDB}
+  .b-fine{display:flex;align-items:center;gap:11px;margin-top:12px;background:#FBF3E4;border-radius:13px;padding:9px 13px}
+  .b-fine .lbl{font-size:12px;color:var(--muted);font-weight:700}.b-fine .slider{flex:1}
+
+  /* C badge */
+  .c-read{display:flex;align-items:baseline;gap:9px;margin:16px 0 4px}
+  .c-read .num{font-size:48px}.c-read .u{font-family:var(--display);font-weight:700;font-size:16px;color:var(--muted)}
+  .c-read .eff{margin-left:auto;transform:translateY(-4px)}
+  .c-pd{margin-top:14px;text-align:center;font-size:13px;color:var(--muted)}.c-pd b{font-family:var(--display);color:var(--ink);font-size:16px}
+</style>
+</head>
+<body>
+  <div class="head">
+    <span class="eyebrow">Læseudfordring · indsats efter slutdato</span>
+    <h1>Læsemål — indsats = min/dag</h1>
+    <p>Sværhedsgrad = <code>mål ÷ dage til slutdato</code>. Bånd: <b>0–9 = Lille</b> · <b>10–20 = Mellem</b> · <b>21+ = Stor indsats</b>.
+       Slider 200–750 · trin 50. Skift slutdato og se zonerne / indsatsen flytte sig.</p>
+  </div>
+
+  <div class="driver">
+    <div class="lead"><div class="cal">📅</div>
+      <div><div class="t">1 · Slutdato sættes først</div><div class="s">Driver beregningen for målet</div></div></div>
+    <div class="opts" id="days">
+      <button class="opt" data-d="90">3 mdr</button>
+      <button class="opt" data-d="60">2 mdr</button>
+      <button class="opt" data-d="30" aria-pressed="true">1 mdr</button>
+    </div>
+    <div class="now"><b id="days-n">30</b> dage tilbage</div>
+  </div>
+
+  <div class="grid">
+    <!-- ZONES (favorit) -->
+    <div class="col">
+      <div class="col-head"><div class="tag fav">★ DIN FAVORIT · zoner</div><h2>Tempo-zoner (dynamiske)</h2>
+        <div class="why">Dit foretrukne look, nu indsats-styret. Zonegrænserne <b>flytter sig</b> med slutdatoen — prøv at skifte den.</div></div>
+      <div class="phone fav"><div class="phone-top"><span class="dot"></span>Indstillinger</div>
+        <div class="card">
+          <div class="card-h">2 · Læsemål</div>
+          <div class="card-sub">Vælg jeres mål — træk for at finjustere.</div>
+          <div class="z-read"><span class="num" id="z-num">450</span><span class="u">min</span>
+            <span class="pd">Ca. <b id="z-pd">15 min</b><br>om dagen</span></div>
+          <div class="z-cap">Indsats</div>
+          <div class="zones" id="z-labels">
+            <span class="zone-lbl" data-b="lille" id="zl-l">Lille</span>
+            <span class="zone-lbl" data-b="mellem" id="zl-m">Mellem</span>
+            <span class="zone-lbl" data-b="stor" id="zl-s">Stor</span>
+          </div>
+          <div class="slider" id="z-slider">
+            <div class="track" id="z-track"></div>
+            <div class="zdiv" id="zd1"></div><div class="zdiv" id="zd2"></div>
+            <div class="thumb" id="z-thumb"></div>
+          </div>
+        </div>
+        <button class="commit">Opdater udfordring</button>
+      </div>
+    </div>
+
+    <!-- B cards -->
+    <div class="col">
+      <div class="col-head"><div class="tag">ALTERNATIV · kort</div><h2>Anbefalede kort</h2>
+        <div class="why">Kortene viser live min/dag + indsats-prik for slutdatoen. Slider finjusterer.</div></div>
+      <div class="phone"><div class="phone-top"><span class="dot"></span>Indstillinger</div>
+        <div class="card">
+          <div class="card-h">2 · Læsemål</div>
+          <div class="card-sub">Vælg et mål — kortene viser indsatsen for jeres slutdato.</div>
+          <div class="b-read"><div class="l"><span class="num" id="b-num">450</span><span class="u">min</span></div>
+            <span class="eff mellem" id="b-eff"><span class="swatch"></span>Mellem indsats</span></div>
+          <div class="pcards" id="b-cards">
+            <button class="pcard" data-v="300"><div class="big">300</div><div class="pd" id="b-pd300"></div></button>
+            <button class="pcard" data-v="450" aria-pressed="true"><div class="big">450</div><div class="pd" id="b-pd450"></div></button>
+            <button class="pcard" data-v="600"><div class="big">600</div><div class="pd" id="b-pd600"></div></button>
+          </div>
+          <div class="b-fine"><span class="lbl">Finjuster</span>
+            <div class="slider" id="b-slider"><div class="track"></div><div class="fill" id="b-fill"></div><div class="thumb" id="b-thumb"></div></div></div>
+        </div>
+        <button class="commit">Opdater udfordring</button>
+      </div>
+    </div>
+
+    <!-- C badge -->
+    <div class="col">
+      <div class="col-head"><div class="tag">ALTERNATIV · badge</div><h2>Slider + indsats-badge</h2>
+        <div class="why">Reneste form: tal, slider, ét badge der opdaterer mens man trækker.</div></div>
+      <div class="phone"><div class="phone-top"><span class="dot"></span>Indstillinger</div>
+        <div class="card">
+          <div class="card-h">2 · Læsemål</div>
+          <div class="card-sub">Hvor mange minutter vil I gerne læse i alt?</div>
+          <div class="c-read"><span class="num" id="c-num">450</span><span class="u">min</span>
+            <span class="eff mellem" id="c-eff"><span class="swatch"></span>Mellem indsats</span></div>
+          <div class="slider" id="c-slider"><div class="track"></div><div class="fill" id="c-fill"></div><div class="thumb" id="c-thumb"></div></div>
+          <div class="c-pd">≈ <b id="c-pd">15 min</b> om dagen frem til slutdato</div>
+        </div>
+        <button class="commit">Opdater udfordring</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const MIN=200,MAX=750,STEP=50;
+  const PCT=v=>((v-MIN)/(MAX-MIN))*100;
+  let days=30;
+  const perDay=v=>Math.round(v/Math.max(1,days));
+  const EFFORT=md=> md<=9?{k:'lille',l:'Lille indsats'} : md<=20?{k:'mellem',l:'Mellem indsats'} : {k:'stor',l:'Stor indsats'};
+  function attach(el,onV){
+    function fromX(cx){const r=el.getBoundingClientRect();let p=Math.max(0,Math.min(1,(cx-r.left)/r.width));
+      let v=Math.round((MIN+p*(MAX-MIN))/STEP)*STEP;onV(Math.max(MIN,Math.min(MAX,v)));}
+    let d=false;const dn=e=>{d=true;fromX((e.touches?e.touches[0]:e).clientX);e.preventDefault();};
+    const mv=e=>{if(d)fromX((e.touches?e.touches[0]:e).clientX);};const up=()=>d=false;
+    el.addEventListener('mousedown',dn);el.addEventListener('touchstart',dn,{passive:false});
+    window.addEventListener('mousemove',mv);window.addEventListener('touchmove',mv,{passive:false});
+    window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+  }
+  function setEff(el,md){const e=EFFORT(md);el.className='eff '+e.k;el.innerHTML='<span class="swatch"></span>'+e.l;}
+
+  let z=450,b=450,c=450;
+  // ZONES
+  const zNum=document.getElementById('z-num'),zPd=document.getElementById('z-pd'),zThumb=document.getElementById('z-thumb'),
+        zTrack=document.getElementById('z-track'),zd1=document.getElementById('zd1'),zd2=document.getElementById('zd2'),
+        zL=document.getElementById('zl-l'),zM=document.getElementById('zl-m'),zS=document.getElementById('zl-s');
+  function placeLbl(el,center,wide){ if(center==null||!wide){el.classList.add('hide');return;} el.classList.remove('hide'); el.style.left=(center*100)+'%'; }
+  function setDiv(el,p){ if(p<=0.005||p>=0.995){el.style.opacity=0;} else {el.style.opacity=.7;el.style.left=(p*100)+'%';} }
+  function rZ(){
+    zNum.textContent=z; zPd.textContent=perDay(z)+' min'; zThumb.style.left=PCT(z)+'%';
+    const b1=9.5*days, b2=20.5*days;
+    const p1=Math.max(0,Math.min(1,(b1-MIN)/(MAX-MIN))), p2=Math.max(0,Math.min(1,(b2-MIN)/(MAX-MIN)));
+    const t1=Math.round(p1*100), t2=Math.round(p2*100);
+    zTrack.style.background=`linear-gradient(90deg,#EAF3DD 0 ${t1}%,#FBE7C4 ${t1}% ${t2}%,#F6D3C6 ${t2}% 100%)`;
+    setDiv(zd1,p1); setDiv(zd2,p2);
+    placeLbl(zL, p1>0? p1/2 : null, p1>0.07);
+    placeLbl(zM, p2>p1? (p1+p2)/2 : null, (p2-p1)>0.11);
+    placeLbl(zS, p2<1? (p2+1)/2 : null, (1-p2)>0.07);
+    const band=EFFORT(perDay(z)).k;
+    [[zL,'lille'],[zM,'mellem'],[zS,'stor']].forEach(([el,k])=>el.classList.toggle('on',k===band));
+  }
+  attach(document.getElementById('z-slider'),v=>{z=v;rZ();});
+  // B
+  const bN=document.getElementById('b-num'),bF=document.getElementById('b-fill'),bT=document.getElementById('b-thumb'),
+        bEff=document.getElementById('b-eff'),bCards=document.getElementById('b-cards');
+  function rB(){bN.textContent=b;bF.style.width=PCT(b)+'%';bT.style.left=PCT(b)+'%';setEff(bEff,perDay(b));
+    [300,450,600].forEach(v=>{const md=perDay(v),e=EFFORT(md),fg=e.k==='lille'?'easy':e.k==='mellem'?'med':'hard';
+      document.getElementById('b-pd'+v).innerHTML=`<span class="d" style="background:var(--${fg}-fg)"></span>~${md}/dag`;});
+    [...bCards.children].forEach(x=>x.setAttribute('aria-pressed',(+x.dataset.v===b)?'true':'false'));}
+  attach(document.getElementById('b-slider'),v=>{b=v;rB();});
+  bCards.addEventListener('click',e=>{const x=e.target.closest('.pcard');if(!x)return;b=+x.dataset.v;rB();});
+  // C
+  const cN=document.getElementById('c-num'),cF=document.getElementById('c-fill'),cT=document.getElementById('c-thumb'),
+        cEff=document.getElementById('c-eff'),cPd=document.getElementById('c-pd');
+  function rC(){cN.textContent=c;cF.style.width=PCT(c)+'%';cT.style.left=PCT(c)+'%';setEff(cEff,perDay(c));cPd.textContent=perDay(c)+' min';}
+  attach(document.getElementById('c-slider'),v=>{c=v;rC();});
+  // days driver
+  const daysN=document.getElementById('days-n'),daysWrap=document.getElementById('days');
+  daysWrap.addEventListener('click',e=>{const o=e.target.closest('.opt');if(!o)return;
+    days=+o.dataset.d;daysN.textContent=days;[...daysWrap.children].forEach(x=>x.setAttribute('aria-pressed',x===o?'true':'false'));
+    rZ();rB();rC();});
+  rZ();rB();rC();
+</script>
+</body>
+</html>
