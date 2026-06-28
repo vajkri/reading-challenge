@@ -12,12 +12,17 @@ treat those handoffs as the source of truth for behaviour, copy, and the mascot 
 the visible screen (Progress / Log / Settings) is just `state.screen` switched in `AppShell.tsx`
 — there are no Next routes and no data fetching. Everything runs client-side off `localStorage`.
 
-Data flows one way through four `lib/` layers — keep logic in the layer it belongs to:
+Data flows one way through the `lib/` layers — keep logic in the layer it belongs to:
 
-- `types.ts` — the shared contract (`PersistedState`, `Entry`, `ChallengeStatus`, `Stage`).
+- `types.ts` — the shared contract (`PersistedState`, `Entry`, `ChallengeStatus`, `Stage`, `BingoState`).
 - `storage.ts` — the `localStorage` layer, **SSR-safe** (no `window` → returns `DEFAULTS`, writes
-  are no-ops). Owns the seven `sommerlaesning.v1.*` keys and the `loadState()` migration.
+  are no-ops). Owns the eight `sommerlaesning.v1.*` keys (incl. `bingo`) and the `loadState()` migration.
 - `joy.ts` — pure progress math (`pctFor`, `joyForPct`, `ringOffset`, `deadlineInfo`); no React/DOM.
+- `bingo.ts` — pure bingo domain (`SEASONS` config, `activeSeason`, row/board math); no React/DOM/copy,
+  same purity contract as `joy.ts`. The **Bingo** page (`components/BingoScreen.tsx`) is a 4th screen,
+  fully **standalone** from the challenge lifecycle: a date-windowed seasonal board whose crossed-off
+  feats persist per season id. Off-season → teaser. Provider launches a season = add a `SEASONS` entry
+  + its `copy.bingo.seasons.<id>` block + deploy.
 - `store.tsx` — the reducer **+ `computeDerived()`** (the prototype's `renderVals()`), exposed via
   `useApp()` as `{ state, derived, actions }`. Screens read `derived` / call `actions`, nothing more.
 

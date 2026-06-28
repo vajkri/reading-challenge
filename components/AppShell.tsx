@@ -11,6 +11,7 @@ import ProgressScreen from "@/components/ProgressScreen";
 import LogScreen from "@/components/LogScreen";
 import SettingsScreen from "@/components/SettingsScreen";
 import NewChallengeModal from "@/components/NewChallengeModal";
+import BingoScreen from "@/components/BingoScreen";
 
 export default function AppShell() {
   const { state } = useApp();
@@ -51,6 +52,7 @@ export default function AppShell() {
             {state.screen === "progress" && <ProgressScreen />}
             {state.screen === "log" && <LogScreen />}
             {state.screen === "settings" && <SettingsScreen />}
+            {state.screen === "bingo" && <BingoScreen />}
           </>
         )}
       </main>
