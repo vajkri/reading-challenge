@@ -50,24 +50,6 @@ const FIELD: CSSProperties = {
   outline: "none",
 };
 
-const GEM_BTN: CSSProperties = {
-  flex: "0 0 auto",
-  padding: "12px 20px",
-  borderRadius: 12,
-  background: "var(--color-accent)",
-  color: "#fff",
-  fontFamily: "var(--font-display)",
-  fontWeight: 700,
-  fontSize: 15,
-};
-
-const SAVED_FLASH: CSSProperties = {
-  marginTop: 12,
-  fontSize: 13,
-  fontWeight: 700,
-  color: "#5FA886",
-};
-
 const FOCUS_RING =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
@@ -207,115 +189,102 @@ export default function SettingsScreen() {
         {copy.settings.title}
       </h2>
 
-      {/* Lock status bar — only once a challenge has been started. */}
-      {derived.challengeStarted &&
-        (derived.effLocked ? (
+      {/* Banner — ongoing (locked) prompts to edit; completed prompts to start anew. */}
+      {derived.showEditBanner && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 13,
+            background: "#FBEFDB",
+            border: "1.5px solid #F2DEBE",
+            borderRadius: 18,
+            padding: "15px 16px",
+            marginBottom: 16,
+          }}
+        >
           <div
             style={{
+              flex: "0 0 auto",
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: "#F6E2BE",
               display: "flex",
               alignItems: "center",
-              gap: 13,
-              background: "#FBEFDB",
-              border: "1.5px solid #F2DEBE",
-              borderRadius: 18,
-              padding: "15px 16px",
-              marginBottom: 16,
+              justifyContent: "center",
             }}
           >
-            <div
-              style={{
-                flex: "0 0 auto",
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                background: "#F6E2BE",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Padlock open={false} color="#B5803A" keyhole="#FBEFDB" />
-            </div>
-            <div style={{ flex: "1 1 auto", minWidth: 0 }}>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "#4F4034" }}>
-                {copy.settings.lock.lockedTitle}
-              </div>
-              <div style={{ fontSize: 12, color: "#A9967E", lineHeight: 1.4, marginTop: 1 }}>
-                {copy.settings.lock.lockedSub}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={actions.openUnlock}
-              className={FOCUS_RING}
-              style={{
-                flex: "0 0 auto",
-                padding: "11px 16px",
-                borderRadius: 12,
-                background: "var(--color-accent)",
-                color: "#fff",
-                fontFamily: "var(--font-display)",
-                fontWeight: 700,
-                fontSize: 14,
-              }}
-            >
-              {copy.settings.lock.unlockBtn}
-            </button>
+            <Padlock open={false} color="#B5803A" keyhole="#FBEFDB" />
           </div>
-        ) : (
-          <div
+          <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "#4F4034" }}>
+              {copy.settings.ongoingBanner.title}
+            </div>
+            <div style={{ fontSize: 12, color: "#A9967E", lineHeight: 1.4, marginTop: 1 }}>
+              {copy.settings.ongoingBanner.sub}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={actions.openUnlock}
+            className={FOCUS_RING}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 13,
-              background: "#fff",
-              borderRadius: 18,
-              padding: "15px 16px",
-              marginBottom: 16,
-              boxShadow: "0 6px 16px rgba(80,55,25,.08)",
+              flex: "0 0 auto",
+              padding: "11px 16px",
+              borderRadius: 12,
+              background: "var(--color-accent)",
+              color: "#fff",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 14,
             }}
           >
-            <div
-              style={{
-                flex: "0 0 auto",
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                background: "#E4F1D8",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Padlock open color="#5C8A3F" keyhole="#E4F1D8" />
+            {copy.settings.ongoingBanner.editBtn}
+          </button>
+        </div>
+      )}
+
+      {derived.showDoneBanner && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 13,
+            background: "#E4F1D8",
+            border: "1.5px solid #CDE4BC",
+            borderRadius: 18,
+            padding: "15px 16px",
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "#4F4034" }}>
+              {copy.settings.completedBanner.title}
             </div>
-            <div style={{ flex: "1 1 auto", minWidth: 0 }}>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "#4F4034" }}>
-                {copy.settings.lock.openTitle}
-              </div>
-              <div style={{ fontSize: 12, color: "#A9967E", lineHeight: 1.4, marginTop: 1 }}>
-                {copy.settings.lock.openSub}
-              </div>
+            <div style={{ fontSize: 12, color: "#7A8C66", lineHeight: 1.4, marginTop: 1 }}>
+              {copy.settings.completedBanner.sub}
             </div>
-            <button
-              type="button"
-              onClick={actions.lock}
-              className={FOCUS_RING}
-              style={{
-                flex: "0 0 auto",
-                padding: "11px 16px",
-                borderRadius: 12,
-                background: "#F2E6D2",
-                color: "#8A7559",
-                fontFamily: "var(--font-display)",
-                fontWeight: 700,
-                fontSize: 14,
-              }}
-            >
-              {copy.settings.lock.lockBtn}
-            </button>
           </div>
-        ))}
+          <button
+            type="button"
+            onClick={actions.requestNewChallenge}
+            className={FOCUS_RING}
+            style={{
+              flex: "0 0 auto",
+              padding: "11px 16px",
+              borderRadius: 12,
+              background: "var(--color-accent)",
+              color: "#fff",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 14,
+            }}
+          >
+            {copy.settings.completedBanner.newBtn}
+          </button>
+        </div>
+      )}
 
       {/* Gating wrapper — dims + disables the four cards while locked. */}
       <div
@@ -335,18 +304,16 @@ export default function SettingsScreen() {
             <MascotTile
               animal="cat"
               label={copy.settings.mascot.cat}
-              active={state.mascot === "cat"}
+              active={state.mascotDraft === "cat"}
               onClick={() => actions.pickMascot("cat")}
             />
             <MascotTile
               animal="dog"
               label={copy.settings.mascot.dog}
-              active={state.mascot === "dog"}
+              active={state.mascotDraft === "dog"}
               onClick={() => actions.pickMascot("dog")}
             />
           </div>
-
-          {state.mascotSaved && <div style={SAVED_FLASH}>{copy.settings.mascot.saved}</div>}
         </div>
 
         {/* Card 2 — Maskottens navn */}
@@ -364,12 +331,7 @@ export default function SettingsScreen() {
               className={FOCUS_RING}
               style={FIELD}
             />
-            <button type="button" onClick={actions.saveName} className={FOCUS_RING} style={GEM_BTN}>
-              {copy.settings.name.save}
-            </button>
           </div>
-
-          {state.nameSaved && <div style={SAVED_FLASH}>{copy.settings.name.saved}</div>}
         </div>
 
         {/* Card 3 — Læsemål */}
@@ -396,12 +358,7 @@ export default function SettingsScreen() {
             <span style={{ fontWeight: 700, color: "#A9967E", fontSize: 14 }}>
               {copy.settings.goal.unit}
             </span>
-            <button type="button" onClick={actions.saveGoal} className={FOCUS_RING} style={GEM_BTN}>
-              {copy.settings.goal.save}
-            </button>
           </div>
-
-          {state.goalSaved && <div style={SAVED_FLASH}>{copy.settings.goal.saved}</div>}
         </div>
 
         {/* Card 4 — Slutdato */}
@@ -418,20 +375,15 @@ export default function SettingsScreen() {
               className={FOCUS_RING}
               style={FIELD}
             />
-            <button type="button" onClick={actions.saveDeadline} className={FOCUS_RING} style={GEM_BTN}>
-              {copy.settings.deadline.save}
-            </button>
           </div>
-
-          {state.deadlineSaved && <div style={SAVED_FLASH}>{copy.settings.deadline.saved}</div>}
         </div>
       </div>
 
-      {/* Start the challenge (only before one exists). */}
-      {derived.isNone && (
+      {/* Single commit button: Start (no challenge) or Update (editing a running one). */}
+      {(derived.isNone || derived.isEditing) && (
         <button
           type="button"
-          onClick={actions.startChallenge}
+          onClick={derived.isNone ? actions.startChallenge : actions.updateChallenge}
           className={FOCUS_RING}
           style={{
             width: "100%",
@@ -450,7 +402,7 @@ export default function SettingsScreen() {
             boxShadow: "0 10px 24px rgba(246,166,35,.34)",
           }}
         >
-          {copy.settings.startBtn}
+          {derived.isNone ? copy.settings.startBtn : copy.settings.updateBtn}
         </button>
       )}
 
