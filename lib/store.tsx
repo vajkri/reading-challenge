@@ -652,17 +652,20 @@ function computeDerived(state: State): Derived {
 
   // ---- Bingo (standalone; independent of the challenge lifecycle) ----
   const season = activeSeason(SEASONS, new Date());
+  // Off-season / partial-config fallback. Only `confetti` varies, and it's read
+  // from state here, so a single helper keeps the two fallbacks from drifting.
+  const teaserBingo = (): BingoView => ({
+    active: false,
+    seasonId: null,
+    seasonName: "",
+    feats: [],
+    doneCount: 0,
+    boardComplete: false,
+    confetti: state.bingoConfetti,
+  });
   let bingo: BingoView;
   if (!season) {
-    bingo = {
-      active: false,
-      seasonId: null,
-      seasonName: "",
-      feats: [],
-      doneCount: 0,
-      boardComplete: false,
-      confetti: state.bingoConfetti,
-    };
+    bingo = teaserBingo();
   } else {
     const doneIds = new Set(state.bingo[season.id] ?? []);
     const seasonsCopy = copy.bingo.seasons as unknown as Record<string, SeasonCopy>;
@@ -670,15 +673,7 @@ function computeDerived(state: State): Derived {
     if (!sc) {
       // A future season is in SEASONS but its copy block is missing from
       // da.json — fall back to the teaser shape instead of crashing every render.
-      bingo = {
-        active: false,
-        seasonId: null,
-        seasonName: "",
-        feats: [],
-        doneCount: 0,
-        boardComplete: false,
-        confetti: state.bingoConfetti,
-      };
+      bingo = teaserBingo();
     } else {
       // Skip a feat whose copy entry is missing (e.g. a future season adds a feat
       // id to SEASONS but not yet to copy/da.json) rather than crashing the screen.
@@ -701,7 +696,9 @@ function computeDerived(state: State): Derived {
         seasonId: season.id,
         seasonName: sc.name,
         feats,
-        doneCount: doneIds.size,
+        // Count the rendered feats, not raw saved ids — a stale/missing-copy id
+        // is skipped above, so doneIds.size could otherwise exceed feats.length.
+        doneCount: feats.filter((f) => f.done).length,
         boardComplete: isBoardComplete(season.feats, doneIds),
         confetti: state.bingoConfetti,
       };
@@ -828,11 +825,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [state.flashId]);
 
-  // Auto-clear the bingo row/board confetti after its run (~3.5s, covering the
-  // ~3.6s two-iteration mons-fall burst so it isn't cut off mid-fall).
+  // Auto-clear the bingo row/board confetti after its run. The slowest piece
+  // starts at delay 0.5s and runs 2×1.8s, finishing at ~4.1s, so unmount at
+  // 4.2s to let every piece fade out at the bottom rather than vanish mid-fall.
   useEffect(() => {
     if (state.bingoConfetti === "none") return;
-    const t = setTimeout(() => dispatch({ type: "CLEAR_BINGO_CONFETTI" }), 3500);
+    const t = setTimeout(() => dispatch({ type: "CLEAR_BINGO_CONFETTI" }), 4200);
     return () => clearTimeout(t);
   }, [state.bingoConfetti]);
 
