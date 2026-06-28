@@ -13,14 +13,14 @@
     "startSub": "{name} keder sig lidt. Sæt et mål og kom i gang!",
     "startBtn": "Start en udfordring",
     "captions": [
-      "{name} keder sig lidt... skal vi læse en bog?",
-      "{name} er vågnet – kom i gang med at læse!",
-      "Godt begyndt! {name} begynder at smile.",
-      "Det går rigtig godt – bliv ved!",
-      "Wow! {name} har taget festhat på.",
-      "Så fin! {name} har fået butterfly på.",
-      "Du gjorde det – 100%! {name} jubler!",
-      "FEST! Du er en ægte superlæser!"
+      "{name} keder sig... skal vi finde en god bog?",
+      "Yes! {name} vågnede – nu kører det!",
+      "{name} smiler allerede – sikke en start!",
+      "Wauw, du læser løs! {name} gnistrer af stolthed.",
+      "Festhat på! {name} fejrer hvert minut, du læser.",
+      "Næsten i mål! {name} har taget butterfly på.",
+      "100%! Du gjorde det – {name} jubler!",
+      "Konge! Du er en ægte superlæser!"
     ],
     "unit": "min",
     "completedBadge": "Udfordring fuldført",

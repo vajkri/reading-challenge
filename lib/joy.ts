@@ -1,29 +1,32 @@
 // Progress math for the Læseudfordring reading challenge.
 //
 // Pure helpers — no React, no DOM, no side effects beyond reading the local
-// clock inside deadlineInfo(). Faithfully reproduces the design-tool spec
-// (Sommerlæsning.dc.html): _joy (~526–535), the progress ring constants and
-// stroke-dashoffset in renderVals (~796–798), the pct computation (~767), and
-// the deadline countdown (~853–868).
+// clock inside deadlineInfo(). Reproduces the design-tool spec
+// (Sommerlæsning.dc.html): the progress ring constants and stroke-dashoffset
+// in renderVals (~796–798), the pct computation (~767), and the deadline
+// countdown (~853–868). joyForPct intentionally retunes the prototype's _joy
+// thresholds for engagement (issue #16) — see its docstring.
 
 import type { Stage } from "@/lib/types";
 
 /**
  * Map a completion percentage to a mascot happiness Stage (0–7).
  *
- * Mirrors the source `_joy(p)` thresholds verbatim, including the `>=101`
- * "konge" tier that sits one notch above the plain 100% celebration so that
- * over-achievers get the top crown. Callers decide whether challenge lifecycle
- * (none → 0, completed → 7) overrides this progress-driven value.
+ * Front-loaded ramp (issue #16): the cutoffs 5/15/30/50/75/100/101 react sooner
+ * than the prototype's verbatim 10/25/50/75/90 so the first reading session
+ * visibly wakes the mascot. The `>=101` "konge" tier sits one notch above the
+ * plain 100% celebration so over-achievers get the top crown; stages 6 (100%)
+ * and 7 stay pinned to the 100% caption. Callers decide whether challenge
+ * lifecycle (none → 0, completed → 7) overrides this progress-driven value.
  */
 export function joyForPct(pct: number): Stage {
   if (pct >= 101) return 7;
   if (pct >= 100) return 6;
-  if (pct >= 90) return 5;
-  if (pct >= 75) return 4;
-  if (pct >= 50) return 3;
-  if (pct >= 25) return 2;
-  if (pct >= 10) return 1;
+  if (pct >= 75) return 5;
+  if (pct >= 50) return 4;
+  if (pct >= 30) return 3;
+  if (pct >= 15) return 2;
+  if (pct >= 5) return 1;
   return 0;
 }
 
