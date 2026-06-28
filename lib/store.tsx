@@ -120,7 +120,7 @@ const INITIAL: State = {
 // When the challenge is "none", the Settings form seeds its drafts with these
 // sensible defaults instead of the persisted DEFAULTS (goal 1000 / empty deadline).
 // Drafts only — never persisted; the +N-day deadline is computed at seed time.
-const NONE_DEFAULT_GOAL = 450;
+const NONE_DEFAULT_GOAL = 300;
 const NONE_DEFAULT_DEADLINE_DAYS = 30;
 
 /** Local-time `YYYY-MM-DD`, shifted `days` forward from today (zero-padded). */

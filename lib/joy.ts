@@ -74,9 +74,9 @@ export function minutesPerDay(goal: number, daysLeft: number): number {
   return Math.round(goal / Math.max(1, daysLeft));
 }
 
-/** Bucket minutes-per-day into an effort band: 0–9 lille, 10–20 mellem, 21+ stor. */
+/** Bucket minutes-per-day into an effort band: 0–10 lille, 11–20 mellem, 21+ stor. */
 export function effortFor(minPerDay: number): EffortKey {
-  if (minPerDay <= 9) return "lille";
+  if (minPerDay <= 10) return "lille";
   if (minPerDay <= 20) return "mellem";
   return "stor";
 }
@@ -84,16 +84,16 @@ export function effortFor(minPerDay: number): EffortKey {
 /**
  * Track fractions (0–1) of the two band boundaries for a given deadline, used to
  * tint the slider track and place the zone labels. The lille/mellem edge sits at
- * 9.5·days minutes and the mellem/stor edge at 20.5·days (the round() midpoints of
- * the 9/10 and 20/21 cutoffs), mapped onto [GOAL_MIN, GOAL_MAX] and clamped.
+ * 10.5·days minutes and the mellem/stor edge at 20.5·days (the round() midpoints of
+ * the 10/11 and 20/21 cutoffs), mapped onto [GOAL_MIN, GOAL_MAX] and clamped.
  * A boundary past the track end clamps to 1 → that zone disappears (expected at
- * long deadlines, where every goal is "Lille").
+ * long deadlines, where every goal is "Let").
  */
 export function effortZones(daysLeft: number): { p1: number; p2: number } {
   const d = Math.max(1, daysLeft);
   const frac = (minutes: number) =>
     Math.max(0, Math.min(1, (minutes - GOAL_MIN) / (GOAL_MAX - GOAL_MIN)));
-  return { p1: frac(9.5 * d), p2: frac(20.5 * d) };
+  return { p1: frac(10.5 * d), p2: frac(20.5 * d) };
 }
 
 /**

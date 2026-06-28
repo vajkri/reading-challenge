@@ -64,24 +64,24 @@ test("start a challenge from settings → ongoing + locked banner", async ({ pag
   await page.goto("./");
   await page.getByRole("button", { name: "Start en udfordring" }).click();
   await page.getByPlaceholder("Max").fill("Bella");
-  // Slider seeds at 450; step is 50, so three ArrowLeft presses → 300.
+  // Slider seeds at 300; step is 50, so three ArrowRight presses → 450.
   const goal = page.getByLabel("Læsemål");
   await goal.focus();
-  await goal.press("ArrowLeft");
-  await goal.press("ArrowLeft");
-  await goal.press("ArrowLeft");
-  await expect(goal).toHaveValue("300");
+  await goal.press("ArrowRight");
+  await goal.press("ArrowRight");
+  await goal.press("ArrowRight");
+  await expect(goal).toHaveValue("450");
   await page.getByRole("button", { name: "Start udfordringen" }).click();
-  await expect(page.getByText("0 / 300 min")).toBeVisible();
+  await expect(page.getByText("0 / 450 min")).toBeVisible();
   await page.getByRole("button", { name: "Indstillinger" }).click();
   await expect(page.getByText("Der er en udfordring i gang")).toBeVisible();
   await expect(page.getByRole("button", { name: "Rediger udfordring" })).toBeVisible();
 });
 
-test("none state: Settings pre-fills 450 goal + today+30 deadline defaults", async ({ page }) => {
+test("none state: Settings pre-fills 300 goal + today+30 deadline defaults", async ({ page }) => {
   await page.goto("./");
   await page.getByRole("button", { name: "Start en udfordring" }).click();
-  await expect(page.getByLabel("Læsemål")).toHaveValue("450");
+  await expect(page.getByLabel("Læsemål")).toHaveValue("300");
   await expect(page.getByLabel("Slutdato")).toHaveValue(iso(30));
 });
 
@@ -118,12 +118,12 @@ test("a legacy out-of-range goal clamps into the slider range", async ({ page, c
 test("effort/per-day recomputes from the deadline", async ({ page }) => {
   await page.goto("./");
   await page.getByRole("button", { name: "Start en udfordring" }).click();
-  // Default draft: goal 450, deadline today+30 → 450/30 = 15 min/dag.
-  await expect(page.getByText("Ca. 15 min om dagen")).toBeVisible();
-  // Push the deadline out to today+90 → 450/90 = 5 min/dag.
+  // Default draft: goal 300, deadline today+30 → 300/30 = 10 min/dag.
+  await expect(page.getByText("Ca. 10 min / dag")).toBeVisible();
+  // Push the deadline out to today+90 → 300/90 = 3 min/dag.
   await page.getByLabel("Slutdato").fill(iso(90));
-  await expect(page.getByText("Ca. 5 min om dagen")).toBeVisible();
-  await expect(page.getByText("Ca. 15 min om dagen")).toHaveCount(0);
+  await expect(page.getByText("Ca. 3 min / dag")).toBeVisible();
+  await expect(page.getByText("Ca. 10 min / dag")).toHaveCount(0);
 });
 
 test("add a reading updates the log list and total", async ({ page, context }) => {
@@ -238,7 +238,7 @@ test("completed → start new → confirm wipes the log and opens setup", async 
 
   // Now in none setup: single start button + defaults restored.
   await expect(page.getByRole("button", { name: "Start udfordringen" })).toBeVisible();
-  await expect(page.getByLabel("Læsemål")).toHaveValue("450");
+  await expect(page.getByLabel("Læsemål")).toHaveValue("300");
   const entries = await page.evaluate(() => localStorage.getItem("sommerlaesning.v1.entries"));
   expect(entries).toBe("[]");
 });

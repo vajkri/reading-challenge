@@ -128,23 +128,8 @@ export default function GoalField() {
         </span>
       </div>
 
-      {/* Indsats caption (written once) */}
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          letterSpacing: ".14em",
-          textTransform: "uppercase",
-          color: "#C2B299",
-          textAlign: "center",
-          marginBottom: 5,
-        }}
-      >
-        {g.effortCaption}
-      </div>
-
       {/* Zone labels overlay */}
-      <div style={{ position: "relative", height: 20, marginBottom: 8 }}>
+      <div style={{ position: "relative", height: 20, marginTop: 4, marginBottom: 8 }}>
         {/* Hide a label when its band is too narrow to fit the word (~7–11% of track). */}
         {zoneLabel("lille", lilleCenter, p1 > 0.07, active === "lille")}
         {zoneLabel("mellem", mellemCenter, p2 - p1 > 0.11, active === "mellem")}
