@@ -292,8 +292,14 @@ test("bingo: tapping a tile opens the modal and marks it done", async ({ page })
   await expect(page.getByText("Find et træ eller en bænk udenfor og læs der.")).toBeVisible();
   await page.getByRole("button", { name: "Marker som færdig" }).click();
 
-  // Modal stays open; tile is now done and the sheet offers Undo.
+  // The flip registers in the still-visible sheet (button becomes Undo)…
   await expect(tile).toHaveAttribute("data-done", "true");
+  await expect(page.getByRole("button", { name: "Fortryd" })).toBeVisible();
+  // …then the sheet auto-dismisses so the board (and any confetti) is revealed.
+  await page.clock.runFor(700);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  // Reopening a completed tile still offers the (destructive) Undo.
+  await tile.click();
   await expect(page.getByRole("button", { name: "Fortryd" })).toBeVisible();
 });
 

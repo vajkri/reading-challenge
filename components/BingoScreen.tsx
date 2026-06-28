@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "@/lib/store";
 import { copy, interp } from "@/lib/copy";
 import BingoModal from "@/components/BingoModal";
@@ -9,10 +9,36 @@ import BingoConfetti from "@/components/BingoConfetti";
 
 const display: React.CSSProperties = { fontFamily: "var(--font-display)" };
 
+// The detail sheet lingers briefly after a mark/undo tap so the state flip is
+// seen, then auto-dismisses — short enough that the row/board confetti is
+// revealed promptly behind the dismissed sheet.
+const AUTO_CLOSE_MS = 500;
+
 export default function BingoScreen() {
   const { derived, actions } = useApp();
   const b = derived.bingo;
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear any pending auto-close when the screen unmounts.
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    };
+  }, []);
+
+  const closeModal = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setSelectedId(null);
+  };
+
+  // Toggle the feat, then auto-dismiss the sheet so the change registers and any
+  // completed-row/board confetti becomes visible.
+  const toggleAndClose = (id: string) => {
+    actions.toggleFeat(id);
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setSelectedId(null), AUTO_CLOSE_MS);
+  };
 
   // Off-season: a season tab exists but no active board → teaser.
   if (!b.active) {
@@ -123,8 +149,8 @@ export default function BingoScreen() {
       {selected && (
         <BingoModal
           feat={selected}
-          onToggle={() => actions.toggleFeat(selected.id)}
-          onClose={() => setSelectedId(null)}
+          onToggle={() => toggleAndClose(selected.id)}
+          onClose={closeModal}
         />
       )}
     </section>

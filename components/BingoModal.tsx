@@ -81,6 +81,7 @@ export default function BingoModal({
         aria-label={feat.title}
         onClick={(e) => e.stopPropagation()}
         style={{
+          position: "relative",
           width: "100%",
           maxWidth: 430,
           background: "#FFF6E9",
@@ -91,6 +92,26 @@ export default function BingoModal({
           animation: "mons-sheet .26s ease-out",
         }}
       >
+        {/* "Færdig" status rides the sheet's top-right edge (absolute) so the
+            sheet height is identical whether the feat is done or not. */}
+        {feat.done && (
+          <span
+            style={{
+              position: "absolute",
+              top: 14,
+              right: 16,
+              background: "#E4F1D8",
+              color: "#4C7A2E",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 12,
+              padding: "4px 10px",
+              borderRadius: 999,
+            }}
+          >
+            {copy.bingo.modal.doneState}
+          </span>
+        )}
         <div style={{ fontSize: 52, lineHeight: 1, marginBottom: 8 }}>{feat.emoji}</div>
         <div
           style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: "#4F4034" }}
@@ -110,14 +131,6 @@ export default function BingoModal({
           {feat.desc}
         </p>
 
-        {feat.done && (
-          <div
-            style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "#4C7A2E", marginBottom: 14 }}
-          >
-            {copy.bingo.modal.doneState}
-          </div>
-        )}
-
         <button
           ref={actionRef}
           type="button"
@@ -127,9 +140,12 @@ export default function BingoModal({
             width: "100%",
             padding: 15,
             borderRadius: 16,
-            border: feat.done ? "2px solid #7BAE52" : "0",
+            // Undo is destructive → redish outline; mark-done is the green primary.
+            // Both keep a 2px border (mark-done's matches its fill) so the button —
+            // and thus the sheet height — is identical across done/not-done states.
+            border: feat.done ? "2px solid #C45B40" : "2px solid #5C8A3F",
             background: feat.done ? "transparent" : "#5C8A3F",
-            color: feat.done ? "#4C7A2E" : "#fff",
+            color: feat.done ? "#C45B40" : "#fff",
             fontFamily: "var(--font-display)",
             fontWeight: 700,
             fontSize: 17,
