@@ -27,6 +27,7 @@ import {
   DEFAULTS,
   loadState,
   newId,
+  saveBingo,
   saveChallenge,
   saveDeadline,
   saveEntries,
@@ -37,13 +38,19 @@ import {
   totalMinutes,
 } from "@/lib/storage";
 import { joyForPct, pctFor, ringOffset, deadlineInfo } from "@/lib/joy";
+import {
+  SEASONS,
+  activeSeason,
+  isBoardComplete,
+  completedRowCount,
+} from "@/lib/bingo";
 import { copy, interp, DATE_LOCALE } from "@/lib/copy";
 
 // ---------------------------------------------------------------------------
 // State
 // ---------------------------------------------------------------------------
 
-export type Screen = "progress" | "log" | "settings";
+export type Screen = "progress" | "log" | "settings" | "bingo";
 
 interface FormState {
   title: string;
@@ -61,6 +68,9 @@ interface UIState {
   confirmId: string | null;
   form: FormState;
   flashId: string | null; // entry that just got edited (green flash)
+  // Transient bingo celebration: set on a feat-toggle that newly completes a
+  // row/board, auto-cleared by a timer (NOT persisted). "board" outranks "row".
+  bingoConfetti: "none" | "row" | "board";
   // Settings drafts — committed together by START_CHALLENGE / UPDATE_CHALLENGE
   goalDraft: string;
   nameDraft: string;
@@ -89,6 +99,7 @@ const INITIAL: State = {
   confirmId: null,
   form: { title: "", author: "", date: "", minutes: "" },
   flashId: null,
+  bingoConfetti: "none",
   goalDraft: String(DEFAULTS.goal),
   nameDraft: DEFAULTS.name,
   deadlineDraft: DEFAULTS.deadline,
@@ -196,7 +207,9 @@ type Action =
   | { type: "SET_UNLOCK_INPUT"; value: string }
   | { type: "SUBMIT_UNLOCK"; nextA: number; nextB: number }
   | { type: "CLOSE_UNLOCK" }
-  | { type: "CLEAR_FLASH" };
+  | { type: "CLEAR_FLASH" }
+  | { type: "TOGGLE_FEAT"; seasonId: string; featId: string }
+  | { type: "CLEAR_BINGO_CONFETTI" };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -438,6 +451,34 @@ function reducer(state: State, action: Action): State {
     case "CLEAR_FLASH":
       return { ...state, flashId: null };
 
+    case "TOGGLE_FEAT": {
+      const season = SEASONS.find((s) => s.id === action.seasonId);
+      if (!season) return state;
+
+      const prev = state.bingo[action.seasonId] ?? [];
+      const wasDone = prev.includes(action.featId);
+      const next = wasDone
+        ? prev.filter((id) => id !== action.featId)
+        : [...prev, action.featId];
+      const bingo = { ...state.bingo, [action.seasonId]: next };
+
+      // Confetti only when COMPLETING (not undoing) and a new row/board lands.
+      let bingoConfetti = state.bingoConfetti;
+      if (!wasDone) {
+        const before = new Set(prev);
+        const after = new Set(next);
+        const boardNew = isBoardComplete(season.feats, after) && !isBoardComplete(season.feats, before);
+        const rowNew = completedRowCount(season.feats, after) > completedRowCount(season.feats, before);
+        if (boardNew) bingoConfetti = "board";
+        else if (rowNew) bingoConfetti = "row";
+      }
+
+      return { ...state, bingo, bingoConfetti };
+    }
+
+    case "CLEAR_BINGO_CONFETTI":
+      return { ...state, bingoConfetti: "none" };
+
     default:
       return state;
   }
@@ -446,6 +487,25 @@ function reducer(state: State, action: Action): State {
 // ---------------------------------------------------------------------------
 // Derived values (the rest of renderVals())
 // ---------------------------------------------------------------------------
+
+export interface BingoFeatView {
+  id: string;
+  emoji: string;
+  card: string; // single-word card label
+  title: string; // full feat title (modal)
+  desc: string; // one-sentence description (modal)
+  done: boolean;
+}
+
+export interface BingoView {
+  active: boolean; // a season window contains today
+  seasonId: string | null;
+  seasonName: string;
+  feats: BingoFeatView[];
+  doneCount: number;
+  boardComplete: boolean;
+  confetti: "none" | "row" | "board";
+}
 
 export interface RecentBook {
   title: string;
@@ -462,6 +522,11 @@ export interface EntryView {
   editing: boolean;
   flashing: boolean;
 }
+
+// copy.bingo.seasons is keyed by season id; index it through a Record cast
+// because the JSON-inferred type only knows the literal "sommer-26" key.
+interface FeatCopy { card: string; title: string; desc: string }
+interface SeasonCopy { name: string; feats: Record<string, FeatCopy> }
 
 export interface Derived {
   total: number;
@@ -494,6 +559,7 @@ export interface Derived {
   showEditBanner: boolean; // ongoing + locked → "edit it?" + Rediger udfordring
   showDoneBanner: boolean; // completed → "🎉 complete" + Start ny udfordring
   isEditing: boolean;      // ongoing + unlocked session → show Opdater udfordring
+  bingo: BingoView;
 }
 
 function computeDerived(state: State): Derived {
@@ -584,6 +650,45 @@ function computeDerived(state: State): Derived {
   const showEditBanner = isOngoing && !state.editing;
   const showDoneBanner = isCompleted;
 
+  // ---- Bingo (standalone; independent of the challenge lifecycle) ----
+  const season = activeSeason(SEASONS, new Date());
+  let bingo: BingoView;
+  if (!season) {
+    bingo = {
+      active: false,
+      seasonId: null,
+      seasonName: "",
+      feats: [],
+      doneCount: 0,
+      boardComplete: false,
+      confetti: state.bingoConfetti,
+    };
+  } else {
+    const doneIds = new Set(state.bingo[season.id] ?? []);
+    const seasonsCopy = copy.bingo.seasons as unknown as Record<string, SeasonCopy>;
+    const sc = seasonsCopy[season.id];
+    const feats: BingoFeatView[] = season.feats.map((f) => {
+      const fc = sc.feats[f.id];
+      return {
+        id: f.id,
+        emoji: f.emoji,
+        card: fc.card,
+        title: fc.title,
+        desc: fc.desc,
+        done: doneIds.has(f.id),
+      };
+    });
+    bingo = {
+      active: true,
+      seasonId: season.id,
+      seasonName: sc.name,
+      feats,
+      doneCount: doneIds.size,
+      boardComplete: isBoardComplete(season.feats, doneIds),
+      confetti: state.bingoConfetti,
+    };
+  }
+
   return {
     total,
     pct,
@@ -613,6 +718,7 @@ function computeDerived(state: State): Derived {
     showEditBanner,
     showDoneBanner,
     isEditing,
+    bingo,
   };
 }
 
@@ -624,6 +730,8 @@ export interface Actions {
   goProgress: () => void;
   goLog: () => void;
   goSettings: () => void;
+  goBingo: () => void;
+  toggleFeat: (featId: string) => void;
   startChallenge: () => void;
   updateChallenge: () => void;
   requestNewChallenge: () => void;
@@ -690,6 +798,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (state.hydrated) saveMascot(state.mascot);
   }, [state.mascot, state.hydrated]);
+  useEffect(() => {
+    if (state.hydrated) saveBingo(state.bingo);
+  }, [state.bingo, state.hydrated]);
 
   // Auto-clear the edited-entry green flash (~1.5s).
   useEffect(() => {
@@ -698,11 +809,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [state.flashId]);
 
+  // Auto-clear the bingo row/board confetti after its run (~2.5s).
+  useEffect(() => {
+    if (state.bingoConfetti === "none") return;
+    const t = setTimeout(() => dispatch({ type: "CLEAR_BINGO_CONFETTI" }), 2500);
+    return () => clearTimeout(t);
+  }, [state.bingoConfetti]);
+
   const actions = useMemo<Actions>(
     () => ({
       goProgress: () => dispatch({ type: "SET_SCREEN", screen: "progress" }),
       goLog: () => dispatch({ type: "SET_SCREEN", screen: "log" }),
       goSettings: () => dispatch({ type: "GO_SETTINGS" }),
+      goBingo: () => dispatch({ type: "SET_SCREEN", screen: "bingo" }),
+      toggleFeat: (featId) => {
+        const s = activeSeason(SEASONS, new Date());
+        if (s) dispatch({ type: "TOGGLE_FEAT", seasonId: s.id, featId });
+      },
       startChallenge: () => dispatch({ type: "START_CHALLENGE" }),
       updateChallenge: () => dispatch({ type: "UPDATE_CHALLENGE" }),
       requestNewChallenge: () => dispatch({ type: "OPEN_NEW_CHALLENGE" }),
