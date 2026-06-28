@@ -74,6 +74,12 @@ export default function BottomNav() {
           <circle cx="15" cy="16" r="2.6" fill="none" />
         </svg>
       </Tab>
+      <Tab active={s === "bingo"} label={copy.bingo.nav} onClick={actions.goBingo}>
+        <svg {...iconProps} strokeWidth={2}>
+          <rect x="4" y="4" width="16" height="16" rx="2.5" />
+          <path d="M9.3 4 V20 M14.7 4 V20 M4 9.3 H20 M4 14.7 H20" />
+        </svg>
+      </Tab>
     </nav>
   );
 }
