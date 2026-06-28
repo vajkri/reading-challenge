@@ -96,8 +96,15 @@
     },
     "goal": {
       "heading": "Læsemål",
-      "sub": "Hvor mange minutter vil I gerne læse i alt?",
-      "unit": "min"
+      "sub": "Vælg jeres mål — træk for at finjustere.",
+      "unit": "min",
+      "effortCaption": "Indsats",
+      "effort": {
+        "lille": "Lille",
+        "mellem": "Mellem",
+        "stor": "Stor"
+      },
+      "perDay": "Ca. {count} min om dagen"
     },
     "deadline": {
       "heading": "Slutdato",
