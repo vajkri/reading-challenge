@@ -65,13 +65,13 @@ export default function BingoModal({
     <div
       onClick={onClose}
       style={{
-        position: "absolute",
+        position: "fixed",
         inset: 0,
         background: "rgba(60,42,22,.42)",
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "center",
-        zIndex: 40,
+        zIndex: 50,
       }}
     >
       <div
@@ -82,6 +82,7 @@ export default function BingoModal({
         onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
+          maxWidth: 430,
           background: "#FFF6E9",
           borderRadius: "24px 24px 0 0",
           padding: "26px 22px calc(22px + env(safe-area-inset-bottom))",
