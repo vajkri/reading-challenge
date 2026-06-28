@@ -667,31 +667,45 @@ function computeDerived(state: State): Derived {
     const doneIds = new Set(state.bingo[season.id] ?? []);
     const seasonsCopy = copy.bingo.seasons as unknown as Record<string, SeasonCopy>;
     const sc = seasonsCopy[season.id];
-    // Skip a feat whose copy entry is missing (e.g. a future season adds a feat
-    // id to SEASONS but not yet to copy/da.json) rather than crashing the screen.
-    const feats: BingoFeatView[] = season.feats.flatMap((f) => {
-      const fc = sc.feats[f.id];
-      if (!fc) return [];
-      return [
-        {
-          id: f.id,
-          emoji: f.emoji,
-          card: fc.card,
-          title: fc.title,
-          desc: fc.desc,
-          done: doneIds.has(f.id),
-        },
-      ];
-    });
-    bingo = {
-      active: true,
-      seasonId: season.id,
-      seasonName: sc.name,
-      feats,
-      doneCount: doneIds.size,
-      boardComplete: isBoardComplete(season.feats, doneIds),
-      confetti: state.bingoConfetti,
-    };
+    if (!sc) {
+      // A future season is in SEASONS but its copy block is missing from
+      // da.json — fall back to the teaser shape instead of crashing every render.
+      bingo = {
+        active: false,
+        seasonId: null,
+        seasonName: "",
+        feats: [],
+        doneCount: 0,
+        boardComplete: false,
+        confetti: state.bingoConfetti,
+      };
+    } else {
+      // Skip a feat whose copy entry is missing (e.g. a future season adds a feat
+      // id to SEASONS but not yet to copy/da.json) rather than crashing the screen.
+      const feats: BingoFeatView[] = season.feats.flatMap((f) => {
+        const fc = sc.feats[f.id];
+        if (!fc) return [];
+        return [
+          {
+            id: f.id,
+            emoji: f.emoji,
+            card: fc.card,
+            title: fc.title,
+            desc: fc.desc,
+            done: doneIds.has(f.id),
+          },
+        ];
+      });
+      bingo = {
+        active: true,
+        seasonId: season.id,
+        seasonName: sc.name,
+        feats,
+        doneCount: doneIds.size,
+        boardComplete: isBoardComplete(season.feats, doneIds),
+        confetti: state.bingoConfetti,
+      };
+    }
   }
 
   return {
@@ -814,10 +828,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [state.flashId]);
 
-  // Auto-clear the bingo row/board confetti after its run (~2.5s).
+  // Auto-clear the bingo row/board confetti after its run (~3.5s, covering the
+  // ~3.6s two-iteration mons-fall burst so it isn't cut off mid-fall).
   useEffect(() => {
     if (state.bingoConfetti === "none") return;
-    const t = setTimeout(() => dispatch({ type: "CLEAR_BINGO_CONFETTI" }), 2500);
+    const t = setTimeout(() => dispatch({ type: "CLEAR_BINGO_CONFETTI" }), 3500);
     return () => clearTimeout(t);
   }, [state.bingoConfetti]);
 

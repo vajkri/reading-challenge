@@ -1,7 +1,7 @@
 "use client";
 
-// Bottom tab bar: Fremgang / Læselog / Indstillinger. Active tab is amber accent,
-// inactive is muted. State-driven (no routing) to match the prototype.
+// Bottom tab bar: Fremgang / Læselog / Indstillinger / Bingo. Active tab is amber
+// accent, inactive is muted. State-driven (no routing) to match the prototype.
 
 import type { ReactNode } from "react";
 import { useApp } from "@/lib/store";
