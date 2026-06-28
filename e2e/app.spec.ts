@@ -261,3 +261,72 @@ test("state persists across reload (hydration)", async ({ page }) => {
   await page.getByRole("button", { name: "Læselog" }).click();
   await expect(page.getByText("Vedholdende Bog")).toBeVisible();
 });
+
+// --- Bingo (seasonal board) ---------------------------------------------
+
+// A date inside the Sommer '26 window (1 Jun–31 Aug 2026) and one outside it.
+const IN_SEASON = new Date("2026-07-01T10:00:00");
+const OFF_SEASON = new Date("2026-12-01T10:00:00");
+
+test("bingo: in-season shows the 3x5 board and feat titles", async ({ page }) => {
+  await page.clock.install({ time: IN_SEASON });
+  await page.goto("./");
+  await page.getByRole("button", { name: "Bingo" }).click();
+  await expect(page.getByText("Læsebingo")).toBeVisible();
+  await expect(page.getByText("Sommer '26", { exact: false })).toBeVisible();
+  // 15 feat tiles (buttons are aria-labelled by full title).
+  await expect(page.getByRole("button", { name: "Læs i naturen" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Læs på stranden" })).toBeVisible();
+});
+
+test("bingo: tapping a tile opens the modal and marks it done", async ({ page }) => {
+  await page.clock.install({ time: IN_SEASON });
+  await page.goto("./");
+  await page.getByRole("button", { name: "Bingo" }).click();
+
+  const tile = page.getByRole("button", { name: "Læs i naturen" });
+  await expect(tile).toHaveAttribute("data-done", "false");
+  await tile.click();
+
+  // Modal shows the description + the mark-done action.
+  await expect(page.getByText("Find et træ eller en bænk udenfor og læs der.")).toBeVisible();
+  await page.getByRole("button", { name: "Marker som færdig" }).click();
+
+  // Modal stays open; tile is now done and the sheet offers Undo.
+  await expect(tile).toHaveAttribute("data-done", "true");
+  await expect(page.getByRole("button", { name: "Fortryd" })).toBeVisible();
+});
+
+test("bingo: a saved completed feat reloads from storage", async ({ page, context }) => {
+  await page.clock.install({ time: IN_SEASON });
+  await seed(context, { bingo: { "sommer-26": ["natur"] } });
+  await page.goto("./");
+  await page.getByRole("button", { name: "Bingo" }).click();
+  await expect(page.getByRole("button", { name: "Læs i naturen" })).toHaveAttribute(
+    "data-done",
+    "true",
+  );
+});
+
+test("bingo: completing a full row triggers row confetti", async ({ page }) => {
+  await page.clock.install({ time: IN_SEASON });
+  await page.goto("./");
+  await page.getByRole("button", { name: "Bingo" }).click();
+
+  for (const name of ["Læs med en ven", "Læs i naturen", "Læs på ferie"]) {
+    await page.getByRole("button", { name }).click();
+    await page.getByRole("button", { name: "Marker som færdig" }).click();
+    // Modal stays open after marking done — close it before clicking the next tile.
+    await page.getByRole("button", { name: "Luk" }).click();
+  }
+  // The burst mounts on the toggle that completed the top row.
+  await expect(page.getByTestId("bingo-confetti")).toBeVisible();
+});
+
+test("bingo: off-season shows the teaser, not the board", async ({ page }) => {
+  await page.clock.install({ time: OFF_SEASON });
+  await page.goto("./");
+  await page.getByRole("button", { name: "Bingo" }).click();
+  await expect(page.getByText("Næste sæson kommer snart", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Læs i naturen" })).toHaveCount(0);
+});
