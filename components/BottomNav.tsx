@@ -1,7 +1,7 @@
 "use client";
 
-// Bottom tab bar: Fremgang / Læselog / Indstillinger. Active tab is amber accent,
-// inactive is muted. State-driven (no routing) to match the prototype.
+// Bottom tab bar: Fremgang / Læselog / Bingo / Indstillinger. Active tab is amber
+// accent, inactive is muted. State-driven (no routing) to match the prototype.
 
 import type { ReactNode } from "react";
 import { useApp } from "@/lib/store";
@@ -65,6 +65,12 @@ export default function BottomNav() {
         <svg {...iconProps}>
           <path d="M5 5.5 C5 4.7 5.7 4 6.5 4 H18 C18.5 4 19 4.5 19 5 V19 C19 19.5 18.5 20 18 20 H6.5 C5.7 20 5 19.3 5 18.5 Z" />
           <path d="M9 8.5 H15 M9 12 H14" />
+        </svg>
+      </Tab>
+      <Tab active={s === "bingo"} label={copy.bingo.nav} onClick={actions.goBingo}>
+        <svg {...iconProps} strokeWidth={2}>
+          <rect x="4" y="4" width="16" height="16" rx="2.5" />
+          <path d="M9.3 4 V20 M14.7 4 V20 M4 9.3 H20 M4 14.7 H20" />
         </svg>
       </Tab>
       <Tab active={s === "settings"} label={copy.nav.settings} onClick={actions.goSettings}>

@@ -126,5 +126,42 @@
       "confirm": "Ja, start forfra",
       "cancel": "Fortryd"
     }
+  },
+  "bingo": {
+    "nav": "Bingo",
+    "title": "Læsebingo",
+    "countLabel": "{done} af {total} felter",
+    "teaser": {
+      "heading": "Ingen bingo lige nu",
+      "sub": "Næste sæson kommer snart – hold øje!"
+    },
+    "modal": {
+      "markDone": "Marker som færdig",
+      "undo": "Fortryd",
+      "doneState": "✓ Færdig!",
+      "close": "Luk"
+    },
+    "seasons": {
+      "sommer-26": {
+        "name": "Sommer '26",
+        "feats": {
+          "ven": { "card": "Ven", "title": "Læs med en ven", "desc": "Læs en bog sammen med en kammerat." },
+          "natur": { "card": "Natur", "title": "Læs i naturen", "desc": "Find et træ eller en bænk udenfor og læs der." },
+          "ferie": { "card": "Ferie", "title": "Læs på ferie", "desc": "Tag en bog med, når I er væk hjemmefra." },
+          "liggende": { "card": "Liggende", "title": "Læs liggende", "desc": "Læg dig godt til rette og læs." },
+          "blad": { "card": "Blad", "title": "Læs i et blad", "desc": "Læs et magasin, en tegneserie eller en avis." },
+          "sprog": { "card": "Sprog", "title": "Læs på et andet sprog", "desc": "Læs noget på et andet sprog end dansk." },
+          "digt": { "card": "Digt", "title": "Læs et digt", "desc": "Find et digt og læs det højt." },
+          "lydbog": { "card": "Lydbog", "title": "Lyt til en lydbog", "desc": "Hør en lydbog – det tæller også!" },
+          "solbriller": { "card": "Solbriller", "title": "Læs med solbriller", "desc": "Tag solbriller på og læs i solen." },
+          "kreativt": { "card": "Kreativt", "title": "Læs kreativt", "desc": "Læs et sted eller på en måde, du aldrig har prøvet." },
+          "dyr": { "card": "Dyr", "title": "Læs for et dyr", "desc": "Læs højt for et kæledyr eller et bamsedyr." },
+          "alene": { "card": "Alene", "title": "Læs alene", "desc": "Find et roligt sted og læs helt for dig selv." },
+          "hojt": { "card": "Højt", "title": "Læs højt", "desc": "Læs en historie højt for nogen." },
+          "eventyr": { "card": "Eventyr", "title": "Læs et eventyr", "desc": "Læs et klassisk eventyr." },
+          "strand": { "card": "Strand", "title": "Læs på stranden", "desc": "Tag en bog med på stranden." }
+        }
+      }
+    }
   }
 }
