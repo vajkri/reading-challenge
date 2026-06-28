@@ -10,6 +10,7 @@ import BottomNav from "@/components/BottomNav";
 import ProgressScreen from "@/components/ProgressScreen";
 import LogScreen from "@/components/LogScreen";
 import SettingsScreen from "@/components/SettingsScreen";
+import NewChallengeModal from "@/components/NewChallengeModal";
 
 export default function AppShell() {
   const { state } = useApp();
@@ -54,6 +55,7 @@ export default function AppShell() {
         )}
       </main>
 
+      <NewChallengeModal />
       <BottomNav />
     </div>
   );
