@@ -61,14 +61,15 @@ interface UIState {
   confirmId: string | null;
   form: FormState;
   flashId: string | null; // entry that just got edited (green flash)
-  // Settings drafts + "✓ gemt" flash flags
+  // Settings drafts — committed together by START_CHALLENGE / UPDATE_CHALLENGE
   goalDraft: string;
   nameDraft: string;
   deadlineDraft: string;
-  goalSaved: boolean;
-  nameSaved: boolean;
-  deadlineSaved: boolean;
-  mascotSaved: boolean;
+  mascotDraft: MascotKey;
+  // Transient "editing a running challenge" session (NOT persisted → resets on refresh)
+  editing: boolean;
+  // Destructive "start a new challenge" confirm dialog
+  newChallengeOpen: boolean;
   // Parental unlock modal
   unlockOpen: boolean;
   unlockInput: string;
@@ -91,10 +92,9 @@ const INITIAL: State = {
   goalDraft: String(DEFAULTS.goal),
   nameDraft: DEFAULTS.name,
   deadlineDraft: DEFAULTS.deadline,
-  goalSaved: false,
-  nameSaved: false,
-  deadlineSaved: false,
-  mascotSaved: false,
+  mascotDraft: DEFAULTS.mascot,
+  editing: false,
+  newChallengeOpen: false,
   unlockOpen: false,
   unlockInput: "",
   unlockError: false,
@@ -125,22 +125,32 @@ function todayISO(): string {
 }
 
 /**
- * Seed the Settings goal/deadline drafts. When the challenge is "none" the form
- * pre-fills the none-defaults (450 / today+30); otherwise it mirrors the saved
- * goal/deadline so an ongoing/completed challenge shows its real values.
+ * Seed the Settings drafts. For a "none" challenge the form shows the fixed
+ * new-challenge defaults (goal 450 / today+30 / "Max" / cat); otherwise it
+ * mirrors the saved values so an ongoing/completed challenge shows its reals.
+ * Drafts only — never persisted until START_CHALLENGE / UPDATE_CHALLENGE.
  */
 function seedDrafts(
   challenge: ChallengeStatus,
   goal: number,
   deadline: string,
-): { goalDraft: string; deadlineDraft: string } {
+  name: string,
+  mascot: MascotKey,
+): { goalDraft: string; deadlineDraft: string; nameDraft: string; mascotDraft: MascotKey } {
   if (challenge === "none") {
     return {
       goalDraft: String(NONE_DEFAULT_GOAL),
       deadlineDraft: isoPlusDays(NONE_DEFAULT_DEADLINE_DAYS),
+      nameDraft: DEFAULTS.name,
+      mascotDraft: DEFAULTS.mascot,
     };
   }
-  return { goalDraft: String(goal), deadlineDraft: deadline };
+  return {
+    goalDraft: String(goal),
+    deadlineDraft: deadline,
+    nameDraft: name,
+    mascotDraft: mascot,
+  };
 }
 
 /** Danish short date, e.g. "27. jun". Empty for blank/invalid input. */
@@ -164,7 +174,10 @@ type Action =
   | { type: "SET_SCREEN"; screen: Screen }
   | { type: "GO_SETTINGS" }
   | { type: "START_CHALLENGE" }
-  | { type: "NEW_CHALLENGE" }
+  | { type: "UPDATE_CHALLENGE" }
+  | { type: "OPEN_NEW_CHALLENGE" }
+  | { type: "CONFIRM_NEW_CHALLENGE" }
+  | { type: "CLOSE_NEW_CHALLENGE" }
   | { type: "OPEN_ADD"; today: string }
   | { type: "OPEN_EDIT"; entry: Entry }
   | { type: "CLOSE_FORM" }
@@ -176,18 +189,14 @@ type Action =
   | { type: "PICK_RECENT"; title: string; author: string }
   | { type: "SET_GOAL_DRAFT"; value: string }
   | { type: "PRESET_GOAL"; value: string }
-  | { type: "SAVE_GOAL" }
   | { type: "SET_NAME_DRAFT"; value: string }
-  | { type: "SAVE_NAME" }
   | { type: "SET_DEADLINE_DRAFT"; value: string }
-  | { type: "SAVE_DEADLINE" }
   | { type: "PICK_MASCOT"; mascot: MascotKey }
-  | { type: "LOCK" }
   | { type: "OPEN_UNLOCK"; uA: number; uB: number }
   | { type: "SET_UNLOCK_INPUT"; value: string }
   | { type: "SUBMIT_UNLOCK"; nextA: number; nextB: number }
   | { type: "CLOSE_UNLOCK" }
-  | { type: "CLEAR_FLASH"; which: "goal" | "name" | "deadline" | "mascot" | "entry" };
+  | { type: "CLEAR_FLASH" };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -196,27 +205,32 @@ function reducer(state: State, action: Action): State {
         ...state,
         ...action.payload,
         hydrated: true,
-        ...seedDrafts(action.payload.challenge, action.payload.goal, action.payload.deadline),
-        nameDraft: action.payload.name,
+        ...seedDrafts(
+          action.payload.challenge,
+          action.payload.goal,
+          action.payload.deadline,
+          action.payload.name,
+          action.payload.mascot,
+        ),
       };
 
     case "SET_SCREEN":
-      return { ...state, screen: action.screen };
+      // Any navigation ends a transient edit session (re-locks the running challenge).
+      return { ...state, screen: action.screen, editing: false };
 
     case "GO_SETTINGS":
+      // Entering Settings always starts locked; seed drafts from current values
+      // (or the none-defaults when there is no challenge).
       return {
         ...state,
         screen: "settings",
-        ...seedDrafts(state.challenge, state.goal, state.deadline),
-        nameDraft: state.name,
-        goalSaved: false,
-        nameSaved: false,
-        deadlineSaved: false,
-        mascotSaved: false,
+        editing: false,
+        ...seedDrafts(state.challenge, state.goal, state.deadline, state.name, state.mascot),
       };
 
     case "START_CHALLENGE": {
-      // Commit the Settings drafts, start the challenge, auto-lock, go to Fremgang.
+      // Commit all drafts, start the challenge, go to Fremgang. (No lock toggle:
+      // an ongoing challenge is locked by default; editing is a transient session.)
       const parsed = Math.round(Number(state.goalDraft));
       const goal = parsed >= 1 ? parsed : state.goal;
       const name = state.nameDraft.trim() || state.name;
@@ -225,28 +239,59 @@ function reducer(state: State, action: Action): State {
         goal,
         name,
         deadline: state.deadlineDraft,
+        mascot: state.mascotDraft,
         challenge: "ongoing",
-        locked: true,
+        editing: false,
         screen: "progress",
-        goalSaved: false,
-        nameSaved: false,
-        deadlineSaved: false,
       };
     }
 
-    case "NEW_CHALLENGE":
-      // Non-destructive: entries/minutes are kept (cumulative). Reopen Settings.
+    case "UPDATE_CHALLENGE": {
+      // Commit edits to a running challenge, then re-lock and stay on Settings.
+      const parsed = Math.round(Number(state.goalDraft));
+      const goal = parsed >= 1 ? parsed : state.goal;
+      const name = state.nameDraft.trim() || state.name;
+      // Edge case: lowering the goal below the logged total auto-completes it.
+      let challenge: ChallengeStatus = state.challenge;
+      let screen: Screen = state.screen;
+      if (state.challenge === "ongoing" && totalMinutes(state.entries) >= goal) {
+        challenge = "completed";
+        screen = "progress";
+      }
       return {
         ...state,
-        challenge: "none",
+        goal,
+        name,
+        deadline: state.deadlineDraft,
+        mascot: state.mascotDraft,
+        challenge,
+        screen,
+        editing: false,
+      };
+    }
+
+    case "OPEN_NEW_CHALLENGE":
+      return { ...state, newChallengeOpen: true };
+
+    case "CLOSE_NEW_CHALLENGE":
+      return { ...state, newChallengeOpen: false };
+
+    case "CONFIRM_NEW_CHALLENGE":
+      // Destructive reset: wipe the log + reset persisted config to fresh-install
+      // defaults, then drop into the open `none` setup (drafts = none-defaults).
+      return {
+        ...state,
+        entries: [],
+        goal: DEFAULTS.goal,
+        name: DEFAULTS.name,
+        deadline: DEFAULTS.deadline,
+        mascot: DEFAULTS.mascot,
         locked: false,
+        challenge: "none",
+        editing: false,
+        newChallengeOpen: false,
         screen: "settings",
-        ...seedDrafts("none", state.goal, state.deadline),
-        nameDraft: state.name,
-        goalSaved: false,
-        nameSaved: false,
-        deadlineSaved: false,
-        mascotSaved: false,
+        ...seedDrafts("none", DEFAULTS.goal, DEFAULTS.deadline, DEFAULTS.name, DEFAULTS.mascot),
       };
 
     case "OPEN_ADD":
@@ -346,35 +391,19 @@ function reducer(state: State, action: Action): State {
       };
 
     case "SET_GOAL_DRAFT":
-      return { ...state, goalDraft: action.value, goalSaved: false };
+      return { ...state, goalDraft: action.value };
 
     case "PRESET_GOAL":
-      return { ...state, goalDraft: action.value, goalSaved: false };
-
-    case "SAVE_GOAL": {
-      const goal = Math.max(1, Math.round(Number(state.goalDraft) || 0));
-      return { ...state, goal, goalSaved: true };
-    }
+      return { ...state, goalDraft: action.value };
 
     case "SET_NAME_DRAFT":
-      return { ...state, nameDraft: action.value, nameSaved: false };
-
-    case "SAVE_NAME": {
-      const name = state.nameDraft.trim() || state.name;
-      return { ...state, name, nameSaved: true };
-    }
+      return { ...state, nameDraft: action.value };
 
     case "SET_DEADLINE_DRAFT":
-      return { ...state, deadlineDraft: action.value, deadlineSaved: false };
-
-    case "SAVE_DEADLINE":
-      return { ...state, deadline: state.deadlineDraft, deadlineSaved: true };
+      return { ...state, deadlineDraft: action.value };
 
     case "PICK_MASCOT":
-      return { ...state, mascot: action.mascot, mascotSaved: true };
-
-    case "LOCK":
-      return { ...state, locked: true };
+      return { ...state, mascotDraft: action.mascot };
 
     case "OPEN_UNLOCK":
       return {
@@ -391,7 +420,8 @@ function reducer(state: State, action: Action): State {
 
     case "SUBMIT_UNLOCK":
       if (Number(state.unlockInput) === state.uA + state.uB) {
-        return { ...state, locked: false, unlockOpen: false, unlockError: false };
+        // Correct → open a transient edit session and close the gate.
+        return { ...state, editing: true, unlockOpen: false, unlockError: false };
       }
       // Wrong → flash error and regenerate the sum.
       return {
@@ -406,19 +436,7 @@ function reducer(state: State, action: Action): State {
       return { ...state, unlockOpen: false };
 
     case "CLEAR_FLASH":
-      switch (action.which) {
-        case "goal":
-          return { ...state, goalSaved: false };
-        case "name":
-          return { ...state, nameSaved: false };
-        case "deadline":
-          return { ...state, deadlineSaved: false };
-        case "mascot":
-          return { ...state, mascotSaved: false };
-        case "entry":
-          return { ...state, flashId: null };
-      }
-      return state;
+      return { ...state, flashId: null };
 
     default:
       return state;
@@ -470,9 +488,12 @@ export interface Derived {
   deadlineLabel: string;
   // lock gating
   effLocked: boolean;
-  unlocked: boolean;
   lockedPE: "none" | "auto";
   lockedOpacity: number;
+  // settings mode
+  showEditBanner: boolean; // ongoing + locked → "edit it?" + Rediger udfordring
+  showDoneBanner: boolean; // completed → "🎉 complete" + Start ny udfordring
+  isEditing: boolean;      // ongoing + unlocked session → show Opdater udfordring
 }
 
 function computeDerived(state: State): Derived {
@@ -557,8 +578,11 @@ function computeDerived(state: State): Derived {
             : dl.expired;
   }
 
-  const effLocked = challengeStarted && state.locked;
-  const unlocked = challengeStarted && !state.locked;
+  const isEditing = isOngoing && state.editing;
+  // Cards are dimmed + inert whenever a challenge exists and we're not editing.
+  const effLocked = (isOngoing && !state.editing) || isCompleted;
+  const showEditBanner = isOngoing && !state.editing;
+  const showDoneBanner = isCompleted;
 
   return {
     total,
@@ -584,9 +608,11 @@ function computeDerived(state: State): Derived {
     showDeadline,
     deadlineLabel,
     effLocked,
-    unlocked,
     lockedPE: effLocked ? "none" : "auto",
     lockedOpacity: effLocked ? 0.5 : 1,
+    showEditBanner,
+    showDoneBanner,
+    isEditing,
   };
 }
 
@@ -599,7 +625,10 @@ export interface Actions {
   goLog: () => void;
   goSettings: () => void;
   startChallenge: () => void;
-  newChallenge: () => void;
+  updateChallenge: () => void;
+  requestNewChallenge: () => void;
+  confirmNewChallenge: () => void;
+  cancelNewChallenge: () => void;
   openAdd: () => void;
   openEdit: (entry: Entry) => void;
   closeForm: () => void;
@@ -611,13 +640,9 @@ export interface Actions {
   pickRecent: (title: string, author: string) => void;
   setGoalDraft: (value: string) => void;
   presetGoal: (value: string) => void;
-  saveGoal: () => void;
   setNameDraft: (value: string) => void;
-  saveName: () => void;
   setDeadlineDraft: (value: string) => void;
-  saveDeadline: () => void;
   pickMascot: (mascot: MascotKey) => void;
-  lock: () => void;
   openUnlock: () => void;
   setUnlockInput: (value: string) => void;
   submitUnlock: () => void;
@@ -666,30 +691,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (state.hydrated) saveMascot(state.mascot);
   }, [state.mascot, state.hydrated]);
 
-  // Auto-clear the "✓ gemt" flashes (~2.2s) and the edited-entry flash (~1.5s).
-  useEffect(() => {
-    if (!state.mascotSaved) return;
-    const t = setTimeout(() => dispatch({ type: "CLEAR_FLASH", which: "mascot" }), 2200);
-    return () => clearTimeout(t);
-  }, [state.mascotSaved]);
-  useEffect(() => {
-    if (!state.nameSaved) return;
-    const t = setTimeout(() => dispatch({ type: "CLEAR_FLASH", which: "name" }), 2200);
-    return () => clearTimeout(t);
-  }, [state.nameSaved]);
-  useEffect(() => {
-    if (!state.goalSaved) return;
-    const t = setTimeout(() => dispatch({ type: "CLEAR_FLASH", which: "goal" }), 2200);
-    return () => clearTimeout(t);
-  }, [state.goalSaved]);
-  useEffect(() => {
-    if (!state.deadlineSaved) return;
-    const t = setTimeout(() => dispatch({ type: "CLEAR_FLASH", which: "deadline" }), 2200);
-    return () => clearTimeout(t);
-  }, [state.deadlineSaved]);
+  // Auto-clear the edited-entry green flash (~1.5s).
   useEffect(() => {
     if (!state.flashId) return;
-    const t = setTimeout(() => dispatch({ type: "CLEAR_FLASH", which: "entry" }), 1500);
+    const t = setTimeout(() => dispatch({ type: "CLEAR_FLASH" }), 1500);
     return () => clearTimeout(t);
   }, [state.flashId]);
 
@@ -699,7 +704,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       goLog: () => dispatch({ type: "SET_SCREEN", screen: "log" }),
       goSettings: () => dispatch({ type: "GO_SETTINGS" }),
       startChallenge: () => dispatch({ type: "START_CHALLENGE" }),
-      newChallenge: () => dispatch({ type: "NEW_CHALLENGE" }),
+      updateChallenge: () => dispatch({ type: "UPDATE_CHALLENGE" }),
+      requestNewChallenge: () => dispatch({ type: "OPEN_NEW_CHALLENGE" }),
+      confirmNewChallenge: () => dispatch({ type: "CONFIRM_NEW_CHALLENGE" }),
+      cancelNewChallenge: () => dispatch({ type: "CLOSE_NEW_CHALLENGE" }),
       openAdd: () => dispatch({ type: "OPEN_ADD", today: todayISO() }),
       openEdit: (entry) => dispatch({ type: "OPEN_EDIT", entry }),
       closeForm: () => dispatch({ type: "CLOSE_FORM" }),
@@ -711,13 +719,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       pickRecent: (title, author) => dispatch({ type: "PICK_RECENT", title, author }),
       setGoalDraft: (value) => dispatch({ type: "SET_GOAL_DRAFT", value }),
       presetGoal: (value) => dispatch({ type: "PRESET_GOAL", value }),
-      saveGoal: () => dispatch({ type: "SAVE_GOAL" }),
       setNameDraft: (value) => dispatch({ type: "SET_NAME_DRAFT", value }),
-      saveName: () => dispatch({ type: "SAVE_NAME" }),
       setDeadlineDraft: (value) => dispatch({ type: "SET_DEADLINE_DRAFT", value }),
-      saveDeadline: () => dispatch({ type: "SAVE_DEADLINE" }),
       pickMascot: (mascot) => dispatch({ type: "PICK_MASCOT", mascot }),
-      lock: () => dispatch({ type: "LOCK" }),
       openUnlock: () => dispatch({ type: "OPEN_UNLOCK", uA: rnd(), uB: rnd() }),
       setUnlockInput: (value) => dispatch({ type: "SET_UNLOCK_INPUT", value }),
       submitUnlock: () => dispatch({ type: "SUBMIT_UNLOCK", nextA: rnd(), nextB: rnd() }),
