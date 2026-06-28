@@ -40,8 +40,8 @@ test("ongoing challenge renders the ring percentage", async ({ page, context }) 
   await page.goto("./");
   await expect(page.getByText("500 / 1000 min")).toBeVisible();
   await expect(page.getByText("20 dage tilbage")).toBeVisible();
-  // caption is derived from joy(pct=50)=stage 3, proving the ring data is wired
-  await expect(page.getByText("Det går rigtig godt", { exact: false })).toBeVisible();
+  // caption is derived from joy(pct=50)=stage 4 (festhat), proving the ring data is wired
+  await expect(page.getByText("Festhat på!", { exact: false })).toBeVisible();
 });
 
 test("reload of a saved ongoing challenge never flickers the none-state (#11)", async ({ page, context }) => {
