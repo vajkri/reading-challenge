@@ -308,17 +308,16 @@ test("bingo: a saved completed feat reloads from storage", async ({ page, contex
   );
 });
 
-test("bingo: completing a full row triggers row confetti", async ({ page }) => {
+test("bingo: completing a full row triggers row confetti", async ({ page, context }) => {
   await page.clock.install({ time: IN_SEASON });
+  // Top row = SEASONS[0].feats indices 0–2 (ven, natur, ferie) — see lib/bingo.ts
+  await seed(context, { bingo: { "sommer-26": ["ven", "natur"] } });
   await page.goto("./");
   await page.getByRole("button", { name: "Bingo" }).click();
 
-  for (const name of ["Læs med en ven", "Læs i naturen", "Læs på ferie"]) {
-    await page.getByRole("button", { name }).click();
-    await page.getByRole("button", { name: "Marker som færdig" }).click();
-    // Modal stays open after marking done — close it before clicking the next tile.
-    await page.getByRole("button", { name: "Luk" }).click();
-  }
+  // Two of the top row are pre-seeded; completing the third lands the row.
+  await page.getByRole("button", { name: "Læs på ferie" }).click();
+  await page.getByRole("button", { name: "Marker som færdig" }).click();
   // The burst mounts on the toggle that completed the top row.
   await expect(page.getByTestId("bingo-confetti")).toBeVisible();
 });
@@ -327,6 +326,7 @@ test("bingo: off-season shows the teaser, not the board", async ({ page }) => {
   await page.clock.install({ time: OFF_SEASON });
   await page.goto("./");
   await page.getByRole("button", { name: "Bingo" }).click();
+  await expect(page.getByText("Ingen bingo lige nu")).toBeVisible();
   await expect(page.getByText("Næste sæson kommer snart", { exact: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "Læs i naturen" })).toHaveCount(0);
 });
