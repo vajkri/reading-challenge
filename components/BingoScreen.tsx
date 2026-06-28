@@ -1,12 +1,13 @@
 "use client";
 
+import * as React from "react";
 import { useState } from "react";
 import { useApp } from "@/lib/store";
 import { copy, interp } from "@/lib/copy";
 import BingoModal from "@/components/BingoModal";
 import BingoConfetti from "@/components/BingoConfetti";
 
-const display = { fontFamily: "var(--font-display)" } as const;
+const display: React.CSSProperties = { fontFamily: "var(--font-display)" };
 
 export default function BingoScreen() {
   const { derived, actions } = useApp();
@@ -32,6 +33,7 @@ export default function BingoScreen() {
   const selected = selectedId ? b.feats.find((f) => f.id === selectedId) ?? null : null;
 
   return (
+    // position:relative scopes the absolutely-positioned <BingoConfetti> burst to this screen.
     <section data-screen-label="Bingo" style={{ position: "relative", paddingTop: 8 }}>
       <h2 className="sr-only">{copy.bingo.nav}</h2>
 
