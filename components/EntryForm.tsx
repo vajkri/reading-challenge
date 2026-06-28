@@ -26,7 +26,9 @@ const inputStyle: React.CSSProperties = {
   padding: 12,
   borderRadius: 12,
   border: "2px solid var(--color-field-border)",
-  fontSize: 15,
+  // 16px is the iOS Safari threshold below which focusing an input auto-zooms
+  // the page; keep it >=16 to suppress that (also matches Settings' FIELD).
+  fontSize: 16,
   color: "var(--color-ink)",
   outline: "none",
 };
