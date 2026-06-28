@@ -96,7 +96,7 @@ test("editing an ongoing challenge shows its real saved goal + deadline", async 
   const m = problem.match(/(\d+)\s*\+\s*(\d+)/);
   await dialog.getByRole("spinbutton").fill(String(Number(m![1]) + Number(m![2])));
   await dialog.getByRole("button", { name: "Lås op" }).click();
-  // Real saved values, not the none-defaults (450 / today+30).
+  // Real saved values, not the none-defaults (300 / today+30).
   await expect(page.getByLabel("Læsemål")).toHaveValue("600");
   await expect(page.getByLabel("Slutdato")).toHaveValue(iso(20));
 });

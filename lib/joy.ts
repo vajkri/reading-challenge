@@ -60,9 +60,10 @@ export const GOAL_STEP = 50;
 /** Effort band keys (also the copy keys under settings.goal.effort). */
 export type EffortKey = "lille" | "mellem" | "stor";
 
-/** Clamp any goal into the slider's [GOAL_MIN, GOAL_MAX] range. */
+/** Clamp any goal into the slider's [GOAL_MIN, GOAL_MAX] range, snapped to GOAL_STEP. */
 export function clampGoal(goal: number): number {
-  return Math.max(GOAL_MIN, Math.min(GOAL_MAX, goal));
+  const clamped = Math.max(GOAL_MIN, Math.min(GOAL_MAX, goal));
+  return Math.round((clamped - GOAL_MIN) / GOAL_STEP) * GOAL_STEP + GOAL_MIN;
 }
 
 /**
