@@ -1,7 +1,7 @@
 // localStorage data layer for the Læseudfordring app.
 //
 // Mirrors the persistence behaviour of the original design-tool prototype
-// (Sommerlæsning.dc.html): seven discrete keys, each with its own encoding,
+// (Sommerlæsning.dc.html): eight discrete keys, each with its own encoding,
 // plus the one-time challenge-status migration that runs on load.
 //
 // Everything here is SSR-safe: during static export / server render there is
@@ -16,7 +16,8 @@ import type {
 } from "@/lib/types";
 
 /**
- * The seven localStorage keys, verbatim from the prototype.
+ * The localStorage keys. The first seven are verbatim from the prototype;
+ * `bingo` was added later for the seasonal reading-bingo feature.
  *
  * DO NOT rename — these strings are the on-disk contract. Renaming any of them
  * silently abandons a real kid's saved progress (it would read as "first run").

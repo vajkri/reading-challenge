@@ -31,7 +31,7 @@ export type SeasonId = string;
  */
 export type BingoState = Record<SeasonId, string[]>;
 
-/** The persisted slice — exactly the seven localStorage keys. */
+/** The persisted slice — one field per localStorage key. */
 export interface PersistedState {
   entries: Entry[];
   goal: number; // target minutes
