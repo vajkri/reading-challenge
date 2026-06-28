@@ -12,6 +12,7 @@ import { useApp } from "@/lib/store";
 import { copy } from "@/lib/copy";
 import MascotFace from "@/components/MascotFace";
 import UnlockModal from "@/components/UnlockModal";
+import GoalField from "@/components/GoalField";
 
 // ---------------------------------------------------------------------------
 // Shared style fragments (match the prototype exactly).
@@ -179,38 +180,6 @@ function MascotTile({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Goal preset chip
-// ---------------------------------------------------------------------------
-
-function PresetChip({
-  value,
-  tier,
-  onClick,
-}: {
-  value: string;
-  tier: "easy" | "med" | "hard";
-  onClick: () => void;
-}) {
-  const bg = tier === "easy" ? "bg-easy-bg" : tier === "med" ? "bg-med-bg" : "bg-hard-bg";
-  const fg = tier === "easy" ? "text-easy-fg" : tier === "med" ? "text-med-fg" : "text-hard-fg";
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`${bg} ${fg} ${FOCUS_RING}`}
-      style={{
-        flex: 1,
-        padding: 11,
-        borderRadius: 11,
-        fontWeight: 800,
-        fontSize: 15,
-      }}
-    >
-      {value}
-    </button>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Screen
@@ -362,35 +331,8 @@ export default function SettingsScreen() {
           </div>
         </div>
 
-        {/* Card 3 — Læsemål */}
+        {/* Card 3 — Slutdato (chosen first; drives the effort calc) */}
         <div style={{ ...CARD, marginBottom: 14 }}>
-          <div style={CARD_HEADING}>{copy.settings.goal.heading}</div>
-          <div style={CARD_SUB}>{copy.settings.goal.sub}</div>
-
-          <div style={{ display: "flex", gap: 8, margin: "16px 0 14px" }}>
-            <PresetChip value="300" tier="easy" onClick={() => actions.presetGoal("300")} />
-            <PresetChip value="450" tier="med" onClick={() => actions.presetGoal("450")} />
-            <PresetChip value="600" tier="hard" onClick={() => actions.presetGoal("600")} />
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <input
-              type="number"
-              min={1}
-              value={state.goalDraft}
-              onChange={(e) => actions.setGoalDraft(e.target.value)}
-              aria-label={copy.settings.goal.heading}
-              className={FOCUS_RING}
-              style={FIELD}
-            />
-            <span style={{ fontWeight: 700, color: "#A9967E", fontSize: 14 }}>
-              {copy.settings.goal.unit}
-            </span>
-          </div>
-        </div>
-
-        {/* Card 4 — Slutdato */}
-        <div style={{ ...CARD, marginTop: 14 }}>
           <div style={CARD_HEADING}>{copy.settings.deadline.heading}</div>
           <div style={CARD_SUB}>{copy.settings.deadline.sub}</div>
 
@@ -398,6 +340,7 @@ export default function SettingsScreen() {
             <input
               type="date"
               value={state.deadlineDraft}
+              min={derived.minDeadlineISO || undefined}
               onChange={(e) => actions.setDeadlineDraft(e.target.value)}
               aria-label={copy.settings.deadline.heading}
               className={FOCUS_RING}
@@ -405,6 +348,9 @@ export default function SettingsScreen() {
             />
           </div>
         </div>
+
+        {/* Card 4 — Læsemål (tempo-zoner slider) */}
+        <GoalField />
       </div>
 
       {/* Single commit button: Start (no challenge) or Update (editing a running one). */}

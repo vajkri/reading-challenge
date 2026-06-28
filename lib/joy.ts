@@ -43,6 +43,60 @@ export function pctFor(total: number, goal: number): number {
   return Math.round((total / safeGoal) * 100);
 }
 
+// ---------------------------------------------------------------------------
+// Reading-goal slider + effort model (issue #23)
+//
+// The Læsemål slider spans a fixed minute range in 50-minute steps. "Effort" is
+// NOT a property of the total — it is minutes/day = goal ÷ days-left-to-deadline,
+// bucketed into three bands. Because the bands are per-day, their position on the
+// minute axis depends on the deadline and shifts/collapses as it lengthens.
+// ---------------------------------------------------------------------------
+
+/** Inclusive slider bounds + step, in total minutes. */
+export const GOAL_MIN = 200;
+export const GOAL_MAX = 750;
+export const GOAL_STEP = 50;
+
+/** Effort band keys (also the copy keys under settings.goal.effort). */
+export type EffortKey = "lille" | "mellem" | "stor";
+
+/** Clamp any goal into the slider's [GOAL_MIN, GOAL_MAX] range, snapped to GOAL_STEP. */
+export function clampGoal(goal: number): number {
+  const clamped = Math.max(GOAL_MIN, Math.min(GOAL_MAX, goal));
+  return Math.round((clamped - GOAL_MIN) / GOAL_STEP) * GOAL_STEP + GOAL_MIN;
+}
+
+/**
+ * Minutes-per-day to hit `goal` by the deadline. `daysLeft` is floored to 1 so a
+ * same-day / missing deadline never divides by zero (it then reports the whole
+ * goal as one day's effort). Rounded to whole minutes to match the band cutoffs.
+ */
+export function minutesPerDay(goal: number, daysLeft: number): number {
+  return Math.round(goal / Math.max(1, daysLeft));
+}
+
+/** Bucket minutes-per-day into an effort band: 0–10 lille, 11–20 mellem, 21+ stor. */
+export function effortFor(minPerDay: number): EffortKey {
+  if (minPerDay <= 10) return "lille";
+  if (minPerDay <= 20) return "mellem";
+  return "stor";
+}
+
+/**
+ * Track fractions (0–1) of the two band boundaries for a given deadline, used to
+ * tint the slider track and place the zone labels. The lille/mellem edge sits at
+ * 10.5·days minutes and the mellem/stor edge at 20.5·days (the round() midpoints of
+ * the 10/11 and 20/21 cutoffs), mapped onto [GOAL_MIN, GOAL_MAX] and clamped.
+ * A boundary past the track end clamps to 1 → that zone disappears (expected at
+ * long deadlines, where every goal is "Let").
+ */
+export function effortZones(daysLeft: number): { p1: number; p2: number } {
+  const d = Math.max(1, daysLeft);
+  const frac = (minutes: number) =>
+    Math.max(0, Math.min(1, (minutes - GOAL_MIN) / (GOAL_MAX - GOAL_MIN)));
+  return { p1: frac(10.5 * d), p2: frac(20.5 * d) };
+}
+
 /**
  * Progress-ring geometry. `r` is the SVG circle radius (matches the prototype's
  * `<circle r="118">`) and `c` its circumference, used as the stroke-dasharray.

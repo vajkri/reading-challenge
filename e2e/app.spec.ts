@@ -64,23 +64,29 @@ test("start a challenge from settings → ongoing + locked banner", async ({ pag
   await page.goto("./");
   await page.getByRole("button", { name: "Start en udfordring" }).click();
   await page.getByPlaceholder("Max").fill("Bella");
-  await page.getByRole("button", { name: "300", exact: true }).click();
+  // Slider seeds at 300; step is 50, so three ArrowRight presses → 450.
+  const goal = page.getByLabel("Læsemål");
+  await goal.focus();
+  await goal.press("ArrowRight");
+  await goal.press("ArrowRight");
+  await goal.press("ArrowRight");
+  await expect(goal).toHaveValue("450");
   await page.getByRole("button", { name: "Start udfordringen" }).click();
-  await expect(page.getByText("0 / 300 min")).toBeVisible();
+  await expect(page.getByText("0 / 450 min")).toBeVisible();
   await page.getByRole("button", { name: "Indstillinger" }).click();
   await expect(page.getByText("Der er en udfordring i gang")).toBeVisible();
   await expect(page.getByRole("button", { name: "Rediger udfordring" })).toBeVisible();
 });
 
-test("none state: Settings pre-fills 450 goal + today+30 deadline defaults", async ({ page }) => {
+test("none state: Settings pre-fills 300 goal + today+30 deadline defaults", async ({ page }) => {
   await page.goto("./");
   await page.getByRole("button", { name: "Start en udfordring" }).click();
-  await expect(page.getByLabel("Læsemål")).toHaveValue("450");
+  await expect(page.getByLabel("Læsemål")).toHaveValue("300");
   await expect(page.getByLabel("Slutdato")).toHaveValue(iso(30));
 });
 
 test("editing an ongoing challenge shows its real saved goal + deadline", async ({ page, context }) => {
-  await seed(context, { goal: "1000", challenge: "ongoing", name: "Max", deadline: iso(20) });
+  await seed(context, { goal: "600", challenge: "ongoing", name: "Max", deadline: iso(20) });
   await page.goto("./");
   await page.getByRole("button", { name: "Indstillinger" }).click();
   // Unlock via the math gate to reveal the editable form.
@@ -90,9 +96,34 @@ test("editing an ongoing challenge shows its real saved goal + deadline", async 
   const m = problem.match(/(\d+)\s*\+\s*(\d+)/);
   await dialog.getByRole("spinbutton").fill(String(Number(m![1]) + Number(m![2])));
   await dialog.getByRole("button", { name: "Lås op" }).click();
-  // Real saved values, not the none-defaults (450 / today+30).
-  await expect(page.getByLabel("Læsemål")).toHaveValue("1000");
+  // Real saved values, not the none-defaults (300 / today+30).
+  await expect(page.getByLabel("Læsemål")).toHaveValue("600");
   await expect(page.getByLabel("Slutdato")).toHaveValue(iso(20));
+});
+
+test("a legacy out-of-range goal clamps into the slider range", async ({ page, context }) => {
+  await seed(context, { goal: "1000", challenge: "ongoing", name: "Max", deadline: iso(20) });
+  await page.goto("./");
+  await page.getByRole("button", { name: "Indstillinger" }).click();
+  await page.getByRole("button", { name: "Rediger udfordring" }).click();
+  const dialog = page.getByRole("dialog");
+  const problem = (await dialog.getByText(/\d+\s*\+\s*\d+/).first().textContent()) ?? "";
+  const m = problem.match(/(\d+)\s*\+\s*(\d+)/);
+  await dialog.getByRole("spinbutton").fill(String(Number(m![1]) + Number(m![2])));
+  await dialog.getByRole("button", { name: "Lås op" }).click();
+  // 1000 is above GOAL_MAX (750) → the slider shows the clamped value.
+  await expect(page.getByLabel("Læsemål")).toHaveValue("750");
+});
+
+test("effort/per-day recomputes from the deadline", async ({ page }) => {
+  await page.goto("./");
+  await page.getByRole("button", { name: "Start en udfordring" }).click();
+  // Default draft: goal 300, deadline today+30 → 300/30 = 10 min/dag.
+  await expect(page.getByText("Ca. 10 min / dag")).toBeVisible();
+  // Push the deadline out to today+90 → 300/90 = 3 min/dag.
+  await page.getByLabel("Slutdato").fill(iso(90));
+  await expect(page.getByText("Ca. 3 min / dag")).toBeVisible();
+  await expect(page.getByText("Ca. 10 min / dag")).toHaveCount(0);
 });
 
 test("add a reading updates the log list and total", async ({ page, context }) => {
@@ -207,7 +238,7 @@ test("completed → start new → confirm wipes the log and opens setup", async 
 
   // Now in none setup: single start button + defaults restored.
   await expect(page.getByRole("button", { name: "Start udfordringen" })).toBeVisible();
-  await expect(page.getByLabel("Læsemål")).toHaveValue("450");
+  await expect(page.getByLabel("Læsemål")).toHaveValue("300");
   const entries = await page.evaluate(() => localStorage.getItem("sommerlaesning.v1.entries"));
   expect(entries).toBe("[]");
 });
