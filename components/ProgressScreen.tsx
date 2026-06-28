@@ -398,7 +398,7 @@ export default function ProgressScreen(): React.ReactElement {
 
           <button
             type="button"
-            onClick={actions.newChallenge}
+            onClick={actions.requestNewChallenge}
             className="bg-accent"
             style={{
               ...display,
