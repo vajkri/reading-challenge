@@ -73,42 +73,38 @@
   },
   "settings": {
     "title": "Indstillinger",
-    "lock": {
-      "lockedTitle": "Indstillinger er låst",
-      "lockedSub": "Bed en voksen om at låse op for at ændre.",
-      "unlockBtn": "Lås op",
-      "openTitle": "Indstillinger er åbne",
-      "openSub": "Lås, så de ikke ændres ved et uheld.",
-      "lockBtn": "Lås"
+    "ongoingBanner": {
+      "title": "Der er en udfordring i gang",
+      "sub": "Vil du ændre udfordringen?",
+      "editBtn": "Rediger udfordring"
+    },
+    "completedBanner": {
+      "title": "🎉 Udfordring fuldført!",
+      "sub": "Klar til en ny en?",
+      "newBtn": "Start en ny udfordring"
     },
     "mascot": {
       "heading": "Vælg maskot",
       "sub": "Hvilket dyr skal følge jer på udfordringen?",
       "cat": "Kat",
-      "dog": "Hund",
-      "saved": "✓ Maskot valgt!"
+      "dog": "Hund"
     },
     "name": {
       "heading": "Maskottens navn",
       "sub": "Hvad skal jeres maskot hedde?",
-      "placeholder": "Max",
-      "save": "Gem",
-      "saved": "✓ Navnet er gemt!"
+      "placeholder": "Max"
     },
     "goal": {
       "heading": "Læsemål",
       "sub": "Hvor mange minutter vil I gerne læse i alt?",
-      "unit": "min",
-      "save": "Gem",
-      "saved": "✓ Målet er gemt!"
+      "unit": "min"
     },
     "deadline": {
       "heading": "Slutdato",
-      "sub": "Hvornår skal udfordringen være færdig?",
-      "save": "Gem",
-      "saved": "✓ Slutdato er gemt!"
+      "sub": "Hvornår skal udfordringen være færdig?"
     },
     "startBtn": "Start udfordringen",
+    "updateBtn": "Opdater udfordring",
     "footer": "Al fremgang gemmes på denne enhed.",
     "unlock": {
       "heading": "Kun for voksne",
@@ -117,6 +113,12 @@
       "error": "Prøv igen!",
       "cancel": "Annuller",
       "submit": "Lås op"
+    },
+    "newChallengeConfirm": {
+      "title": "Start forfra?",
+      "body": "Dette sletter alle dine læsninger. Er du sikker?",
+      "confirm": "Ja, start forfra",
+      "cancel": "Fortryd"
     }
   }
 }
