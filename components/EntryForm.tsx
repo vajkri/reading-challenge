@@ -18,6 +18,11 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
+  // border-box: padding stays inside the declared width, so a 100%-wide input
+  // can't overflow its column. minWidth 0: lets iOS's intrinsically-wide
+  // date/number inputs shrink instead of bleeding into the neighbour field.
+  boxSizing: "border-box",
+  minWidth: 0,
   padding: 12,
   borderRadius: 12,
   border: "2px solid var(--color-field-border)",
@@ -80,7 +85,7 @@ export default function EntryForm({ children }: { children?: ReactNode }) {
       />
 
       <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 2, minWidth: 0 }}>
           <label htmlFor="entry-date" style={labelStyle}>
             {copy.log.labels.date}
           </label>
@@ -93,7 +98,7 @@ export default function EntryForm({ children }: { children?: ReactNode }) {
             style={inputStyle}
           />
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <label htmlFor="entry-minutes" style={labelStyle}>
             {copy.log.labels.minutes}
           </label>

@@ -97,7 +97,7 @@ test("add a reading updates the log list and total", async ({ page, context }) =
   await page.getByRole("button", { name: "Læselog" }).click();
   await page.getByRole("button", { name: /Tilføj læsning/ }).click();
   await page.getByPlaceholder("fx Vitello").fill("Palle alene i verden");
-  await page.getByPlaceholder("20").fill("25");
+  await page.getByPlaceholder("15").fill("25");
   await page.getByRole("button", { name: "Gem læsning" }).click();
   await expect(page.getByText("Palle alene i verden")).toBeVisible();
   await expect(page.getByText("25 min i alt")).toBeVisible();
@@ -109,7 +109,7 @@ test("reaching the goal auto-completes the challenge", async ({ page, context })
   await page.getByRole("button", { name: "Læselog" }).click();
   await page.getByRole("button", { name: /Tilføj læsning/ }).click();
   await page.getByPlaceholder("fx Vitello").fill("Sluttest");
-  await page.getByPlaceholder("20").fill("40");
+  await page.getByPlaceholder("15").fill("40");
   await page.getByRole("button", { name: "Gem læsning" }).click();
   await expect(page.getByText("Udfordring fuldført")).toBeVisible();
 });
