@@ -82,18 +82,23 @@ else
   git worktree add "$worktree" "$branch"
 fi
 
-# .planning/ is gitignored (local-only), so worktrees don't inherit GSD state.
-# Symlink it so every worktree shares ONE GSD workspace (single source of truth).
+# .planning/ is gitignored (local-only). If it exists, symlink it so every
+# worktree shares ONE workspace (single source of truth for plans/notes).
 if [[ -d "$repo_root/.planning" && ! -e "$worktree/.planning" ]]; then
   ln -s "$repo_root/.planning" "$worktree/.planning"
-  echo "→ linked .planning → $repo_root/.planning (shared GSD workspace)" >&2
+  echo "→ linked .planning → $repo_root/.planning (shared workspace)" >&2
 fi
 
 echo >&2
 echo "Ready. Next:" >&2
 echo "  in-session: EnterWorktree path=$worktree" >&2
 echo "  or shell:   cd $worktree" >&2
-echo "  then:       /gsd-plan-phase  (or /gsd-quick)" >&2
+echo >&2
+echo "Workflow — superpowers skills (always execute via subagents):" >&2
+echo "  • No good feature spec on the issue?" >&2
+echo "      brainstorming → writing-plans → subagent-driven-development" >&2
+echo "  • Issue already has a good feature spec?  (skip brainstorming)" >&2
+echo "      writing-plans → subagent-driven-development" >&2
 
 # Print the path on stdout so you can:  cd \"\$(scripts/pick-up-task.sh 3)\"
 printf '%s\n' "$worktree"

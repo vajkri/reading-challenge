@@ -8,11 +8,10 @@ The native Claude Code worktree tooling **is** the harness — prefer it over sc
 > A worktree builds and runs from tracked files alone, so there is **no env/secrets propagation**
 > to manage and **no `.worktreeinclude`** in this harness.
 >
-> The one gitignored-but-needed dir is **`.planning/`** (local-only GSD workspace). Worktrees do
+> If a gitignored **`.planning/`** dir exists (local-only workspace for plans/notes), worktrees do
 > not inherit it, so `scripts/pick-up-task.sh` **symlinks** it into each worktree — all sessions
-> then share one GSD workspace (single source of truth: project docs, roadmap, intel). Trade-off:
-> avoid running heavy GSD planning in two worktrees *simultaneously*, since they write to the same
-> `.planning/`. One task at a time is fine.
+> then share one workspace (single source of truth). Trade-off: avoid two worktrees writing to it
+> *simultaneously*. One task at a time is fine.
 
 ## Creating a worktree
 
@@ -56,8 +55,11 @@ The native Claude Code worktree tooling **is** the harness — prefer it over sc
   This project doesn't need one; don't add it.
 
 ## Per-item flow (where worktrees fit)
-1. `gh issue list --label feedback` — pick a task
+Workflow uses **superpowers** skills, and execution **always runs through subagents**.
+1. `gh issue list --label feedback` (or `enhancement`) — pick a task
 2. `scripts/pick-up-task.sh <N>` — issue-linked branch + worktree under `.claude/worktrees/`
-3. `EnterWorktree path=…`, then `/gsd-plan-phase` (or `/gsd-quick`)
-4. Implement + verify gates (see `CLAUDE.md`), optional `/gsd-verify-work`
-5. `/gsd-ship` (PR body `Closes #<N>` → merging auto-closes the issue)
+3. `EnterWorktree path=…`, then:
+   - **No good feature spec on the issue** → `brainstorming` → `writing-plans` → `subagent-driven-development`
+   - **Issue already has a good feature spec** → skip brainstorming → `writing-plans` → `subagent-driven-development`
+4. Implement + verify gates (see `CLAUDE.md`); `verification-before-completion`, then `requesting-code-review`
+5. `finishing-a-development-branch` → open the PR (body `Closes #<N>` → merging auto-closes the issue)
