@@ -12,6 +12,7 @@ import type {
   Entry,
   MascotKey,
   ChallengeStatus,
+  BingoState,
 } from "@/lib/types";
 
 /**
@@ -28,6 +29,7 @@ export const KEYS = {
   locked: "sommerlaesning.v1.locked",
   challenge: "sommerlaesning.v1.challenge",
   mascot: "sommerlaesning.v1.mascot",
+  bingo: "sommerlaesning.v1.bingo",
 } as const;
 
 /**
@@ -43,6 +45,7 @@ export const DEFAULTS: PersistedState = {
   locked: false,
   challenge: "none",
   mascot: "cat",
+  bingo: {},
 };
 
 // ---------------------------------------------------------------------------
@@ -148,6 +151,20 @@ export function loadState(): PersistedState {
     mascot = DEFAULTS.mascot;
   }
 
+  // bingo — JSON object { seasonId: string[] }, guard corrupt → {}
+  let bingo: BingoState = {};
+  try {
+    const raw = window.localStorage.getItem(KEYS.bingo);
+    if (raw) {
+      const parsed: unknown = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        bingo = parsed as BingoState;
+      }
+    }
+  } catch {
+    bingo = {};
+  }
+
   // challenge — raw string validated against the union.
   // `null` here means "key absent", which the migration step needs to detect.
   let challenge: ChallengeStatus | null = null;
@@ -158,7 +175,7 @@ export function loadState(): PersistedState {
     challenge = null;
   }
 
-  return migrate({ entries, goal, name, deadline, locked, mascot, challenge });
+  return migrate({ entries, goal, name, deadline, locked, mascot, challenge, bingo });
 }
 
 /**
@@ -184,8 +201,9 @@ function migrate(decoded: {
   locked: boolean;
   mascot: MascotKey;
   challenge: ChallengeStatus | null;
+  bingo: BingoState;
 }): PersistedState {
-  const { entries, goal, name, deadline, locked, mascot } = decoded;
+  const { entries, goal, name, deadline, locked, mascot, bingo } = decoded;
   let challenge = decoded.challenge;
 
   // Rule 1: derive status for existing users when the key was never written.
@@ -200,7 +218,7 @@ function migrate(decoded: {
     saveChallenge(challenge);
   }
 
-  return { entries, goal, name, deadline, locked, challenge, mascot };
+  return { entries, goal, name, deadline, locked, challenge, mascot, bingo };
 }
 
 // ---------------------------------------------------------------------------
@@ -269,6 +287,15 @@ export function saveMascot(mascot: MascotKey): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(KEYS.mascot, mascot);
+  } catch {
+    // ignore
+  }
+}
+
+export function saveBingo(bingo: BingoState): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(KEYS.bingo, JSON.stringify(bingo));
   } catch {
     // ignore
   }
