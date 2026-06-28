@@ -22,6 +22,15 @@ export interface Entry {
   created: number; // epoch ms — stable tiebreaker for sorting newest-first
 }
 
+/** Identifier for a bingo season (e.g. "sommer-26"). */
+export type SeasonId = string;
+
+/**
+ * Completed bingo feats, keyed by season id → list of completed feat ids.
+ * Per-season so each season keeps a fresh board without losing prior crosses.
+ */
+export type BingoState = Record<SeasonId, string[]>;
+
 /** The persisted slice — exactly the seven localStorage keys. */
 export interface PersistedState {
   entries: Entry[];
@@ -31,4 +40,5 @@ export interface PersistedState {
   locked: boolean; // parental lock
   challenge: ChallengeStatus;
   mascot: MascotKey;
+  bingo: BingoState; // per-season completed feat ids
 }
