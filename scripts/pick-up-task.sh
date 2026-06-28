@@ -16,6 +16,7 @@ set -euo pipefail
 
 LABEL="${PICKUP_LABEL:-enhancement}"
 BASE="main"
+BASE_REF="origin/${BASE}"
 
 repo_root="$(git rev-parse --show-toplevel)"
 
@@ -61,14 +62,18 @@ echo "→ issue #$issue: $title" >&2
 echo "→ branch:   $branch" >&2
 echo "→ worktree: $worktree" >&2
 
+# Pull latest base so every new branch/worktree forks from the current tip.
+git fetch origin "$BASE" >/dev/null 2>&1 || true
+
 # gh issue develop creates a branch git-linked to the issue (no checkout here).
 # Idempotent-ish: ignore failure if the linked branch already exists.
 gh issue develop "$issue" --name "$branch" --base "$BASE" >/dev/null 2>&1 || true
 
 # Make sure the branch exists locally before adding the worktree.
+# Always fork from origin/main (just fetched) — never a stale local main.
 git fetch origin "$branch" >/dev/null 2>&1 || true
 if ! git show-ref --verify --quiet "refs/heads/$branch"; then
-  git branch "$branch" "$BASE" >/dev/null 2>&1 || true
+  git branch "$branch" "$BASE_REF" >/dev/null 2>&1 || true
 fi
 
 if [[ -d "$worktree" ]]; then
