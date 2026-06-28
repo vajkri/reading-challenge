@@ -36,7 +36,18 @@ import {
   saveName,
   totalMinutes,
 } from "@/lib/storage";
-import { joyForPct, pctFor, ringOffset, deadlineInfo } from "@/lib/joy";
+import {
+  joyForPct,
+  pctFor,
+  ringOffset,
+  deadlineInfo,
+  clampGoal,
+  minutesPerDay,
+  effortFor,
+  effortZones,
+  GOAL_MIN,
+  type EffortKey,
+} from "@/lib/joy";
 import { copy, interp, DATE_LOCALE } from "@/lib/copy";
 
 // ---------------------------------------------------------------------------
@@ -139,14 +150,14 @@ function seedDrafts(
 ): { goalDraft: string; deadlineDraft: string; nameDraft: string; mascotDraft: MascotKey } {
   if (challenge === "none") {
     return {
-      goalDraft: String(NONE_DEFAULT_GOAL),
+      goalDraft: String(clampGoal(NONE_DEFAULT_GOAL)),
       deadlineDraft: isoPlusDays(NONE_DEFAULT_DEADLINE_DAYS),
       nameDraft: DEFAULTS.name,
       mascotDraft: DEFAULTS.mascot,
     };
   }
   return {
-    goalDraft: String(goal),
+    goalDraft: String(clampGoal(goal)),
     deadlineDraft: deadline,
     nameDraft: name,
     mascotDraft: mascot,
@@ -188,7 +199,6 @@ type Action =
   | { type: "DELETE_ENTRY"; id: string }
   | { type: "PICK_RECENT"; title: string; author: string }
   | { type: "SET_GOAL_DRAFT"; value: string }
-  | { type: "PRESET_GOAL"; value: string }
   | { type: "SET_NAME_DRAFT"; value: string }
   | { type: "SET_DEADLINE_DRAFT"; value: string }
   | { type: "PICK_MASCOT"; mascot: MascotKey }
@@ -232,7 +242,7 @@ function reducer(state: State, action: Action): State {
       // Commit all drafts, start the challenge, go to Fremgang. (No lock toggle:
       // an ongoing challenge is locked by default; editing is a transient session.)
       const parsed = Math.round(Number(state.goalDraft));
-      const goal = parsed >= 1 ? parsed : state.goal;
+      const goal = clampGoal(parsed >= 1 ? parsed : state.goal);
       const name = state.nameDraft.trim() || state.name;
       return {
         ...state,
@@ -249,7 +259,7 @@ function reducer(state: State, action: Action): State {
     case "UPDATE_CHALLENGE": {
       // Commit edits to a running challenge, then re-lock and stay on Settings.
       const parsed = Math.round(Number(state.goalDraft));
-      const goal = parsed >= 1 ? parsed : state.goal;
+      const goal = clampGoal(parsed >= 1 ? parsed : state.goal);
       const name = state.nameDraft.trim() || state.name;
       // Edge case: lowering the goal below the logged total auto-completes it.
       let challenge: ChallengeStatus = state.challenge;
@@ -393,9 +403,6 @@ function reducer(state: State, action: Action): State {
     case "SET_GOAL_DRAFT":
       return { ...state, goalDraft: action.value };
 
-    case "PRESET_GOAL":
-      return { ...state, goalDraft: action.value };
-
     case "SET_NAME_DRAFT":
       return { ...state, nameDraft: action.value };
 
@@ -494,6 +501,15 @@ export interface Derived {
   showEditBanner: boolean; // ongoing + locked → "edit it?" + Rediger udfordring
   showDoneBanner: boolean; // completed → "🎉 complete" + Start ny udfordring
   isEditing: boolean;      // ongoing + unlocked session → show Opdater udfordring
+  // settings goal slider (draft-based, deadline-relative effort)
+  goalNum: number;            // clamped parsed goalDraft, in [GOAL_MIN, GOAL_MAX]
+  goalPerDay: number;         // minutes/day for the draft goal + draft deadline
+  goalEffort: EffortKey;      // "lille" | "mellem" | "stor"
+  goalEffortLabel: string;    // localized bare word (Lille/Mellem/Stor)
+  goalPerDayLabel: string;    // "Ca. 15 min om dagen"
+  goalZoneP1: number;         // lille/mellem boundary as 0–1 track fraction
+  goalZoneP2: number;         // mellem/stor boundary as 0–1 track fraction
+  minDeadlineISO: string;     // today's ISO once hydrated, else "" (date picker min)
 }
 
 function computeDerived(state: State): Derived {
@@ -584,6 +600,20 @@ function computeDerived(state: State): Derived {
   const showEditBanner = isOngoing && !state.editing;
   const showDoneBanner = isCompleted;
 
+  // --- Settings goal slider (draft-based) ---
+  // Effort uses the DRAFT deadline (what the user is editing), days-left from today.
+  const goalNum = clampGoal(Math.round(Number(state.goalDraft)) || GOAL_MIN);
+  const draftDi = deadlineInfo(state.deadlineDraft);
+  const draftDaysLeft = draftDi && draftDi.daysLeft >= 1 ? draftDi.daysLeft : 1;
+  const goalPerDay = minutesPerDay(goalNum, draftDaysLeft);
+  const goalEffort = effortFor(goalPerDay);
+  const { p1: goalZoneP1, p2: goalZoneP2 } = effortZones(draftDaysLeft);
+  const goalEffortLabel = copy.settings.goal.effort[goalEffort];
+  const goalPerDayLabel = interp(copy.settings.goal.perDay, { count: goalPerDay });
+  // SSR/first-paint render uses "" (matches server) → set today only after hydrate,
+  // so React never sees a min-attr hydration mismatch.
+  const minDeadlineISO = state.hydrated ? todayISO() : "";
+
   return {
     total,
     pct,
@@ -613,6 +643,14 @@ function computeDerived(state: State): Derived {
     showEditBanner,
     showDoneBanner,
     isEditing,
+    goalNum,
+    goalPerDay,
+    goalEffort,
+    goalEffortLabel,
+    goalPerDayLabel,
+    goalZoneP1,
+    goalZoneP2,
+    minDeadlineISO,
   };
 }
 
@@ -639,7 +677,6 @@ export interface Actions {
   deleteEntry: (id: string) => void;
   pickRecent: (title: string, author: string) => void;
   setGoalDraft: (value: string) => void;
-  presetGoal: (value: string) => void;
   setNameDraft: (value: string) => void;
   setDeadlineDraft: (value: string) => void;
   pickMascot: (mascot: MascotKey) => void;
@@ -718,7 +755,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       deleteEntry: (id) => dispatch({ type: "DELETE_ENTRY", id }),
       pickRecent: (title, author) => dispatch({ type: "PICK_RECENT", title, author }),
       setGoalDraft: (value) => dispatch({ type: "SET_GOAL_DRAFT", value }),
-      presetGoal: (value) => dispatch({ type: "PRESET_GOAL", value }),
       setNameDraft: (value) => dispatch({ type: "SET_NAME_DRAFT", value }),
       setDeadlineDraft: (value) => dispatch({ type: "SET_DEADLINE_DRAFT", value }),
       pickMascot: (mascot) => dispatch({ type: "PICK_MASCOT", mascot }),
