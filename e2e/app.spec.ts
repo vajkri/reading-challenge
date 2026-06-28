@@ -53,7 +53,7 @@ test("reload of a saved ongoing challenge never flickers the none-state (#11)", 
     entries: [{ id: "a", title: "Vitello", author: "Kim Fupz", date: iso(-1), minutes: 500, created: 1 }],
   });
   await page.goto("./");
-  // The skeleton occupies the hydration window, so the gloomy none-state heading
+  // <main> stays empty until state is hydrated, so the gloomy none-state heading
   // must never paint — not even for a frame. toHaveCount(0) polls, catching a late flash.
   await expect(page.getByText("Klar til en udfordring?")).toHaveCount(0);
   // ...and the real ongoing content lands in its place.

@@ -8,7 +8,6 @@ import { useApp } from "@/lib/store";
 import { copy } from "@/lib/copy";
 import BottomNav from "@/components/BottomNav";
 import ProgressScreen from "@/components/ProgressScreen";
-import SkeletonProgress from "@/components/SkeletonProgress";
 import LogScreen from "@/components/LogScreen";
 import SettingsScreen from "@/components/SettingsScreen";
 
@@ -40,10 +39,13 @@ export default function AppShell() {
         </h1>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-5 pb-6">
-        {!state.hydrated ? (
-          <SkeletonProgress />
-        ) : (
+      {/* Until state is hydrated from localStorage we don't know which screen
+          to show, so <main> stays empty rather than flashing the wrong state.
+          Hydration is sub-frame in practice (static export + SW precache), so
+          the empty→content swap is imperceptible and never shows a "none"
+          flicker. Header + nav are state-independent and paint immediately. */}
+      <main className="flex-1 overflow-y-auto px-5 pb-6" aria-busy={!state.hydrated}>
+        {state.hydrated && (
           <>
             {state.screen === "progress" && <ProgressScreen />}
             {state.screen === "log" && <LogScreen />}
