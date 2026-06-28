@@ -667,16 +667,21 @@ function computeDerived(state: State): Derived {
     const doneIds = new Set(state.bingo[season.id] ?? []);
     const seasonsCopy = copy.bingo.seasons as unknown as Record<string, SeasonCopy>;
     const sc = seasonsCopy[season.id];
-    const feats: BingoFeatView[] = season.feats.map((f) => {
+    // Skip a feat whose copy entry is missing (e.g. a future season adds a feat
+    // id to SEASONS but not yet to copy/da.json) rather than crashing the screen.
+    const feats: BingoFeatView[] = season.feats.flatMap((f) => {
       const fc = sc.feats[f.id];
-      return {
-        id: f.id,
-        emoji: f.emoji,
-        card: fc.card,
-        title: fc.title,
-        desc: fc.desc,
-        done: doneIds.has(f.id),
-      };
+      if (!fc) return [];
+      return [
+        {
+          id: f.id,
+          emoji: f.emoji,
+          card: fc.card,
+          title: fc.title,
+          desc: fc.desc,
+          done: doneIds.has(f.id),
+        },
+      ];
     });
     bingo = {
       active: true,
