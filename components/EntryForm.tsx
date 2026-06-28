@@ -85,7 +85,7 @@ export default function EntryForm({ children }: { children?: ReactNode }) {
       />
 
       <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 2, minWidth: 0 }}>
           <label htmlFor="entry-date" style={labelStyle}>
             {copy.log.labels.date}
           </label>
