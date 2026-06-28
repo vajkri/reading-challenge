@@ -77,10 +77,28 @@ export default function LogScreen() {
 
       {/* Empty state */}
       {derived.noEntries && (
-        <div style={{ textAlign: "center", padding: "48px 20px", color: "#BBA98F" }}>
-          <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.5 }}>
+        <div style={{ textAlign: "center", padding: "48px 20px" }}>
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 17,
+              lineHeight: 1.3,
+              color: "var(--color-ink-2)",
+            }}
+          >
             {copy.log.emptyLine1}
-            <br />
+          </div>
+          <div
+            style={{
+              marginTop: 8,
+              marginInline: "auto",
+              maxWidth: 200,
+              fontSize: 14,
+              lineHeight: 1.5,
+              color: "#BBA98F",
+            }}
+          >
             {copy.log.emptyLine2Prefix}
             <b style={{ color: "var(--color-ink-2)" }}>{copy.log.emptyLine2Bold}</b>
             {copy.log.emptyLine2Suffix}
