@@ -32,8 +32,11 @@ Two cross-file invariants that are easy to break:
   `localStorage` once on the client. Every persistence `useEffect` is guarded by `state.hydrated`
   so the first paint never overwrites real saved data with defaults. New persisted slice → same guard.
 - **Challenge lifecycle.** `none → ongoing → completed` drives the mascot and most derived values.
-  It **auto-completes** when logged minutes reach the goal (in *both* `SAVE_ENTRY` and `migrate()`),
-  and "Ny udfordring" resets to `none` **without deleting entries** (minutes stay cumulative).
+  It **auto-completes** when logged minutes reach the goal (in `SAVE_ENTRY`, `UPDATE_CHALLENGE`,
+  and `migrate()`), and "Start en ny udfordring" **wipes the log and resets config to defaults**
+  (confirm-gated; minutes do *not* carry over). An ongoing challenge is **locked by default**;
+  unlocking is a transient `editing` session (UI-only, re-locks on commit/navigation/refresh) —
+  there is no persisted lock toggle.
 
 ## Hard rules
 
