@@ -12,7 +12,7 @@ const display: React.CSSProperties = { fontFamily: "var(--font-display)" };
 // The detail sheet lingers briefly after a mark/undo tap so the state flip is
 // seen, then auto-dismisses — short enough that the row/board confetti is
 // revealed promptly behind the dismissed sheet.
-const AUTO_CLOSE_MS = 500;
+const AUTO_CLOSE_MS = 250;
 
 export default function BingoScreen() {
   const { derived, actions } = useApp();
