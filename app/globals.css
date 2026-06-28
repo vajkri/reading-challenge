@@ -102,6 +102,33 @@ input::placeholder {
 }
 
 /* ---------------------------------------------------------------------------
+   DATE INPUT — iOS Safari sizing (#15)
+   On iOS Safari, <input type="date"> is a NATIVE control with a hard intrinsic
+   minimum width: it sizes to its rendered value ("28 Jun 2026") plus internal
+   padding and ignores width:100% / flex / min-width:0 — so it overflows into
+   the Minutter field beside it. (This reproduces only on real iOS; Chromium and
+   desktop WebKit size date inputs narrowly and hide the bug.)
+
+   -webkit-appearance: none drops the native control so the input becomes a
+   plain styleable box that honours width:100% + min-width:0. We also remove the
+   calendar picker indicator (not shown on iOS anyway) and the native value's
+   inner padding/margin so the date text left-aligns like the other fields. */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+}
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* ---------------------------------------------------------------------------
    PROGRESS SCREEN — short-viewport fit (#4)
    The app shell is locked to 100dvh with a pinned footer (see #2), so the
    document never scrolls and Safari keeps its chrome visible — meaning the
