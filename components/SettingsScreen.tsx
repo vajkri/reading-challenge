@@ -53,6 +53,53 @@ const FIELD: CSSProperties = {
 const FOCUS_RING =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
+// State banner (ongoing / completed): a content row stacked above a full-width
+// action button. Stacking keeps the heading readable down to the narrowest phones.
+const BANNER: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 13,
+  borderRadius: 18,
+  padding: 16,
+  marginBottom: 16,
+};
+
+const BANNER_ROW: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 13,
+};
+
+const BANNER_TITLE: CSSProperties = {
+  fontFamily: "var(--font-display)",
+  fontWeight: 700,
+  fontSize: 15,
+  color: "#4F4034",
+  lineHeight: 1.25,
+  textWrap: "balance",
+};
+
+const BANNER_SUB: CSSProperties = {
+  fontSize: 12.5,
+  lineHeight: 1.4,
+  marginTop: 2,
+};
+
+const BANNER_BTN: CSSProperties = {
+  width: "100%",
+  padding: "12px 16px",
+  borderRadius: 12,
+  background: "var(--color-accent)",
+  color: "#fff",
+  fontFamily: "var(--font-display)",
+  fontWeight: 700,
+  fontSize: 15,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+};
+
 /** Padlock body (rounded rect) + arc shackle + keyhole dot. */
 function Padlock({
   open,
@@ -189,98 +236,79 @@ export default function SettingsScreen() {
         {copy.settings.title}
       </h2>
 
-      {/* Banner — ongoing (locked) prompts to edit; completed prompts to start anew. */}
+      {/* Banner — ongoing (locked) prompts to edit; completed prompts to start anew.
+          Stacks vertically (content row + full-width action) so the heading never
+          gets crushed by the long button label on narrow phones. */}
       {derived.showEditBanner && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 13,
-            background: "#FBEFDB",
-            border: "1.5px solid #F2DEBE",
-            borderRadius: 18,
-            padding: "15px 16px",
-            marginBottom: 16,
-          }}
-        >
-          <div
-            style={{
-              flex: "0 0 auto",
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              background: "#F6E2BE",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Padlock open={false} color="#B5803A" keyhole="#FBEFDB" />
-          </div>
-          <div style={{ flex: "1 1 auto", minWidth: 0 }}>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "#4F4034" }}>
-              {copy.settings.ongoingBanner.title}
+        <div style={{ ...BANNER, background: "#FBEFDB", border: "1.5px solid #F2DEBE" }}>
+          <div style={BANNER_ROW}>
+            <div
+              style={{
+                flex: "0 0 auto",
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: "#F6E2BE",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Padlock open={false} color="#B5803A" keyhole="#FBEFDB" />
             </div>
-            <div style={{ fontSize: 12, color: "#A9967E", lineHeight: 1.4, marginTop: 1 }}>
-              {copy.settings.ongoingBanner.sub}
+            <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+              <div style={BANNER_TITLE}>{copy.settings.ongoingBanner.title}</div>
+              <div style={{ ...BANNER_SUB, color: "#A9967E" }}>{copy.settings.ongoingBanner.sub}</div>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={actions.openUnlock}
-            className={FOCUS_RING}
-            style={{
-              flex: "0 0 auto",
-              padding: "11px 16px",
-              borderRadius: 12,
-              background: "var(--color-accent)",
-              color: "#fff",
-              fontFamily: "var(--font-display)",
-              fontWeight: 700,
-              fontSize: 14,
-            }}
-          >
+          <button type="button" onClick={actions.openUnlock} className={FOCUS_RING} style={BANNER_BTN}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M4 16.5 14 6.5 17.5 10 7.5 20 4 20 Z"
+                stroke="#fff"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <path d="M13 7.5 16.5 11" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+            </svg>
             {copy.settings.ongoingBanner.editBtn}
           </button>
         </div>
       )}
 
       {derived.showDoneBanner && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 13,
-            background: "#E4F1D8",
-            border: "1.5px solid #CDE4BC",
-            borderRadius: 18,
-            padding: "15px 16px",
-            marginBottom: 16,
-          }}
-        >
-          <div style={{ flex: "1 1 auto", minWidth: 0 }}>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "#4F4034" }}>
-              {copy.settings.completedBanner.title}
+        <div style={{ ...BANNER, background: "#E4F1D8", border: "1.5px solid #CDE4BC" }}>
+          <div style={BANNER_ROW}>
+            <div
+              style={{
+                flex: "0 0 auto",
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: "#D3E8C2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" fill="#5C8A3F" />
+                <path
+                  d="M7.5 12.3 10.5 15.3 16.5 9"
+                  stroke="#fff"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </div>
-            <div style={{ fontSize: 12, color: "#7A8C66", lineHeight: 1.4, marginTop: 1 }}>
-              {copy.settings.completedBanner.sub}
+            <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+              <div style={BANNER_TITLE}>{copy.settings.completedBanner.title}</div>
+              <div style={{ ...BANNER_SUB, color: "#7A8C66" }}>{copy.settings.completedBanner.sub}</div>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={actions.requestNewChallenge}
-            className={FOCUS_RING}
-            style={{
-              flex: "0 0 auto",
-              padding: "11px 16px",
-              borderRadius: 12,
-              background: "var(--color-accent)",
-              color: "#fff",
-              fontFamily: "var(--font-display)",
-              fontWeight: 700,
-              fontSize: 14,
-            }}
-          >
+          <button type="button" onClick={actions.requestNewChallenge} className={FOCUS_RING} style={BANNER_BTN}>
+            <span style={{ fontSize: 20, lineHeight: 1, marginTop: -2 }}>+</span>
             {copy.settings.completedBanner.newBtn}
           </button>
         </div>
