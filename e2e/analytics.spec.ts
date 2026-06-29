@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 // The e2e build is served on localhost:4399 — the same static export Pages
-// ships. GA4 is hostname-gated OFF there, so loading the app must NOT request
-// gtag.js and must NOT define window.gtag.
+// ships. GA4 is allowlisted to the prod Pages host only, so on any other host
+// (here: localhost) loading the app must NOT request gtag.js and must NOT
+// define window.gtag.
 test("GA4 does not load on the localhost (e2e) host", async ({ page }) => {
   const gtagRequests: string[] = [];
   page.on("request", (req) => {

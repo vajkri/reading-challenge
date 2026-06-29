@@ -4,7 +4,7 @@
 
 **Goal:** Load Google Analytics 4 (`G-TKWB5RGY4V`) on the deployed PWA for pageview tracking, while never firing on local dev or the Playwright e2e build.
 
-**Architecture:** An `<Analytics />` component renders a single `next/script` (`afterInteractive`) whose inline bootstrap self-injects gtag.js — but only after a runtime hostname check (`localhost`/`127.0.0.1` → early return). Putting the gate inside the script (rather than in React state) keeps the rendered markup byte-identical at build and runtime, so there is no hydration mismatch and no `react-hooks/set-state-in-effect` lint violation, while localhost makes zero gtag.js requests. Mounted once from `app/layout.tsx` next to `<ServiceWorkerRegister />`.
+**Architecture:** An `<Analytics />` component renders a single `next/script` (`afterInteractive`) whose inline bootstrap self-injects gtag.js — but only after a runtime allowlist check (fire only when `location.hostname === PAGES_HOST`; any other host → early return). Putting the gate inside the script (rather than in React state) keeps the rendered markup byte-identical at build and runtime, so there is no hydration mismatch and no `react-hooks/set-state-in-effect` lint violation, while every non-prod host makes zero gtag.js requests. Mounted once from `app/layout.tsx` next to `<ServiceWorkerRegister />`.
 
 **Tech Stack:** Next.js 16 static export, `next/script`, React 19, Playwright (e2e).
 
@@ -24,19 +24,22 @@ import Script from "next/script";
 
 const GA_ID = "G-TKWB5RGY4V";
 
-// GA4 must fire only on the deployed GitHub Pages site — never on local dev
-// (localhost:3000) nor the Playwright e2e build (localhost:4399), both of
-// which would otherwise pollute analytics. Hostname is the only reliable
-// runtime signal: e2e serves the exact same static export as Pages, so
-// NODE_ENV can't distinguish them. The gate lives inside the bootstrap script
-// so the rendered markup is byte-identical everywhere (no hydration mismatch)
-// and localhost makes no gtag.js request at all.
+// The deployed GitHub Pages host. GA4 fires ONLY here.
+const PAGES_HOST = "vajkri.github.io";
+
+// GA4 must fire only on the deployed GitHub Pages site — never on local dev,
+// the Playwright e2e build (localhost:4399), or on-device PWA testing over the
+// LAN ([::1] / 0.0.0.0 / 192.168.x.x). This is an *allowlist*, not a denylist:
+// any unknown host defaults to OFF, so we can't leak page_views from a host we
+// forgot to exclude. (If the site moves to a custom domain, update PAGES_HOST.)
+// The gate lives inside the bootstrap script so the rendered markup is
+// byte-identical everywhere (no hydration mismatch) and non-prod hosts make no
+// gtag.js request at all.
 export default function Analytics() {
   return (
     <Script id="ga4-init" strategy="afterInteractive">
       {`(function(){
-  var h = location.hostname;
-  if (h === 'localhost' || h === '127.0.0.1') return;
+  if (location.hostname !== '${PAGES_HOST}') return;
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   window.gtag = gtag;
@@ -188,7 +191,9 @@ Expected: the measurement ID appears in the exported HTML/JS (proof the code shi
 
 ## Self-Review
 
-- **Spec coverage:** direct load ✓ (Task 1 fires gtag unconditionally once enabled), pageviews only ✓ (only `gtag('config', ...)`, no custom events), no consent banner ✓, no new deps ✓ (`next/script` only), no config changes ✓, hostname gate kept ✓ (Task 1 + guarded by Task 3).
+- **Spec coverage:** direct load ✓ (Task 1 fires gtag on the prod host), pageviews only ✓ (only `gtag('config', ...)`, no custom events), no consent banner ✓, no new deps ✓ (`next/script` only), no config changes ✓, hostname gate present ✓ (Task 1 + guarded by Task 3).
 - **Placeholder scan:** none — all code blocks complete.
-- **Type consistency:** `GA_ID`, `isAnalyticsHost`, `enabled` used consistently; component default-exported and imported as `Analytics` in Task 2.
-- **Ambiguity:** gate is explicit (`!== "localhost" && !== "127.0.0.1"`).
+- **Type consistency:** `GA_ID` / `PAGES_HOST` used consistently; component default-exported and imported as `Analytics` in Task 2.
+- **Ambiguity:** gate is an explicit allowlist of the Pages host (`location.hostname !== PAGES_HOST` → off), so unknown hosts default to off.
+
+> **Post-review update (PR #29):** the gate was changed from a denylist (`localhost`/`127.0.0.1`) to an allowlist of the Pages host (`vajkri.github.io`), so on-device PWA testing over LAN IP / `[::1]` / `0.0.0.0` can't leak page_views to production.
