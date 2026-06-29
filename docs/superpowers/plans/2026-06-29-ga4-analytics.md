@@ -4,7 +4,7 @@
 
 **Goal:** Load Google Analytics 4 (`G-TKWB5RGY4V`) on the deployed PWA for pageview tracking, while never firing on local dev or the Playwright e2e build.
 
-**Architecture:** A `"use client"` `<Analytics />` component wraps the gtag.js loader + init in `next/script` (`afterInteractive`). It starts disabled and enables itself in a `useEffect` only when `window.location.hostname` is not `localhost`/`127.0.0.1`. Starting disabled keeps the first client render identical to the static HTML (both render nothing), so there is no hydration mismatch — matching the app's existing `hydrated`-gating discipline. It is mounted once from `app/layout.tsx` next to `<ServiceWorkerRegister />`.
+**Architecture:** An `<Analytics />` component renders a single `next/script` (`afterInteractive`) whose inline bootstrap self-injects gtag.js — but only after a runtime hostname check (`localhost`/`127.0.0.1` → early return). Putting the gate inside the script (rather than in React state) keeps the rendered markup byte-identical at build and runtime, so there is no hydration mismatch and no `react-hooks/set-state-in-effect` lint violation, while localhost makes zero gtag.js requests. Mounted once from `app/layout.tsx` next to `<ServiceWorkerRegister />`.
 
 **Tech Stack:** Next.js 16 static export, `next/script`, React 19, Playwright (e2e).
 
@@ -20,10 +20,7 @@
 - [ ] **Step 1: Write the component**
 
 ```tsx
-"use client";
-
 import Script from "next/script";
-import { useEffect, useState } from "react";
 
 const GA_ID = "G-TKWB5RGY4V";
 
@@ -31,36 +28,31 @@ const GA_ID = "G-TKWB5RGY4V";
 // (localhost:3000) nor the Playwright e2e build (localhost:4399), both of
 // which would otherwise pollute analytics. Hostname is the only reliable
 // runtime signal: e2e serves the exact same static export as Pages, so
-// NODE_ENV can't distinguish them.
-function isAnalyticsHost(hostname: string): boolean {
-  return hostname !== "localhost" && hostname !== "127.0.0.1";
-}
-
+// NODE_ENV can't distinguish them. The gate lives inside the bootstrap script
+// so the rendered markup is byte-identical everywhere (no hydration mismatch)
+// and localhost makes no gtag.js request at all.
 export default function Analytics() {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    if (isAnalyticsHost(window.location.hostname)) setEnabled(true);
-  }, []);
-
-  if (!enabled) return null;
-
   return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-        strategy="afterInteractive"
-      />
-      <Script id="ga4-init" strategy="afterInteractive">
-        {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_ID}');`}
-      </Script>
-    </>
+    <Script id="ga4-init" strategy="afterInteractive">
+      {`(function(){
+  var h = location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1') return;
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag = gtag;
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=${GA_ID}';
+  document.head.appendChild(s);
+  gtag('js', new Date());
+  gtag('config', '${GA_ID}');
+})();`}
+    </Script>
   );
 }
 ```
+
+> **Deviation note:** the originally planned `useState`/`useEffect` gate tripped Next 16's `react-hooks/set-state-in-effect` lint rule. Moving the gate into the inline bootstrap is behaviourally equivalent (no GA on localhost, GA on real host), removes the lint issue, and eliminates the hydration concern.
 
 - [ ] **Step 2: Typecheck + lint the new file**
 
