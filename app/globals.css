@@ -142,6 +142,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   --mascot-scale: 1;     /* face transform multiplier (ceiling 1 = 150x162) */
   --hero-gap: 14px;      /* caption / ring / deadline vertical rhythm        */
   --pad-top: 14px;       /* section top padding                              */
+  --ring-size: clamp(168px, 30dvh, 236px); /* progress ring diameter        */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 @media (max-height: 760px) {
   .progress-screen { --mascot-scale: 0.92; --hero-gap: 11px; --pad-top: 10px; }
@@ -208,4 +212,47 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .goal-slider:focus-visible::-moz-range-thumb {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   TABLET LAYOUT (issue #25)
+   At >=768px the shell cap is lifted (see AppShell). Each screen reflows for
+   the wider canvas. The 440px Playwright viewport and real phones never match
+   these queries, so the phone layout is unchanged.
+--------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+  /* Fremgang — ongoing only: mascot+caption (left) beside the ring (right). */
+  .progress-screen[data-lifecycle="ongoing"] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+    align-items: center;
+    justify-items: center;
+    align-content: center;
+    width: 100%;
+    max-width: 900px;
+    margin-inline: auto;
+  }
+  .progress-screen[data-lifecycle="ongoing"] > .mascot-hero {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: flex-end;
+  }
+  .progress-screen[data-lifecycle="ongoing"] > .progress-caption {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .progress-screen[data-lifecycle="ongoing"] > .progress-ongoing {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+/* Grow the mascot + ring only when there's real vertical room (true tablets),
+   so a short, wide desktop window doesn't get an oversized hero. */
+@media (min-width: 768px) and (min-height: 700px) {
+  .progress-screen {
+    --mascot-scale: 1.25;
+    --ring-size: clamp(240px, 32dvh, 300px);
+  }
 }
