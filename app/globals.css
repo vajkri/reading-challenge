@@ -256,3 +256,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     --ring-size: clamp(240px, 32dvh, 300px);
   }
 }
+
+.log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+@media (min-width: 768px) {
+  /* Læselog — centered add-form, two-column entries beneath. */
+  .log-head {
+    max-width: 520px;
+    margin-inline: auto;
+  }
+  .log-entries {
+    max-width: 760px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+}
