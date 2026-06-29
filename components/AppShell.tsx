@@ -17,7 +17,10 @@ export default function AppShell() {
   const { state } = useApp();
 
   return (
-    <div className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-app">
+    <div
+      data-testid="app-shell"
+      className="relative mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-hidden bg-app md:max-w-[1280px]"
+    >
       <header
         className="flex items-center gap-2 px-5 py-4"
         style={{ borderBottom: "1.5px solid #F2E6D2" }}
