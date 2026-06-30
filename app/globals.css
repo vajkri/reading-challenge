@@ -255,7 +255,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* Grow the mascot + ring only when there's real vertical room (true tablets),
-   so a short, wide desktop window doesn't get an oversized hero. */
+   so a short, wide desktop window doesn't get an oversized hero.
+   Precedence note: in the 700–760px-tall band this intentionally wins over the
+   max-height shrink rules above (later source order). That's safe — at this
+   width (>=768) the band is always landscape (768 > 760 >= height), which uses
+   the 2-column grid above, so the enlarged hero splits into two short columns
+   and fits with room to spare. Don't raise this guard to >=768 to "resolve" the
+   overlap: that would drop landscape tablets (e.g. iPad mini, 1024x744) back to
+   the 0.92 shrink and leave them with a too-small hero despite the room. */
 @media (min-width: 768px) and (min-height: 700px) {
   .progress-screen {
     --mascot-scale: 1.25;
