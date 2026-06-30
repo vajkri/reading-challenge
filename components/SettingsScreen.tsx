@@ -193,6 +193,7 @@ export default function SettingsScreen() {
       data-screen-label="Indstillinger"
       style={{ flex: "1 1 auto", overflowY: "auto", padding: "6px 22px 24px" }}
     >
+      <div className="settings-content">
       <h2
         style={{
           fontFamily: "var(--font-display)",
@@ -382,6 +383,7 @@ export default function SettingsScreen() {
 
       <div style={{ textAlign: "center", fontSize: 12, color: "#C2B299", marginTop: 22, lineHeight: 1.5 }}>
         {copy.settings.footer}
+      </div>
       </div>
 
       <UnlockModal />

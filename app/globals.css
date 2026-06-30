@@ -278,3 +278,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: start;
   }
 }
+
+@media (min-width: 768px) {
+  /* Indstillinger — same single column, just centered + capped. */
+  .settings-content {
+    max-width: 520px;
+    margin-inline: auto;
+  }
+}
