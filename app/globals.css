@@ -286,3 +286,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-inline: auto;
   }
 }
+
+.bingo-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+@media (min-width: 768px) {
+  /* Læsebingo — keep 3 wide (short rows = easy row-confetti), just larger. */
+  .bingo-board {
+    max-width: 540px;
+    margin-inline: auto;
+    gap: 14px;
+  }
+}

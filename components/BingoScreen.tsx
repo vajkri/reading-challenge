@@ -72,14 +72,7 @@ export default function BingoScreen() {
         </div>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 9,
-          marginTop: 14,
-        }}
-      >
+      <div className="bingo-board" style={{ marginTop: 14 }}>
         {b.feats.map((f) => (
           <button
             key={f.id}

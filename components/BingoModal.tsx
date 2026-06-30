@@ -83,7 +83,7 @@ export default function BingoModal({
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: 430,
+          maxWidth: 460,
           background: "#FFF6E9",
           borderRadius: "24px 24px 0 0",
           padding: "26px 22px calc(22px + env(safe-area-inset-bottom))",
