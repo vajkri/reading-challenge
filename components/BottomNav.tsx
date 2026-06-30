@@ -53,9 +53,10 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="sticky bottom-0 z-20 flex bg-white"
+      className="sticky bottom-0 z-20 flex justify-center bg-white"
       style={{ borderTop: "1.5px solid #F2E6D2", paddingBottom: "env(safe-area-inset-bottom)" }}
     >
+      <div data-testid="nav-inner" className="flex w-full max-w-[520px]">
       {/* Challenge-lifecycle group */}
       <div className="flex flex-[3]">
         <Tab active={s === "progress"} label={copy.nav.progress} onClick={actions.goProgress}>
@@ -95,6 +96,7 @@ export default function BottomNav() {
             <path d="M9.3 4 V20 M14.7 4 V20 M4 9.3 H20 M4 14.7 H20" />
           </svg>
         </Tab>
+      </div>
       </div>
     </nav>
   );

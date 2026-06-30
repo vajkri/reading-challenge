@@ -367,3 +367,33 @@ test("bingo: off-season shows the teaser, not the board", async ({ page }) => {
   await expect(page.getByText("Næste sæson kommer snart", { exact: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "Læs i naturen" })).toHaveCount(0);
 });
+
+// --- Tablet layout (>=768px) --------------------------------------------
+
+test.describe("tablet layout", () => {
+  test.use({ viewport: { width: 1024, height: 1366 } });
+
+  test("shell lifts past the phone cap", async ({ page, context }) => {
+    await seed(context, {
+      goal: "1000",
+      challenge: "ongoing",
+      name: "Max",
+      deadline: iso(20),
+      entries: [{ id: "a", title: "Vitello", author: "Kim Fupz", date: iso(-1), minutes: 500, created: 1 }],
+    });
+    await page.goto("./");
+    await expect(page.getByText("500 / 1000 min")).toBeVisible();
+    const box = await page.getByTestId("app-shell").boundingBox();
+    expect(box).not.toBeNull();
+    // On a 1024px viewport the shell is far wider than the old 430px cap.
+    expect(box!.width).toBeGreaterThan(700);
+  });
+
+  test("bottom nav stays capped and centered", async ({ page }) => {
+    await page.goto("./");
+    const box = await page.getByTestId("nav-inner").boundingBox();
+    expect(box).not.toBeNull();
+    // Capped at 520px (allow a little slack); not stretched across the tablet.
+    expect(box!.width).toBeLessThanOrEqual(560);
+  });
+});

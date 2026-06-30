@@ -19,61 +19,63 @@ export default function LogScreen() {
       aria-label={copy.log.title}
       style={{ flex: "1 1 auto", overflowY: "auto", padding: "6px 22px 24px" }}
     >
-      {/* Header: title + total summary */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
-          marginBottom: 14,
-        }}
-      >
-        <h2
+      <div className="log-head">
+        {/* Header: title + total summary */}
+        <div
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: 20,
-            color: "var(--color-ink)",
-          }}
-        >
-          {copy.log.title}
-        </h2>
-        <div style={{ fontWeight: 700, fontSize: 14, color: "var(--color-ink-3)" }}>
-          {derived.total} {copy.log.totalSuffix}
-        </div>
-      </div>
-
-      {/* Add button (only when no form is open) */}
-      {!state.formOpen && (
-        <button
-          type="button"
-          onClick={actions.openAdd}
-          className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          style={{
-            width: "100%",
-            padding: 14,
-            borderRadius: 16,
-            background: "var(--color-accent)",
-            color: "#fff",
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: 16,
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            boxShadow: "0 8px 18px rgba(246,166,35,.32)",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+            marginBottom: 14,
           }}
         >
-          <span style={{ fontSize: 22, lineHeight: 1, marginTop: -2 }}>+</span>{" "}
-          {copy.log.addBtn}
-        </button>
-      )}
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 20,
+              color: "var(--color-ink)",
+            }}
+          >
+            {copy.log.title}
+          </h2>
+          <div style={{ fontWeight: 700, fontSize: 14, color: "var(--color-ink-3)" }}>
+            {derived.total} {copy.log.totalSuffix}
+          </div>
+        </div>
 
-      {/* Top add form with quick-pick chips above the Titel field */}
-      {showAddForm && (
-        <EntryForm>{derived.hasRecentBooks && <QuickPickRow />}</EntryForm>
-      )}
+        {/* Add button (only when no form is open) */}
+        {!state.formOpen && (
+          <button
+            type="button"
+            onClick={actions.openAdd}
+            className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            style={{
+              width: "100%",
+              padding: 14,
+              borderRadius: 16,
+              background: "var(--color-accent)",
+              color: "#fff",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: 16,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              boxShadow: "0 8px 18px rgba(246,166,35,.32)",
+            }}
+          >
+            <span style={{ fontSize: 22, lineHeight: 1, marginTop: -2 }}>+</span>{" "}
+            {copy.log.addBtn}
+          </button>
+        )}
+
+        {/* Top add form with quick-pick chips above the Titel field */}
+        {showAddForm && (
+          <EntryForm>{derived.hasRecentBooks && <QuickPickRow />}</EntryForm>
+        )}
+      </div>
 
       {/* Empty state */}
       {derived.noEntries && (
@@ -107,9 +109,7 @@ export default function LogScreen() {
       )}
 
       {/* Entry list */}
-      <div
-        style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 11 }}
-      >
+      <div className="log-entries" style={{ marginTop: 14 }}>
         {derived.viewEntries.map((item) =>
           item.editing ? (
             <EntryForm key={item.entry.id} />

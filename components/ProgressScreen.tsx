@@ -66,13 +66,13 @@ export default function ProgressScreen(): React.ReactElement {
     <section
       data-screen-label="Fremgang"
       className="progress-screen"
+      data-lifecycle={
+        derived.isOngoing ? "ongoing" : derived.isCompleted ? "completed" : "none"
+      }
       style={{
         flex: "1 1 auto",
         overflowY: "auto",
         padding: "var(--pad-top) 22px calc(var(--pad-top) + 10px)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
       }}
     >
       <h2 className="sr-only">{copy.nav.progress}</h2>
@@ -83,6 +83,7 @@ export default function ProgressScreen(): React.ReactElement {
           wrapper's layout box is calc'd to the scaled size (transform-origin
           top-center) so it reserves no dead space. */}
       <div
+        className="mascot-hero"
         style={{
           position: "relative",
           width: "calc(200px * var(--mascot-scale))",
@@ -120,6 +121,7 @@ export default function ProgressScreen(): React.ReactElement {
       {/* caption (ongoing only) */}
       {derived.isOngoing && (
         <div
+          className="progress-caption"
           style={{
             ...display,
             marginTop: "var(--hero-gap)",
@@ -193,6 +195,7 @@ export default function ProgressScreen(): React.ReactElement {
       {/* ONGOING: ring + deadline */}
       {derived.isOngoing && (
         <div
+          className="progress-ongoing"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -203,7 +206,7 @@ export default function ProgressScreen(): React.ReactElement {
           <div
             style={{
               position: "relative",
-              width: "clamp(168px, 30dvh, 236px)",
+              width: "var(--ring-size)",
               aspectRatio: "1 / 1",
               marginTop: "var(--hero-gap)",
             }}

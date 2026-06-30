@@ -142,6 +142,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   --mascot-scale: 1;     /* face transform multiplier (ceiling 1 = 150x162) */
   --hero-gap: 14px;      /* caption / ring / deadline vertical rhythm        */
   --pad-top: 14px;       /* section top padding                              */
+  --ring-size: clamp(168px, 30dvh, 236px); /* progress ring diameter        */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 @media (max-height: 760px) {
   .progress-screen { --mascot-scale: 0.92; --hero-gap: 11px; --pad-top: 10px; }
@@ -208,4 +212,105 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .goal-slider:focus-visible::-moz-range-thumb {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   TABLET LAYOUT (issue #25)
+   At >=768px the shell cap is lifted (see AppShell). Each screen reflows for
+   the wider canvas. The 440px Playwright viewport and real phones never match
+   these queries, so the phone layout is unchanged.
+--------------------------------------------------------------------------- */
+/* The two-column hero only makes sense in landscape; in portrait (height >
+   width) the columns would sit too far apart, so it falls back to the stacked
+   single column (the .progress-screen flex default). */
+@media (min-width: 768px) and (orientation: landscape) {
+  /* Fremgang — ongoing only: mascot+caption (left) beside the ring (right). */
+  .progress-screen[data-lifecycle="ongoing"] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+    align-items: center;
+    justify-items: center;
+    align-content: center;
+    width: 100%;
+    max-width: 900px;
+    margin-inline: auto;
+    /* Fill the available height so align-content:center actually centers the
+       hero vertically (the section is otherwise sized to its content). */
+    min-height: 100%;
+  }
+  .progress-screen[data-lifecycle="ongoing"] > .mascot-hero {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+  }
+  .progress-screen[data-lifecycle="ongoing"] > .progress-caption {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .progress-screen[data-lifecycle="ongoing"] > .progress-ongoing {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+/* Grow the mascot + ring only when there's real vertical room (true tablets),
+   so a short, wide desktop window doesn't get an oversized hero.
+   Precedence note: in the 700–760px-tall band this intentionally wins over the
+   max-height shrink rules above (later source order). That's safe — at this
+   width (>=768) the band is always landscape (768 > 760 >= height), which uses
+   the 2-column grid above, so the enlarged hero splits into two short columns
+   and fits with room to spare. Don't raise this guard to >=768 to "resolve" the
+   overlap: that would drop landscape tablets (e.g. iPad mini, 1024x744) back to
+   the 0.92 shrink and leave them with a too-small hero despite the room. */
+@media (min-width: 768px) and (min-height: 700px) {
+  .progress-screen {
+    --mascot-scale: 1.25;
+    --ring-size: clamp(240px, 32dvh, 300px);
+  }
+}
+
+.log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+@media (min-width: 768px) {
+  /* Læselog — centered add-form, two-column entries beneath. */
+  .log-head {
+    max-width: 520px;
+    margin-inline: auto;
+  }
+  .log-entries {
+    max-width: 760px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Indstillinger — same single column, just centered + capped. */
+  .settings-content {
+    max-width: 520px;
+    margin-inline: auto;
+  }
+}
+
+.bingo-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+@media (min-width: 768px) {
+  /* Læsebingo — keep 3 wide (short rows = easy row-confetti), just larger. */
+  .bingo-board {
+    max-width: 540px;
+    margin-inline: auto;
+    gap: 14px;
+  }
 }
