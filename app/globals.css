@@ -239,7 +239,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .progress-screen[data-lifecycle="ongoing"] > .mascot-hero {
     grid-column: 1;
     grid-row: 1;
-    align-self: flex-end;
+    align-self: end;
   }
   .progress-screen[data-lifecycle="ongoing"] > .progress-caption {
     grid-column: 1;

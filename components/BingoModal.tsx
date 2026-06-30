@@ -83,6 +83,10 @@ export default function BingoModal({
         style={{
           position: "relative",
           width: "100%",
+          // Bottom sheet — slides up full-width on phones (width:100% binds);
+          // maxWidth caps it on wider screens, kept just above the tablet
+          // bingo-board cap (540) so it reads as the same family, not the
+          // retired 430 shell width.
           maxWidth: 460,
           background: "#FFF6E9",
           borderRadius: "24px 24px 0 0",
