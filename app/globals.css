@@ -220,7 +220,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    the wider canvas. The 440px Playwright viewport and real phones never match
    these queries, so the phone layout is unchanged.
 --------------------------------------------------------------------------- */
-@media (min-width: 768px) {
+/* The two-column hero only makes sense in landscape; in portrait (height >
+   width) the columns would sit too far apart, so it falls back to the stacked
+   single column (the .progress-screen flex default). */
+@media (min-width: 768px) and (orientation: landscape) {
   /* Fremgang — ongoing only: mascot+caption (left) beside the ring (right). */
   .progress-screen[data-lifecycle="ongoing"] {
     display: grid;
