@@ -56,6 +56,8 @@ import {
   completedRowCount,
 } from "@/lib/bingo";
 import { copy, interp, DATE_LOCALE } from "@/lib/copy";
+import { track } from "@/lib/analytics";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 // ---------------------------------------------------------------------------
 // State
@@ -871,12 +873,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [state.bingoConfetti]);
 
+  // GA4 Tier 2 events (no-op off the prod host).
+  useAnalytics(state);
+
   const actions = useMemo<Actions>(
     () => ({
-      goProgress: () => dispatch({ type: "SET_SCREEN", screen: "progress" }),
-      goLog: () => dispatch({ type: "SET_SCREEN", screen: "log" }),
-      goSettings: () => dispatch({ type: "GO_SETTINGS" }),
-      goBingo: () => dispatch({ type: "SET_SCREEN", screen: "bingo" }),
+      goProgress: () => {
+        track("nav_screen", { screen: "progress" });
+        dispatch({ type: "SET_SCREEN", screen: "progress" });
+      },
+      goLog: () => {
+        track("nav_screen", { screen: "log" });
+        dispatch({ type: "SET_SCREEN", screen: "log" });
+      },
+      goSettings: () => {
+        track("nav_screen", { screen: "settings" });
+        dispatch({ type: "GO_SETTINGS" });
+      },
+      goBingo: () => {
+        track("nav_screen", { screen: "bingo" });
+        dispatch({ type: "SET_SCREEN", screen: "bingo" });
+      },
       toggleFeat: (featId) => {
         const s = activeSeason(SEASONS, new Date());
         if (s) dispatch({ type: "TOGGLE_FEAT", seasonId: s.id, featId });
