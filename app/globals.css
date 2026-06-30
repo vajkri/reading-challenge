@@ -232,6 +232,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: 100%;
     max-width: 900px;
     margin-inline: auto;
+    /* Fill the available height so align-content:center actually centers the
+       hero vertically (the section is otherwise sized to its content). */
+    min-height: 100%;
   }
   .progress-screen[data-lifecycle="ongoing"] > .mascot-hero {
     grid-column: 1;
