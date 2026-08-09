@@ -3,7 +3,7 @@
 Parallel agent sessions run in isolated git worktrees so concurrent edits never collide.
 The native Claude Code worktree tooling **is** the harness — prefer it over scripting around it.
 
-> **Why this project differs from the generic worktree rule:** Læseudfordring is a static
+> **Why this project differs from the generic worktree rule:** Læsemakker is a static
 > Next.js export with **no gitignored build inputs** — no `.env`, no certs, no generated client.
 > A worktree builds and runs from tracked files alone, so there is **no env/secrets propagation**
 > to manage and **no `.worktreeinclude`** in this harness.
