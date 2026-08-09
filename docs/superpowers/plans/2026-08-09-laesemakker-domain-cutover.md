@@ -40,6 +40,7 @@
 | `components/Analytics.tsx` | 6 | GA4 host allowlist | `PAGES_HOST` |
 | `public/CNAME` | new | Pages custom domain | create |
 | `CLAUDE.md` | — | project instructions | update Pages section |
+| `README.md` | 7, 38, 43, 74 | public-facing readme | live URL + dev/serve URLs |
 
 `app/manifest.ts` and `components/ServiceWorkerRegister.tsx` need **no edit** — both
 derive their paths from `BASE_PATH` (`lib/config.ts:3`), which becomes `""` automatically.
@@ -388,13 +389,14 @@ git commit -m "feat(#32): add CNAME for laesemakker.dk"
 
 ---
 
-### Task 7: Update CLAUDE.md
+### Task 7: Update CLAUDE.md and README.md
 
 The "GitHub Pages config is load-bearing" bullet describes the old prefix layout and
-would actively mislead the next reader.
+would actively mislead the next reader. `README.md` still advertises the old live URL.
 
 **Files:**
 - Modify: `CLAUDE.md` (the "GitHub Pages config is load-bearing" bullet under **Hard rules**, and the `npm run dev` line under **Commands**)
+- Modify: `README.md` (lines 7, 38, 43, 74)
 
 - [ ] **Step 1: Replace the hard-rules bullet**
 
@@ -426,7 +428,21 @@ And the `npm run serve` comment from "under the basePath at :4399" to:
 npm run serve      # serve ./out at :4399 (what Playwright + Pages actually hit)
 ```
 
-- [ ] **Step 3: Verify no stale prefix remains anywhere in the repo**
+- [ ] **Step 3: Update README.md**
+
+`README.md` carries the public-facing URLs. Four lines change:
+
+- line 7: `**Live:** https://vajkri.github.io/reading-challenge/` → `**Live:** https://laesemakker.dk/`
+- line 38: `npm run dev      # http://localhost:3000/reading-challenge/  (basePath applies in dev too)`
+  → `npm run dev      # http://localhost:3000/`
+- line 43: `npm run serve    # serve ./out under the basePath at http://localhost:4399/reading-challenge/`
+  → `npm run serve    # serve ./out at http://localhost:4399/`
+- line 74: the GitHub Pages bullet naming `` `/reading-challenge` `` — rewrite it to describe the
+  apex custom domain and the absence of a basePath, matching the `CLAUDE.md` wording from Step 1.
+
+Read each line before editing; the line numbers are from the pre-change file and will drift as you edit.
+
+- [ ] **Step 4: Verify no stale prefix remains anywhere in the repo**
 
 Run:
 ```bash
@@ -439,10 +455,10 @@ in `app/`, `components/`, `lib/`, `public/`, `scripts/`, `e2e/`, or `CLAUDE.md`.
 
 `package.json` `name` stays `reading-challenge` — the repo is not being renamed.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add CLAUDE.md
+git add CLAUDE.md README.md
 git commit -m "docs(#32): document the root-served laesemakker.dk Pages setup"
 ```
 
