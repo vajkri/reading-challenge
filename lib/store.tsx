@@ -1,6 +1,6 @@
 "use client";
 
-// Central app state for Læseudfordring.
+// Central app state for Læsemakker.
 //
 // This is the React reimplementation of the prototype's single `renderVals()` +
 // `_method` handlers: a useReducer store (persisted slice + UI slice), with all

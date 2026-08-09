@@ -1,4 +1,4 @@
-// localStorage data layer for the Læseudfordring app.
+// localStorage data layer for the Læsemakker app.
 //
 // Mirrors the persistence behaviour of the original design-tool prototype
 // (Sommerlæsning.dc.html): eight discrete keys, each with its own encoding,

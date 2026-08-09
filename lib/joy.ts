@@ -1,4 +1,4 @@
-// Progress math for the Læseudfordring reading challenge.
+// Progress math for the Læsemakker reading challenge.
 //
 // Pure helpers — no React, no DOM, no side effects beyond reading the local
 // clock inside deadlineInfo(). Reproduces the design-tool spec

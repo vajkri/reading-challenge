@@ -1,4 +1,4 @@
-// Minimal offline service worker for Læseudfordring.
+// Minimal offline service worker for Læsemakker.
 //
 // Strategy:
 //   - navigations (HTML): network-first → fall back to cache, then the app shell
