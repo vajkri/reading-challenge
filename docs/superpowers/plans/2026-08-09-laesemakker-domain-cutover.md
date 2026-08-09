@@ -84,11 +84,15 @@ Before changing any config, make the e2e suite demand root-serving. The suite's
 `baseURL` currently carries the prefix, so this test fails until Task 2 lands.
 
 **Files:**
-- Modify: `e2e/app.spec.ts` (append at end of file)
+- Modify: `e2e/shell.spec.ts` (append at end of file)
+
+`e2e/shell.spec.ts` holds app-shell-level assertions — branding, document metadata, the
+manifest. A root-path assertion belongs there, not in `e2e/app.spec.ts`, which covers
+screen behaviour and is already near the ~300-line guideline.
 
 - [ ] **Step 1: Write the failing test**
 
-Append to `e2e/app.spec.ts`:
+Append to `e2e/shell.spec.ts`:
 
 ```ts
 test("app is served from the root path, not a project subpath", async ({ page }) => {
@@ -121,7 +125,7 @@ when the request actually starts with it. The manifest assertions fail on their 
 - [ ] **Step 3: Commit the failing test**
 
 ```bash
-git add e2e/app.spec.ts
+git add e2e/shell.spec.ts
 git commit -m "test(#32): assert the app is served from the root path"
 ```
 
