@@ -63,7 +63,7 @@ import { useAnalytics } from "@/lib/useAnalytics";
 // State
 // ---------------------------------------------------------------------------
 
-export type Screen = "progress" | "log" | "settings" | "bingo";
+export type Screen = "progress" | "log" | "settings" | "bingo" | "about";
 
 interface FormState {
   title: string;
@@ -787,6 +787,7 @@ export interface Actions {
   goLog: () => void;
   goSettings: () => void;
   goBingo: () => void;
+  goAbout: () => void;
   toggleFeat: (featId: string) => void;
   startChallenge: () => void;
   updateChallenge: () => void;
@@ -893,6 +894,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       goBingo: () => {
         track("nav_screen", { screen: "bingo" });
         dispatch({ type: "SET_SCREEN", screen: "bingo" });
+      },
+      goAbout: () => {
+        track("nav_screen", { screen: "about" });
+        dispatch({ type: "SET_SCREEN", screen: "about" });
       },
       toggleFeat: (featId) => {
         const s = activeSeason(SEASONS, new Date());

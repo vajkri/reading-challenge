@@ -12,9 +12,10 @@ import LogScreen from "@/components/LogScreen";
 import SettingsScreen from "@/components/SettingsScreen";
 import NewChallengeModal from "@/components/NewChallengeModal";
 import BingoScreen from "@/components/BingoScreen";
+import AboutScreen from "@/components/AboutScreen";
 
 export default function AppShell() {
-  const { state } = useApp();
+  const { state, actions } = useApp();
 
   return (
     <div
@@ -42,6 +43,36 @@ export default function AppShell() {
         >
           {copy.app.name}
         </h1>
+
+        {/* Right-hand header cluster. Today it holds only the About (ⓘ) button;
+            it is laid out as a flex row because the language pill will sit here
+            later (separate issue) — see spec. */}
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            data-testid="header-about"
+            onClick={actions.goAbout}
+            aria-label={copy.about.navAria}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-ink-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            style={{ boxShadow: "0 0 0 1.5px #F0DBB4 inset" }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11 V16" />
+              <path d="M12 8 H12.01" />
+            </svg>
+          </button>
+        </div>
       </header>
 
       {/* Until state is hydrated from localStorage we don't know which screen
@@ -56,6 +87,7 @@ export default function AppShell() {
             {state.screen === "log" && <LogScreen />}
             {state.screen === "settings" && <SettingsScreen />}
             {state.screen === "bingo" && <BingoScreen />}
+            {state.screen === "about" && <AboutScreen />}
           </>
         )}
       </main>
