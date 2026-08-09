@@ -35,3 +35,13 @@ test("back arrow returns to Fremgang", async ({ page }) => {
   await page.getByRole("button", { name: "Tilbage" }).click();
   await expect(page.locator('[data-screen-label="Fremgang"]')).toBeVisible();
 });
+
+// Testid, not name: copy.settings.about and copy.about.navAria are both "Om appen",
+// so a name-based selector would match the header ⓘ button too (strict-mode violation).
+test("Settings 'Om appen' row opens the About page", async ({ page }) => {
+  await page.goto("./");
+  await page.getByRole("button", { name: "Indstillinger" }).click();
+
+  await page.getByTestId("settings-about").click();
+  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+});

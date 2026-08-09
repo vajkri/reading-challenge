@@ -381,6 +381,67 @@ export default function SettingsScreen() {
         </button>
       )}
 
+      {/* "Om appen" — navigates to the standalone About screen. Same testid contract
+          as the header ⓘ button (both are labelled "Om appen", so e2e uses testids). */}
+      <button
+        type="button"
+        data-testid="settings-about"
+        onClick={actions.goAbout}
+        className={FOCUS_RING}
+        style={{
+          width: "100%",
+          marginTop: 14,
+          background: "#fff",
+          borderRadius: 16,
+          boxShadow: "0 6px 16px rgba(80,55,25,.08)",
+          padding: "14px 16px",
+          display: "flex",
+          alignItems: "center",
+          gap: 11,
+        }}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#C99A3A"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11 V16" />
+          <path d="M12 8 H12.01" />
+        </svg>
+        <span
+          style={{
+            flex: 1,
+            textAlign: "left",
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 14.5,
+            color: "#4F4034",
+          }}
+        >
+          {copy.settings.about}
+        </span>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#C2B299"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 5 L16 12 L9 19" />
+        </svg>
+      </button>
+
       <div style={{ textAlign: "center", fontSize: 12, color: "#C2B299", marginTop: 22, lineHeight: 1.5 }}>
         {copy.settings.footer}
       </div>
