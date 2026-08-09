@@ -397,3 +397,9 @@ test.describe("tablet layout", () => {
     expect(box!.width).toBeLessThanOrEqual(560);
   });
 });
+
+test("header and document title carry the Læsemakker brand", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.getByRole("heading", { level: 1, name: "Læsemakker" })).toBeVisible();
+  await expect(page).toHaveTitle("Læsemakker");
+});
