@@ -314,3 +314,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     gap: 14px;
   }
 }
+
+@media (min-width: 768px) {
+  /* Om appen — reading column; same cap as Indstillinger (its closest analogue,
+     a single centered column) so the CTA doesn't stretch the full canvas. */
+  .about-content {
+    max-width: 520px;
+    margin-inline: auto;
+  }
+}

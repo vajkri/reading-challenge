@@ -52,6 +52,7 @@ export default function AppShell() {
             type="button"
             data-testid="header-about"
             onClick={actions.goAbout}
+            aria-current={state.screen === "about" ? "page" : undefined}
             aria-label={copy.about.navAria}
             className="flex h-9 w-9 items-center justify-center rounded-full text-ink-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             style={{ boxShadow: "0 0 0 1.5px #F0DBB4 inset" }}

@@ -23,15 +23,29 @@ export default function AboutScreen() {
   const { state, actions } = useApp();
 
   return (
-    <section data-testid="about-screen" data-screen-label="Om appen" style={{ paddingTop: 8 }}>
-      {/* Back row: arrow → home (Progress). Bottom nav also stays available. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+    <section
+      className="about-content"
+      data-testid="about-screen"
+      data-screen-label="Om appen"
+      style={{ paddingTop: 8 }}
+    >
+      {/* Back row: arrow → home (Progress). Bottom nav also stays available.
+          The button pads 9 around its 22px icon for a 40px tap target (kids'
+          app; the BottomNav tabs are ~48px). The negative inline-start margin
+          cancels that padding so the icon stays optically flush with the
+          content column below it. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16 }}>
         <button
           type="button"
           onClick={actions.goProgress}
           aria-label={copy.about.back}
-          className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          style={{ display: "inline-flex", padding: 4, borderRadius: 10, color: "#8A7559" }}
+          className="text-ink-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          style={{
+            display: "inline-flex",
+            padding: 9,
+            marginInlineStart: -9,
+            borderRadius: 10,
+          }}
         >
           <svg
             width="22"

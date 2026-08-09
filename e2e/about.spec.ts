@@ -22,6 +22,16 @@ test("bottom nav is still usable from the About page", async ({ page }) => {
   await page.getByTestId("header-about").click();
   await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
 
+  // Assert the Log screen actually rendered *before* asserting About is gone —
+  // a bare toHaveCount(0) would also pass if <main> rendered nothing at all.
   await page.getByRole("button", { name: "Læselog" }).click();
-  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Læselog" })).toBeVisible();
+  await expect(page.getByTestId("about-screen")).toHaveCount(0);
+});
+
+test("back arrow returns to Fremgang", async ({ page }) => {
+  await page.goto("./");
+  await page.getByTestId("header-about").click();
+  await page.getByRole("button", { name: "Tilbage" }).click();
+  await expect(page.locator('[data-screen-label="Fremgang"]')).toBeVisible();
 });
