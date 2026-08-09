@@ -112,6 +112,7 @@
     "startBtn": "Start udfordringen",
     "updateBtn": "Opdater udfordring",
     "footer": "Al fremgang gemmes på denne enhed.",
+    "about": "Om appen",
     "unlock": {
       "heading": "Kun for voksne",
       "sub": "Løs regnestykket for at låse op.",
@@ -163,5 +164,20 @@
         }
       }
     }
+  },
+  "about": {
+    "navAria": "Om appen",
+    "title": "Om Læseudfordring",
+    "back": "Tilbage",
+    "intro": [
+      "Hej! Jeg lavede Læseudfordring i min fritid, fordi jeg ville gøre det sjovere for mit barn at læse lidt hver dag.",
+      "Den er gratis, uden reklamer, og alt bliver kun gemt på din egen enhed."
+    ],
+    "support": {
+      "heading": "Kan du lide appen?",
+      "sub": "Du kan give en kop kaffe — helt frivilligt.",
+      "cta": "Køb mig en kaffe"
+    },
+    "thanks": "Tak fordi I læser med."
   }
 }
