@@ -78,9 +78,9 @@ Bingo pattern.
 
 ### External link + config
 
-- **`lib/links.ts`** (new): export `SUPPORT_URL` — the Buy Me a Coffee page
-  (`https://buymeacoffee.com/<handle>`). This is a deploy-time config value, not
-  translatable copy, so it lives as a constant, not in `copy/da.json`.
+- **`lib/links.ts`** (new): export `SUPPORT_URL = "https://buymeacoffee.com/kriszta.vajda"`.
+  This is a config value, not translatable copy, so it lives as a constant, not
+  in `copy/da.json`.
 - The CTA is an `<a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">`
   styled as a button. On click, fire `track("support_click", { platform: "buymeacoffee" })`
   using the existing analytics `track()` util.
