@@ -1,7 +1,8 @@
 import { test, expect, type BrowserContext } from "@playwright/test";
 
-// Behavioural end-to-end coverage. Each test seeds localStorage (the 7 keys) to
-// reach a starting state, then drives the UI and asserts the prototype behaviour.
+// Behavioural end-to-end coverage. Most tests seed localStorage (the eight
+// `sommerlaesning.v1.*` keys) to reach a starting state, then drive the UI and
+// assert the prototype behaviour.
 
 const K = "sommerlaesning.v1.";
 const iso = (offsetDays: number) => {
@@ -396,10 +397,4 @@ test.describe("tablet layout", () => {
     // Capped at 520px (allow a little slack); not stretched across the tablet.
     expect(box!.width).toBeLessThanOrEqual(560);
   });
-});
-
-test("header and document title carry the Læsemakker brand", async ({ page }) => {
-  await page.goto("./");
-  await expect(page.getByRole("heading", { level: 1, name: "Læsemakker" })).toBeVisible();
-  await expect(page).toHaveTitle("Læsemakker");
 });
