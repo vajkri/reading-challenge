@@ -4,6 +4,8 @@
 // and the bottom nav. Screens are switched by state.screen (no routing),
 // matching the prototype. (Celebratory confetti lives inside ProgressScreen.)
 
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useApp } from "@/lib/store";
 import { copy } from "@/lib/copy";
 import BottomNav from "@/components/BottomNav";
@@ -12,10 +14,36 @@ import LogScreen from "@/components/LogScreen";
 import SettingsScreen from "@/components/SettingsScreen";
 import NewChallengeModal from "@/components/NewChallengeModal";
 import BingoScreen from "@/components/BingoScreen";
-import AboutDrawer from "@/components/AboutDrawer";
+
+// The About drawer drags in Base UI — real weight (~35 KB gzipped) for an
+// overlay most sessions never open, so it is code-split out of the first load:
+// index.html no longer references that chunk and startup never parses it.
+const AboutDrawer = dynamic(() => import("@/components/AboutDrawer"));
 
 export default function AppShell() {
   const { state, actions } = useApp();
+
+  // …and mounted once the app has gone idle, never unmounted. Both halves are
+  // load-bearing:
+  //  - Mounting on idle rather than on the tap keeps *both* drawer transitions.
+  //    Base UI skips the enter animation for a popup that is already open when
+  //    it mounts, so gating on state.aboutOpen made the panel pop in on the
+  //    first open (measured) instead of sliding up. Deferring further would
+  //    also save nothing: public/sw.js precaches every asset on install, so the
+  //    chunk is downloaded regardless — the win here is startup parse, not bytes.
+  //  - Never unmounting is what lets the exit transition play out on close.
+  // This is a render optimisation, not app state — hence local useState rather
+  // than the store. state.aboutOpen is an escape hatch for a tap that somehow
+  // beats the idle callback.
+  const [aboutMounted, setAboutMounted] = useState(false);
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(() => setAboutMounted(true), { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(() => setAboutMounted(true), 1200); // Safari < 17.4
+    return () => window.clearTimeout(id);
+  }, []);
 
   return (
     <div
@@ -94,7 +122,7 @@ export default function AppShell() {
       </main>
 
       <NewChallengeModal />
-      <AboutDrawer />
+      {(aboutMounted || state.aboutOpen) && <AboutDrawer />}
       <BottomNav />
     </div>
   );
