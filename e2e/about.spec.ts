@@ -24,6 +24,21 @@ async function seed(context: BrowserContext, data: Record<string, unknown>) {
   );
 }
 
+/**
+ * Stub gtag before load so track() is observable on localhost; capture every call.
+ * components/Analytics.tsx only injects the real gtag on the prod host, so without
+ * this every track() is a silent no-op and the assertions below would be vacuous.
+ */
+async function stubGtag(context: BrowserContext) {
+  await context.addInitScript(() => {
+    const w = window as unknown as { __gaEvents: unknown[][]; gtag: (...a: unknown[]) => void };
+    w.__gaEvents = [];
+    w.gtag = (...args: unknown[]) => {
+      w.__gaEvents.push(args);
+    };
+  });
+}
+
 test("header info icon opens the About page with the coffee CTA", async ({ page }) => {
   await page.goto("./");
   await page.getByTestId("header-about").click();
@@ -92,4 +107,36 @@ test("'Om appen' row stays reachable while the challenge is locked", async ({ pa
 
   await page.getByTestId("settings-about").click();
   await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+});
+
+test("About fires nav_screen(about) and the CTA fires support_click", async ({ page, context }) => {
+  await stubGtag(context);
+  // Never hit the real support host in CI. Fulfilling locally (rather than
+  // aborting) keeps the request off the network *and* lets the popup settle on
+  // the real URL — an aborted navigation lands on chrome-error:// instead.
+  await context.route(/buymeacoffee\.com/, (route) =>
+    route.fulfill({ status: 200, contentType: "text/html", body: "<title>stub</title>" }),
+  );
+
+  await page.goto("./");
+  await page.getByTestId("header-about").click();
+  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+
+  const cta = page.getByRole("link", { name: "Køb mig en kaffe" });
+  const [popup] = await Promise.all([page.waitForEvent("popup"), cta.click()]);
+  await popup.waitForURL(/buymeacoffee\.com\/kriszta\.vajda/);
+  await popup.close();
+
+  // Each captured entry is ["event", name, params?].
+  const events = await page.evaluate(
+    () => (window as unknown as { __gaEvents: unknown[][] }).__gaEvents,
+  );
+  const paramsFor = (name: string) =>
+    events.filter((e) => e[1] === name).map((e) => e[2] as Record<string, unknown> | undefined);
+
+  // nav_screen fires on EVERY navigation, so match on the payload rather than
+  // taking the first one — this stays green if a nav is ever added ahead of it.
+  expect(paramsFor("nav_screen").map((p) => p?.screen)).toContain("about");
+  // The platform param is what makes support_click useful in GA4 — assert it.
+  expect(paramsFor("support_click")).toEqual([{ platform: "buymeacoffee" }]);
 });
