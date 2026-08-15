@@ -124,7 +124,7 @@ test("About fires nav_screen(about) and the CTA fires support_click", async ({ p
 
   const cta = page.getByRole("link", { name: "Køb mig en kaffe" });
   const [popup] = await Promise.all([page.waitForEvent("popup"), cta.click()]);
-  await popup.waitForURL(/buymeacoffee\.com\/kriszta\.vajda/);
+  await popup.waitForURL(SUPPORT_URL);
   await popup.close();
 
   // Each captured entry is ["event", name, params?].
