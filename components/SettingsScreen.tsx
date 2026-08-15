@@ -381,8 +381,9 @@ export default function SettingsScreen() {
         </button>
       )}
 
-      {/* "Om appen" — navigates to the standalone About screen. Same testid contract
-          as the header ⓘ button (both are labelled "Om appen", so e2e uses testids). */}
+      {/* "Om appen" — navigates to the standalone About screen. Deliberately a sibling
+          of the gating wrapper above, not a child: it must stay reachable while locked.
+          Both this and the header ⓘ are labelled "Om appen", so e2e selects by testid. */}
       <button
         type="button"
         data-testid="settings-about"
@@ -405,7 +406,7 @@ export default function SettingsScreen() {
           height="20"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#C99A3A"
+          stroke="#B5803A"
           strokeWidth="2.2"
           strokeLinecap="round"
           strokeLinejoin="round"
