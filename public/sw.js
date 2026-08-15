@@ -5,9 +5,10 @@
 //     (so a new deploy is picked up online, but the app still opens offline)
 //   - static assets (_next, icons, manifest): cache-first → network, then cache
 //
-// BASE is hardcoded to match next.config.ts `basePath`. This file lives in
-// public/ and is NOT processed by the bundler, so it cannot read env vars.
-const BASE = "/reading-challenge";
+// BASE is empty because the app is served from the root of laesemakker.dk. This
+// file lives in public/ and is NOT processed by the bundler, so it cannot read
+// env vars — the value is duplicated from next.config.ts by hand.
+const BASE = "";
 
 // BUILD_ID and PRECACHE_ASSETS are rewritten in the BUILT out/sw.js by the
 // postbuild script scripts/inject-sw-assets.mjs. The defaults below keep the

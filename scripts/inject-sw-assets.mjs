@@ -11,7 +11,7 @@ import { readFile, writeFile, readdir, stat } from "node:fs/promises";
 import { join, posix, relative, sep } from "node:path";
 import { createHash } from "node:crypto";
 
-const BASE = "/reading-challenge";
+const BASE = "";
 const ROOT = join(process.cwd(), "out");
 const SW = join(ROOT, "sw.js");
 
