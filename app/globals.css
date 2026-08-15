@@ -215,6 +215,75 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* ---------------------------------------------------------------------------
+   "Om appen" drawer (Base UI Drawer). Geometry mirrors BingoModal's bottom
+   sheet; the transition + gesture rules must be CSS because they key off Base
+   UI's data-* attributes and --drawer-swipe-* variables.
+   --bleed extends the panel below the viewport so an over-drag never reveals
+   the page behind it.
+   z-index 50 matches BingoModal/NewChallengeModal; it must clear BottomNav's
+   sticky z-20 or the nav paints over the sheet and swallows its taps.
+--------------------------------------------------------------------------- */
+.about-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(60, 42, 22, 0.42);
+  opacity: calc(1 - var(--drawer-swipe-progress, 0));
+  transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.about-drawer-backdrop[data-swiping] {
+  transition-duration: 0s;
+}
+.about-drawer-backdrop[data-starting-style],
+.about-drawer-backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.about-drawer-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.about-drawer-popup {
+  --bleed: 3rem;
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(85dvh + var(--bleed));
+  margin-bottom: calc(var(--bleed) * -1);
+  padding: 10px 22px calc(22px + env(safe-area-inset-bottom) + var(--bleed));
+  background: #fff6e9;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -10px 30px rgba(60, 42, 22, 0.28);
+  outline: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: auto;
+  transform: translateY(var(--drawer-swipe-movement-y, 0px));
+  transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.about-drawer-popup[data-swiping] {
+  user-select: none;
+}
+.about-drawer-popup[data-starting-style],
+.about-drawer-popup[data-ending-style] {
+  transform: translateY(calc(100% - var(--bleed) + 2px));
+}
+
+/* Grab handle — decorative; the panel is also dismissible by Escape, backdrop
+   press, and the explicit "Luk" button. */
+.about-drawer-handle {
+  width: 44px;
+  height: 4px;
+  margin: 0 auto 14px;
+  border-radius: 999px;
+  background: #e2d3bb;
+}
+
+/* ---------------------------------------------------------------------------
    TABLET LAYOUT (issue #25)
    At >=768px the shell cap is lifted (see AppShell). Each screen reflows for
    the wider canvas. The 440px Playwright viewport and real phones never match
@@ -312,14 +381,5 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     max-width: 540px;
     margin-inline: auto;
     gap: 14px;
-  }
-}
-
-@media (min-width: 768px) {
-  /* Om appen — reading column; same cap as Indstillinger (its closest analogue,
-     a single centered column) so the CTA doesn't stretch the full canvas. */
-  .about-content {
-    max-width: 520px;
-    margin-inline: auto;
   }
 }

@@ -12,7 +12,7 @@ import LogScreen from "@/components/LogScreen";
 import SettingsScreen from "@/components/SettingsScreen";
 import NewChallengeModal from "@/components/NewChallengeModal";
 import BingoScreen from "@/components/BingoScreen";
-import AboutScreen from "@/components/AboutScreen";
+import AboutDrawer from "@/components/AboutDrawer";
 
 export default function AppShell() {
   const { state, actions } = useApp();
@@ -51,9 +51,10 @@ export default function AppShell() {
           <button
             type="button"
             data-testid="header-about"
-            onClick={actions.goAbout}
-            aria-current={state.screen === "about" ? "page" : undefined}
+            onClick={actions.openAbout}
             aria-label={copy.about.navAria}
+            aria-haspopup="dialog"
+            aria-expanded={state.aboutOpen}
             className="flex h-9 w-9 items-center justify-center rounded-full text-ink-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             style={{ boxShadow: "0 0 0 1.5px #F0DBB4 inset" }}
           >
@@ -88,12 +89,12 @@ export default function AppShell() {
             {state.screen === "log" && <LogScreen />}
             {state.screen === "settings" && <SettingsScreen />}
             {state.screen === "bingo" && <BingoScreen />}
-            {state.screen === "about" && <AboutScreen />}
           </>
         )}
       </main>
 
       <NewChallengeModal />
+      <AboutDrawer />
       <BottomNav />
     </div>
   );

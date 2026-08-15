@@ -63,7 +63,7 @@ import { useAnalytics } from "@/lib/useAnalytics";
 // State
 // ---------------------------------------------------------------------------
 
-export type Screen = "progress" | "log" | "settings" | "bingo" | "about";
+export type Screen = "progress" | "log" | "settings" | "bingo";
 
 interface FormState {
   title: string;
@@ -95,6 +95,12 @@ interface UIState {
   newChallengeOpen: boolean;
   // "Om appen" drawer — an overlay, not a screen: it must never displace
   // whatever the user was looking at.
+  // Cleared by SET_SCREEN and GO_SETTINGS only. The four other cases that write
+  // `screen` (START_CHALLENGE, UPDATE_CHALLENGE, CONFIRM_NEW_CHALLENGE, SAVE_ENTRY)
+  // are all pointer-driven from background chrome, so they're unreachable while the
+  // drawer is open — but that safety comes from Drawer.Root's `modal`, not from here.
+  // If the drawer ever becomes non-modal, or gains a control that navigates, clear
+  // `aboutOpen` in those cases too.
   aboutOpen: boolean;
   // Parental unlock modal
   unlockOpen: boolean;
@@ -801,7 +807,6 @@ export interface Actions {
   goLog: () => void;
   goSettings: () => void;
   goBingo: () => void;
-  goAbout: () => void;
   toggleFeat: (featId: string) => void;
   startChallenge: () => void;
   updateChallenge: () => void;
@@ -910,10 +915,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       goBingo: () => {
         track("nav_screen", { screen: "bingo" });
         dispatch({ type: "SET_SCREEN", screen: "bingo" });
-      },
-      goAbout: () => {
-        track("nav_screen", { screen: "about" });
-        dispatch({ type: "SET_SCREEN", screen: "about" });
       },
       toggleFeat: (featId) => {
         const s = activeSeason(SEASONS, new Date());

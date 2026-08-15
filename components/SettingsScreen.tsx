@@ -381,13 +381,13 @@ export default function SettingsScreen() {
         </button>
       )}
 
-      {/* "Om appen" — navigates to the standalone About screen. Deliberately a sibling
+      {/* "Om appen" — opens the About drawer over this screen. Deliberately a sibling
           of the gating wrapper above, not a child: it must stay reachable while locked.
           Both this and the header ⓘ are labelled "Om appen", so e2e selects by testid. */}
       <button
         type="button"
         data-testid="settings-about"
-        onClick={actions.goAbout}
+        onClick={actions.openAbout}
         className={FOCUS_RING}
         style={{
           width: "100%",
