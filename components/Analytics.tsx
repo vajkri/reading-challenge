@@ -2,15 +2,15 @@ import Script from "next/script";
 
 const GA_ID = "G-TKWB5RGY4V";
 
-// The deployed GitHub Pages host. GA4 fires ONLY here.
-const PAGES_HOST = "vajkri.github.io";
+// The deployed production host. GA4 fires ONLY here.
+const PAGES_HOST = "laesemakker.dk";
 
 // GA4 must fire only on the deployed GitHub Pages site — never on local dev,
 // the Playwright e2e build (localhost:4399), or on-device PWA testing over the
 // LAN ([::1] / 0.0.0.0 / 192.168.x.x), any of which would otherwise pollute
 // production analytics. This is an *allowlist*, not a denylist: any unknown
 // host defaults to OFF, so we can't leak page_views from a host we forgot to
-// exclude. (If the site ever moves to a custom domain, update PAGES_HOST.)
+// exclude. (If the site ever moves hosts again, update PAGES_HOST.)
 // Hostname is the only reliable runtime signal — e2e serves the exact same
 // static export as Pages, so NODE_ENV can't distinguish them. The gate lives
 // inside the bootstrap script so the rendered markup is byte-identical
