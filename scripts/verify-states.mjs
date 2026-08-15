@@ -3,7 +3,7 @@
 import { chromium } from "@playwright/test";
 
 const OUT = process.argv[2];
-const BASE = process.argv[3] || "http://localhost:3000/reading-challenge/";
+const BASE = process.argv[3] || "http://localhost:3000/";
 if (!OUT) {
   console.error("usage: node scripts/verify-states.mjs <outDir> [baseUrl]");
   process.exit(1);

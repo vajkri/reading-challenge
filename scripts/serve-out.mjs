@@ -7,7 +7,7 @@ import { join, extname, normalize } from "node:path";
 
 const PORT = Number(process.argv[2] || 4399);
 const ROOT = join(process.cwd(), "out");
-const PREFIX = "/reading-challenge";
+const PREFIX = "";
 
 const TYPES = {
   ".html": "text/html; charset=utf-8",

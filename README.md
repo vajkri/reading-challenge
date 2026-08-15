@@ -4,7 +4,7 @@ A small, playful **reading-challenge PWA** (in Danish) that motivates a 7–9-ye
 A big progress ring and a chosen mascot — a **cat or a dog** — get happier as the minutes add up,
 backed by a full reading log. Everything is stored on the device; there is no account and no server.
 
-**Live:** https://vajkri.github.io/reading-challenge/
+**Live:** https://laesemakker.dk/
 
 > Rebuilt from a Claude Design prototype (`Sommerlæsning.dc.html`) into a real, deployable app.
 > The original design + product spec lives in [`docs/spec/`](docs/spec).
@@ -35,12 +35,12 @@ backed by a full reading log. Everything is stored on the device; there is no ac
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000/reading-challenge/  (basePath applies in dev too)
+npm run dev      # http://localhost:3000/
 ```
 
 ```bash
 npm run build    # static export → ./out  (postbuild injects the SW precache manifest)
-npm run serve    # serve ./out under the basePath at http://localhost:4399/reading-challenge/
+npm run serve    # serve ./out at http://localhost:4399/
 npm run test:e2e # Playwright behavioural suite (builds nothing — run `build` first)
 npm run lint
 ```
@@ -70,9 +70,12 @@ docs/spec/      the original design handoffs, prototype files, and screenshots
   kid's saved progress. A one-time migration upgrades pre-challenge data on load.
 - **The mascot** is a parametric SVG/div renderer (`MascotFace`) ported near-verbatim from the
   prototype; cat + dog are surfaced in v1 (owl/horse/fox exist in the renderer for later).
-- **GitHub Pages traps** (already handled, do not regress): `basePath`/`assetPrefix` =
-  `/reading-challenge`, `public/.nojekyll`, `images: { unoptimized: true }`, `trailingSlash: true`,
-  and a service-worker scope + manifest `start_url`/`scope` that include the basePath.
+- **GitHub Pages traps** (already handled, do not regress): the site is served from the apex
+  custom domain **laesemakker.dk** at the root path — there is no `basePath`/`assetPrefix`, and
+  `public/CNAME` must keep containing `laesemakker.dk`. Also keep `public/.nojekyll`,
+  `images: { unoptimized: true }`, `trailingSlash: true`, and the root-scoped service worker +
+  manifest `start_url`/`scope`. `public/sw.js` and `scripts/inject-sw-assets.mjs` hardcode an
+  empty `BASE`; if a base path is ever reintroduced, all three must change together.
 
 ## Deployment
 

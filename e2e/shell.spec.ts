@@ -12,3 +12,15 @@ test("header, document title, and manifest all carry the Læsemakker brand", asy
   expect(manifest.name).toBe("Læsemakker");
   expect(manifest.short_name).toBe("Læsemakker");
 });
+
+test("app is served from the root path, not a project subpath", async ({ page }) => {
+  await page.goto("./");
+  expect(new URL(page.url()).pathname).toBe("/");
+
+  const manifest = await page.evaluate(async () => {
+    const res = await fetch("/manifest.webmanifest");
+    return res.json() as Promise<{ start_url: string; scope: string }>;
+  });
+  expect(manifest.start_url).toBe("/");
+  expect(manifest.scope).toBe("/");
+});
