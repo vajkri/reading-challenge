@@ -1,6 +1,9 @@
 import Script from "next/script";
 
-const GA_ID = "G-TKWB5RGY4V";
+// GA4 property for laesemakker.dk. The old vajkri.github.io property
+// (G-TKWB5RGY4V) is retired along with the domain — its history stays in GA4
+// but nothing reports to it any more.
+const GA_ID = "G-0N5VCH047L";
 
 // The deployed production host. GA4 fires ONLY here.
 const PAGES_HOST = "laesemakker.dk";
