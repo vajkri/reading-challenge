@@ -53,20 +53,24 @@ Two cross-file invariants that are easy to break:
 - **The mascot renderer (`components/MascotFace.tsx`) is a faithful port** of the prototype's
   parametric face system (`STROKE=2.6`, `BROW=4`, the 8-stage ramp). Keep it pure; tweak geometry
   here, not in markup. cat + dog are surfaced; owl/horse/fox stay in the code, unused.
-- **GitHub Pages config is load-bearing** (`next.config.ts` + `public/.nojekyll` + `public/sw.js`):
-  `basePath`/`assetPrefix` = `/reading-challenge`, `trailingSlash`, `images.unoptimized`, and the
-  SW scope + manifest `start_url`/`scope` all include the basePath. Breaking any of these blanks
-  the deployed site or the installed PWA. The `postbuild` step (`scripts/inject-sw-assets.mjs`)
-  injects the precache list + build id into `out/sw.js` — keep it wired.
+- **GitHub Pages config is load-bearing** (`next.config.ts` + `public/CNAME` +
+  `public/.nojekyll` + `public/sw.js`): the site is served from the apex custom domain
+  **laesemakker.dk** at the root path — there is no `basePath`/`assetPrefix`. `public/CNAME`
+  must keep containing `laesemakker.dk`, and `trailingSlash` + `images.unoptimized` must
+  stay. `public/sw.js` and `scripts/inject-sw-assets.mjs` hardcode an empty `BASE` because
+  neither can read env vars; if a base path is ever reintroduced, all three must change
+  together. Breaking any of these blanks the deployed site or the installed PWA. The
+  `postbuild` step (`scripts/inject-sw-assets.mjs`) injects the precache list + build id
+  into `out/sw.js` — keep it wired.
 - **State lives in one place:** `lib/store.tsx` is the reducer + all derived values (the prototype's
   `renderVals()`). Screens are presentational — read `derived`, call `actions`.
 
 ## Commands
 
 ```bash
-npm run dev        # next dev at http://localhost:3000/reading-challenge/ (basePath applies in dev)
+npm run dev        # next dev at http://localhost:3000/
 npm run build      # static export → ./out, then postbuild injects the SW precache list + build id
-npm run serve      # serve ./out under the basePath at :4399 (what Playwright + Pages actually hit)
+npm run serve      # serve ./out at :4399 (what Playwright + Pages actually hit)
 node scripts/gen-icons.mjs   # regenerate public/icons/* + apple-icon from app/icon.svg after edits
 ```
 

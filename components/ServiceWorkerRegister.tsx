@@ -1,7 +1,7 @@
 "use client";
 
 // Registers the service worker (production only) at the basePath-correct URL
-// and scope, so the installed PWA opens under /reading-challenge/.
+// and scope. BASE_PATH is empty today, so the installed PWA opens at the root.
 import { useEffect } from "react";
 import { BASE_PATH } from "@/lib/config";
 
