@@ -1,4 +1,4 @@
-# Læseudfordring — working notes for Claude
+# Læsemakker — working notes for Claude
 
 @AGENTS.md
 

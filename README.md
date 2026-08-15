@@ -1,4 +1,4 @@
-# Læseudfordring 📚
+# Læsemakker 📚
 
 A small, playful **reading-challenge PWA** (in Danish) that motivates a 7–9-year-old to read.
 A big progress ring and a chosen mascot — a **cat or a dog** — get happier as the minutes add up,

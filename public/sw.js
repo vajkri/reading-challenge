@@ -1,4 +1,4 @@
-// Minimal offline service worker for Læseudfordring.
+// Minimal offline service worker for Læsemakker.
 //
 // Strategy:
 //   - navigations (HTML): network-first → fall back to cache, then the app shell
@@ -15,7 +15,7 @@ const BASE = "/reading-challenge";
 const BUILD_ID = "dev";
 const PRECACHE_ASSETS = [];
 
-const CACHE = `laeseudfordring-${BUILD_ID}`;
+const CACHE = `laesemakker-${BUILD_ID}`;
 const APP_SHELL = `${BASE}/`;
 const PRECACHE = [APP_SHELL, `${BASE}/manifest.webmanifest`, ...PRECACHE_ASSETS];
 
