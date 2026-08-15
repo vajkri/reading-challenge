@@ -114,6 +114,66 @@ test("focus returns to the info button when the drawer closes", async ({ page })
   await expect(page.getByTestId("header-about")).toBeFocused();
 });
 
+/**
+ * Wiring guard for swipe-to-dismiss.
+ *
+ * WHY THIS EXISTS: the swipe gesture itself is deliberately NOT e2e-tested.
+ * Base UI only responds to touch pointers (a `page.mouse` drag does nothing at
+ * all, so a mouse-based swipe test would ship green while asserting nothing),
+ * and the CDP `Input.dispatchTouchEvent` version that does work measured a 5-7%
+ * failure rate under parallel workers — always at the release, where the drag
+ * distance is compared against the dismiss threshold. This suite gates the Pages
+ * deploy, so a gesture test that flakes is worse than no gesture test.
+ *
+ * The gesture is Base UI's code and is unlikely to regress. What CAN regress is
+ * OUR wiring, and every way of breaking it is silent — the drawer still opens,
+ * looks right, and closes via Escape/backdrop/Luk, so every other test here stays
+ * green while swipe is dead. This asserts that contract deterministically:
+ *   1. the popup is inside a real Drawer.Viewport (not a div wearing its class);
+ *   2. `touch-action` isn't `none` — the browser would swallow the drag first;
+ *   3. `--drawer-swipe-movement-y`, the variable Base UI writes on every pointer
+ *      move, actually translates the panel — i.e. our transform wasn't replaced
+ *      by a static one;
+ *   4. `overscroll-behavior` stays `contain`, which is what keeps a drag from a
+ *      scrolled position scrolling the content instead of chaining to the page.
+ *
+ * WHAT IT DOES NOT COVER: the gesture. Thresholds, velocity/flick handling, 1:1
+ * finger tracking, and the scroll-vs-swipe arbitration are verified manually —
+ * this test passing does not mean swiping works, only that nothing here makes it
+ * impossible.
+ */
+test("the popup keeps the CSS contract swipe-to-dismiss depends on", async ({ page }) => {
+  await page.goto("./");
+  await page.getByTestId("header-about").click();
+  const popup = page.getByTestId("about-drawer");
+  await expect(popup).toBeVisible();
+
+  // (1) A real Drawer.Viewport: our class AND Base UI's data-open, which only
+  // the component emits — a hand-rolled div with the same class fails this.
+  const viewport = page.locator(".about-drawer-viewport[data-open]");
+  await expect(viewport).toHaveCount(1);
+  await expect(viewport.getByTestId("about-drawer")).toHaveCount(1);
+
+  // (2) + (4) The two properties that decide whether the browser or Base UI gets
+  // the drag. Asserted on the y axis specifically — the drawer swipes downwards.
+  await expect(popup).toHaveCSS("touch-action", "auto");
+  await expect(popup).toHaveCSS("overscroll-behavior-y", "contain");
+
+  // (3) Drive the variable and watch the panel move, rather than string-matching
+  // the CSS: this stays true however the transform is expressed, and goes red the
+  // moment the panel stops tracking the variable. Wait out the open transition
+  // first so the entry animation can't be mistaken for the drag.
+  await popup.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+  const restingY = (await popup.boundingBox())!.y;
+  await popup.evaluate((el) =>
+    (el as HTMLElement).style.setProperty("--drawer-swipe-movement-y", "120px"),
+  );
+  // Polls (the transform transitions), so no fixed timeout is needed.
+  await expect
+    .poll(async () => (await popup.boundingBox())!.y - restingY)
+    .toBeGreaterThan(100);
+});
+
 // IA guard, deliberately its own test so a failure names the decision it broke.
 // The spec locks the bottom nav at four tabs: About is reachable ONLY from the
 // header ⓘ and the Settings row, because a 5th tab breaks the 3+1 grouping
