@@ -1,10 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Tests run against the real static export (./out) served under the basePath,
-// so they catch the same asset-resolution issues GitHub Pages would. Build first
+// Tests run against the real static export (./out) served from the root, so they
+// catch the same asset-resolution issues GitHub Pages would. Build first
 // (`npm run build`), then `npm run test:e2e`.
 const PORT = 4399;
-const BASE = "/reading-challenge";
+const BASE = "";
 
 export default defineConfig({
   testDir: "./e2e",
