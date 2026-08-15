@@ -1,3 +1,6 @@
+> **Superseded by [`docs/superpowers/plans/2026-08-15-about-drawer.md`](plans/2026-08-15-about-drawer.md) — About ships as a bottom drawer, not a screen.**
+> Kept as a dated record of the original design; do not implement from it.
+
 # HANDOFF — Issue #3: About page + "Buy me a coffee" (restart implementation)
 
 **Purpose:** Everything a fresh session needs to restart the **implementation phase**

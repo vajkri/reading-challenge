@@ -1,3 +1,6 @@
+> **Superseded by [`docs/superpowers/plans/2026-08-15-about-drawer.md`](2026-08-15-about-drawer.md) — About ships as a bottom drawer, not a screen.**
+> Kept as a dated record of the original design; do not implement from it.
+
 # About Page + "Buy Me a Coffee" Support — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
