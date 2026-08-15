@@ -39,7 +39,7 @@ async function stubGtag(context: BrowserContext) {
   });
 }
 
-test("header info icon opens the About page with the coffee CTA", async ({ page }) => {
+test("header info icon opens the About drawer with the coffee CTA", async ({ page }) => {
   await page.goto("./");
   await page.getByTestId("header-about").click();
 
@@ -56,16 +56,62 @@ test("header info icon opens the About page with the coffee CTA", async ({ page 
   await expect(cta).toHaveAttribute("rel", "noopener noreferrer");
 });
 
-test("bottom nav is still usable from the About page", async ({ page }) => {
+// --- Overlay semantics + dismissal -----------------------------------------
+// About is a drawer, not a screen: it overlays whatever the user was on and
+// closing returns them there. The closed assertions all use toHaveCount(0)
+// rather than not.toBeVisible() because it polls, so it also catches a panel
+// lingering through its exit transition — same reasoning as e2e/app.spec.ts:58.
+//
+// While the drawer is open Base UI marks the background aria-hidden, so the
+// screen underneath is asserted with a CSS locator ([data-screen-label]) —
+// a getByRole query would (correctly) not see it.
+
+test("the drawer overlays the current screen and closing returns to it", async ({ page }) => {
+  await page.goto("./");
+  await page.getByRole("button", { name: "Indstillinger" }).click();
+  await expect(page.getByRole("heading", { name: "Indstillinger" })).toBeVisible();
+
+  await page.getByTestId("header-about").click();
+  const drawer = page.getByRole("dialog");
+  await expect(drawer.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
+
+  // The point of the drawer: Indstillinger is still mounted underneath, not replaced.
+  await expect(page.locator('[data-screen-label="Indstillinger"]')).toBeVisible();
+
+  await drawer.getByRole("button", { name: "Luk" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  // Back where we started — NOT bounced to Fremgang, which is what the old screen did.
+  await expect(page.getByRole("heading", { name: "Indstillinger" })).toBeVisible();
+});
+
+test("Escape closes the drawer", async ({ page }) => {
   await page.goto("./");
   await page.getByTestId("header-about").click();
-  await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
+  await expect(page.getByRole("dialog")).toBeVisible();
 
-  // Assert the Log screen actually rendered *before* asserting About is gone —
-  // a bare toHaveCount(0) would also pass if <main> rendered nothing at all.
-  await page.getByRole("button", { name: "Læselog" }).click();
-  await expect(page.getByRole("heading", { name: "Læselog" })).toBeVisible();
-  await expect(page.getByTestId("about-screen")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator('[data-screen-label="Fremgang"]')).toBeVisible();
+});
+
+test("pressing the backdrop closes the drawer", async ({ page }) => {
+  await page.goto("./");
+  await page.getByTestId("header-about").click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+
+  // Press near the top of the viewport — the drawer is anchored to the bottom,
+  // so this lands on the backdrop rather than the panel.
+  await page.mouse.click(10, 10);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+});
+
+test("focus returns to the info button when the drawer closes", async ({ page }) => {
+  await page.goto("./");
+  await page.getByTestId("header-about").click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("header-about")).toBeFocused();
 });
 
 // IA guard, deliberately its own test so a failure names the decision it broke.
@@ -84,16 +130,9 @@ test("the bottom nav stays at 4 tabs — About never becomes one", async ({ page
   await expect(tabs).toHaveText(["Fremgang", "Læselog", "Indstillinger", "Bingo"]);
 });
 
-test("back arrow returns to Fremgang", async ({ page }) => {
-  await page.goto("./");
-  await page.getByTestId("header-about").click();
-  await page.getByRole("button", { name: "Tilbage" }).click();
-  await expect(page.locator('[data-screen-label="Fremgang"]')).toBeVisible();
-});
-
 // Testid, not name: copy.settings.about and copy.about.navAria are both "Om appen",
 // so a name-based selector would match the header ⓘ button too (strict-mode violation).
-test("Settings 'Om appen' row opens the About page", async ({ page }) => {
+test("Settings 'Om appen' row opens the About drawer", async ({ page }) => {
   await page.goto("./");
   await page.getByRole("button", { name: "Indstillinger" }).click();
 
