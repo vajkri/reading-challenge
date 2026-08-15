@@ -43,9 +43,9 @@ test("header info icon opens the About page with the coffee CTA", async ({ page 
   await page.goto("./");
   await page.getByTestId("header-about").click();
 
-  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
   await expect(
-    page.getByText("Jeg lavede Læseudfordring i min fritid", { exact: false }),
+    page.getByText("Jeg lavede Læsemakker i min fritid", { exact: false }),
   ).toBeVisible();
 
   const cta = page.getByRole("link", { name: "Køb mig en kaffe" });
@@ -57,7 +57,7 @@ test("header info icon opens the About page with the coffee CTA", async ({ page 
 test("bottom nav is still usable from the About page", async ({ page }) => {
   await page.goto("./");
   await page.getByTestId("header-about").click();
-  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
 
   // Assert the Log screen actually rendered *before* asserting About is gone —
   // a bare toHaveCount(0) would also pass if <main> rendered nothing at all.
@@ -80,7 +80,7 @@ test("Settings 'Om appen' row opens the About page", async ({ page }) => {
   await page.getByRole("button", { name: "Indstillinger" }).click();
 
   await page.getByTestId("settings-about").click();
-  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
 });
 
 // Regression guard for placement, not for navigation. The four config cards sit in a
@@ -106,7 +106,7 @@ test("'Om appen' row stays reachable while the challenge is locked", async ({ pa
   await expect(page.locator("[data-screen-label='Indstillinger'] [inert]")).toHaveCount(1);
 
   await page.getByTestId("settings-about").click();
-  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
 });
 
 test("About fires nav_screen(about) and the CTA fires support_click", async ({ page, context }) => {
@@ -120,7 +120,7 @@ test("About fires nav_screen(about) and the CTA fires support_click", async ({ p
 
   await page.goto("./");
   await page.getByTestId("header-about").click();
-  await expect(page.getByRole("heading", { name: "Om Læseudfordring" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
 
   const cta = page.getByRole("link", { name: "Køb mig en kaffe" });
   const [popup] = await Promise.all([page.waitForEvent("popup"), cta.click()]);

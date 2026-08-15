@@ -1,6 +1,6 @@
 "use client";
 
-// Om Læseudfordring (About) screen. Reached from the header ⓘ button and the
+// Om Læsemakker (About) screen. Reached from the header ⓘ button and the
 // Settings "Om appen" row — NOT a bottom-nav tab (see spec IA). Returns only the
 // screen's inner scrollable content; the app header + bottom nav come from
 // <AppShell/>. No persisted state. All user-facing text comes from copy.
