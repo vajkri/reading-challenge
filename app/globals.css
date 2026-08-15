@@ -274,13 +274,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* Grab handle — decorative; the panel is also dismissible by Escape, backdrop
-   press, and the explicit "Luk" button. */
+   press, and the explicit "Luk" button. It is still the only *visual* hint that
+   the sheet is draggable, so it has to be perceivable: this is #C9B79C (the
+   --color-nav-inactive value) on the #fff6e9 panel = 1.83:1, enough to read as
+   an affordance while staying subordinate to the title. --color-muted (#BBA98F,
+   2.14:1) was tried and competes with the heading. */
 .about-drawer-handle {
   width: 44px;
-  height: 4px;
+  height: 5px;
   margin: 0 auto 14px;
   border-radius: 999px;
-  background: #e2d3bb;
+  background: #c9b79c;
 }
 
 /* ---------------------------------------------------------------------------

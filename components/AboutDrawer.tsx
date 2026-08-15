@@ -100,7 +100,7 @@ export default function AboutDrawer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => track("support_click", { platform: "buymeacoffee" })}
-                  className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className={FOCUS_RING}
                   style={{
                     marginTop: 14,
                     width: "100%",
