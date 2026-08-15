@@ -51,7 +51,9 @@ test("header info icon opens the About page with the coffee CTA", async ({ page 
   const cta = page.getByRole("link", { name: "Køb mig en kaffe" });
   await expect(cta).toHaveAttribute("href", SUPPORT_URL);
   await expect(cta).toHaveAttribute("target", "_blank");
-  await expect(cta).toHaveAttribute("rel", /noopener/);
+  // Exact, not /noopener/: this is the app's only external link, and a regex on
+  // the first token stays green if `noreferrer` is ever dropped.
+  await expect(cta).toHaveAttribute("rel", "noopener noreferrer");
 });
 
 test("bottom nav is still usable from the About page", async ({ page }) => {
@@ -64,6 +66,22 @@ test("bottom nav is still usable from the About page", async ({ page }) => {
   await page.getByRole("button", { name: "Læselog" }).click();
   await expect(page.getByRole("heading", { name: "Læselog" })).toBeVisible();
   await expect(page.getByTestId("about-screen")).toHaveCount(0);
+});
+
+// IA guard, deliberately its own test so a failure names the decision it broke.
+// The spec locks the bottom nav at four tabs: About is reachable ONLY from the
+// header ⓘ and the Settings row, because a 5th tab breaks the 3+1 grouping
+// (three challenge-lifecycle tabs, divider, standalone Bingo). Scoped to the
+// <nav> landmark rather than the [data-testid="nav-inner"] wrapper — there is
+// exactly one nav, and the wrapper is a layout div that a refactor could drop.
+test("the bottom nav stays at 4 tabs — About never becomes one", async ({ page }) => {
+  await page.goto("./");
+
+  const tabs = page.getByRole("navigation").getByRole("button");
+  await expect(tabs).toHaveCount(4);
+  // Names too, not just the count: a bare count(4) would also pass if a tab were
+  // swapped for About rather than added alongside it.
+  await expect(tabs).toHaveText(["Fremgang", "Læselog", "Indstillinger", "Bingo"]);
 });
 
 test("back arrow returns to Fremgang", async ({ page }) => {
