@@ -78,7 +78,7 @@ export default function AboutDrawer() {
                   reflow when the bitmap decodes. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/laeser-pige.png"
+                src="/reading-girl.svg"
                 alt={copy.about.illustrationAlt}
                 width={290}
                 height={184}

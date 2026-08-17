@@ -52,7 +52,7 @@ test("header info icon opens the About drawer with the coffee CTA", async ({ pag
   // whether the bitmap loads. naturalWidth would couple this suite to the
   // asset being present in ./out, which is a separate concern.
   const illustration = page.getByRole("dialog").locator("img");
-  await expect(illustration).toHaveAttribute("src", "/laeser-pige.png");
+  await expect(illustration).toHaveAttribute("src", "/reading-girl.svg");
   await expect(illustration).toHaveAttribute("alt", "Barn der ligger og læser i en bog");
 
   const cta = page.getByRole("link", { name: "Støt projektet" });
