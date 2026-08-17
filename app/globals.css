@@ -223,11 +223,42 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    z-index 50 matches BingoModal/NewChallengeModal; it must clear BottomNav's
    sticky z-20 or the nav paints over the sheet and swallows its taps.
 --------------------------------------------------------------------------- */
+/* Header entry point — a 44px pill with a visible "Om" label (the accessible
+   name), so it clears the WCAG 2.5.5 target size. Hover/active have to be CSS;
+   the focus ring stays the house focus-visible utility on the element. */
+.about-trigger {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #fff1dd;
+  color: #8a7355;
+  font-weight: 800;
+  font-size: 15px;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    transform 0.12s;
+}
+@media (hover: hover) {
+  .about-trigger:hover {
+    background: #f8e4c6;
+    color: #7a6446;
+  }
+}
+.about-trigger:active {
+  background: #f2d9b2;
+  color: #6e5a3e;
+  transform: scale(0.96);
+}
+
 .about-drawer-backdrop {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(60, 42, 22, 0.42);
+  background: rgba(58, 42, 24, 0.42);
   opacity: calc(1 - var(--drawer-swipe-progress, 0));
   transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
 }
@@ -252,12 +283,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   --bleed: 3rem;
   width: 100%;
   max-width: 460px;
-  max-height: calc(85dvh + var(--bleed));
+  max-height: calc(88dvh + var(--bleed));
   margin-bottom: calc(var(--bleed) * -1);
-  padding: 10px 22px calc(22px + env(safe-area-inset-bottom) + var(--bleed));
+  padding: 0 0 calc(env(safe-area-inset-bottom) + var(--bleed));
   background: #fff6e9;
-  border-radius: 24px 24px 0 0;
-  box-shadow: 0 -10px 30px rgba(60, 42, 22, 0.28);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -12px 40px rgba(58, 42, 24, 0.28);
   outline: none;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -273,18 +304,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transform: translateY(calc(100% - var(--bleed) + 2px));
 }
 
-/* Grab handle — decorative; the panel is also dismissible by Escape, backdrop
-   press, and the explicit "Luk" button. It is still the only *visual* hint that
-   the sheet is draggable, so it has to be perceivable: this is #C9B79C (the
-   --color-nav-inactive value) on the #fff6e9 panel = 1.83:1, enough to read as
-   an affordance while staying subordinate to the title. --color-muted (#BBA98F,
-   2.14:1) was tried and competes with the heading. */
+/* Grab handle — the visual of the close button that wraps it (see AboutDrawer),
+   and the only hint that the sheet is draggable. Purely graphical: the button
+   carries aria-label="Luk", and the panel is also dismissible by Escape,
+   backdrop press, and swipe, so nothing depends on seeing the bar. Colour is
+   the design handoff's #DFCEB2 on the #fff6e9 panel (1.44:1) — softer than the
+   #C9B79C it replaced (1.83:1). Spacing comes from the button's padding. */
 .about-drawer-handle {
-  width: 44px;
+  width: 52px;
   height: 5px;
-  margin: 0 auto 14px;
   border-radius: 999px;
-  background: #c9b79c;
+  background: #dfceb2;
 }
 
 /* ---------------------------------------------------------------------------

@@ -5,21 +5,16 @@
 // ask never displaces anyone. Built on Base UI's Drawer for swipe-to-dismiss,
 // focus trapping, and scroll locking (see the plan for why not hand-rolled).
 // All user-facing text comes from copy.
+//
+// Layout is a port of the Claude Design handoff: grab-handle-as-close-button,
+// illustration, story, signature, support card, footer. The hex values are
+// literal on purpose — that's the house style in this file.
 
-import type { CSSProperties } from "react";
 import { Drawer } from "@base-ui/react/drawer";
 import { useApp } from "@/lib/store";
 import { copy } from "@/lib/copy";
 import { track } from "@/lib/analytics";
 import { SUPPORT_URL } from "@/lib/links";
-import MascotFace from "@/components/MascotFace";
-
-const CARD: CSSProperties = {
-  background: "#fff",
-  borderRadius: 20,
-  padding: 18,
-  boxShadow: "0 6px 16px rgba(80,55,25,.08)",
-};
 
 const FOCUS_RING =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
@@ -38,61 +33,119 @@ export default function AboutDrawer() {
         <Drawer.Backdrop className="about-drawer-backdrop" />
         <Drawer.Viewport className="about-drawer-viewport">
           <Drawer.Popup className="about-drawer-popup" data-testid="about-drawer">
-            <div className="about-drawer-handle" aria-hidden="true" />
+            {/* The grab handle IS the close button — one affordance, not a
+                decorative bar plus a redundant "Luk" row at the bottom. Its
+                accessible name comes from aria-label (Base UI spreads it onto
+                the <button> it renders). Escape / backdrop / swipe still work. */}
+            <Drawer.Close
+              aria-label={copy.about.close}
+              className={FOCUS_RING}
+              style={{
+                padding: "12px 0 6px",
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <div className="about-drawer-handle" />
+            </Drawer.Close>
 
-            <Drawer.Content>
+            <Drawer.Content
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 18,
+                padding: "6px 26px 30px",
+              }}
+            >
               <Drawer.Title
-                className="text-ink"
                 style={{
                   fontFamily: "var(--font-display)",
                   fontWeight: 800,
-                  fontSize: 20,
-                  margin: 0,
+                  fontSize: 24,
+                  color: "#4F4034",
                   textAlign: "center",
+                  margin: 0,
                 }}
               >
                 {copy.about.title}
               </Drawer.Title>
 
-              {/* Mascot hero — the child's chosen mascot, happy. */}
-              <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
-                <MascotFace animal={state.mascot} stage={7} confetti={false} bob={false} />
-              </div>
+              {/* Hero illustration. Plain <img>: this is a static export with
+                  images.unoptimized, and the project uses no next/image. Both
+                  dimensions are set (source is 1224×776) so the panel doesn't
+                  reflow when the bitmap decodes. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/laeser-pige.png"
+                alt={copy.about.illustrationAlt}
+                width={290}
+                height={184}
+                style={{ width: 290, display: "block", margin: "2px 0 -2px" }}
+              />
 
-              {/* Story (2 short paragraphs). Rendered as the accessible description
-                  so screen readers announce it with the title. Base UI's
-                  Drawer.Description renders a <p>, so it is re-rendered as a <div>
-                  to keep the paragraphs below it valid HTML. */}
-              <Drawer.Description render={<div />}>
+              {/* Story. Rendered as the accessible description so screen readers
+                  announce it with the title. Base UI's Drawer.Description renders
+                  a <p>, so it is re-rendered as a <div> to keep the paragraphs
+                  below it valid HTML. */}
+              <Drawer.Description
+                render={<div />}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 14,
+                  textAlign: "center",
+                  fontSize: 16,
+                  lineHeight: 1.6,
+                  color: "#8A7761",
+                  textWrap: "pretty",
+                  margin: 0,
+                }}
+              >
                 {copy.about.intro.map((para, i) => (
-                  <p
-                    key={i}
-                    className="text-ink-2"
-                    style={{
-                      fontSize: 15,
-                      lineHeight: 1.6,
-                      marginTop: i === 0 ? 8 : 12,
-                      textAlign: "center",
-                    }}
-                  >
+                  <p key={i} style={{ margin: 0 }}>
                     {para}
                   </p>
                 ))}
               </Drawer.Description>
 
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#C2B299" }}>
+                {copy.about.signature}
+              </div>
+
               {/* Support card — the single coffee CTA. */}
-              <div style={{ ...CARD, marginTop: 18, textAlign: "center" }}>
+              <div
+                style={{
+                  width: "100%",
+                  background: "#FFFDF8",
+                  borderRadius: 20,
+                  padding: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 8,
+                  boxShadow: "0 6px 18px rgba(80,55,25,.08)",
+                }}
+              >
                 <div
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontWeight: 700,
-                    fontSize: 16,
+                    fontWeight: 800,
+                    fontSize: 18,
                     color: "#4F4034",
                   }}
                 >
                   {copy.about.support.heading}
                 </div>
-                <div style={{ fontSize: 13, color: "#A9967E", marginTop: 4, lineHeight: 1.45 }}>
+                <div
+                  style={{
+                    fontSize: 14,
+                    color: "#B0A08A",
+                    textAlign: "center",
+                    lineHeight: 1.6,
+                  }}
+                >
                   {copy.about.support.sub}
                 </div>
                 <a
@@ -102,63 +155,43 @@ export default function AboutDrawer() {
                   onClick={() => track("support_click", { platform: "buymeacoffee" })}
                   className={FOCUS_RING}
                   style={{
-                    marginTop: 14,
+                    marginTop: 8,
                     width: "100%",
-                    padding: 14,
-                    borderRadius: 14,
+                    height: 56,
+                    borderRadius: 16,
                     background: "var(--color-accent)",
-                    color: "#fff",
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 700,
-                    fontSize: 15.5,
+                    color: "#FFFDF8",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 9,
-                    boxShadow: "0 10px 24px rgba(246,166,35,.34)",
+                    gap: 11,
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 800,
+                    fontSize: 18,
                   }}
                 >
                   <svg
-                    width="20"
-                    height="20"
+                    width="21"
+                    height="21"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
                   >
-                    <path d="M4 8 H17 V13 A4 4 0 0 1 13 17 H8 A4 4 0 0 1 4 13 Z" />
-                    <path d="M17 9 H19.5 A2 2 0 0 1 19.5 13 H17" />
-                    <path d="M7 3 V5 M10.5 3 V5 M14 3 V5" />
+                    <path d="M4 9h12v5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9Z" />
+                    <path d="M16 10h1.8a2.2 2.2 0 0 1 0 4.4H16" />
+                    <path d="M6 5.5v1M10 5v1.5M14 5.5v1" />
                   </svg>
                   {copy.about.support.cta}
                 </a>
               </div>
 
-              <div style={{ textAlign: "center", fontSize: 12, color: "#C2B299", marginTop: 20 }}>
+              <div style={{ fontSize: 14, color: "#C2B299", textAlign: "center" }}>
                 {copy.about.thanks}
               </div>
-
-              {/* Explicit close, in addition to swipe / Escape / backdrop press —
-                  matches BingoModal's text "Luk" button. */}
-              <Drawer.Close
-                className={FOCUS_RING}
-                style={{
-                  width: "100%",
-                  marginTop: 18,
-                  padding: 13,
-                  borderRadius: 14,
-                  background: "#F2E6D2",
-                  color: "#4F4034",
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 700,
-                  fontSize: 15,
-                }}
-              >
-                {copy.about.close}
-              </Drawer.Close>
             </Drawer.Content>
           </Drawer.Popup>
         </Drawer.Viewport>

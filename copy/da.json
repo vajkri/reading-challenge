@@ -166,18 +166,20 @@
     }
   },
   "about": {
-    "navAria": "Om appen",
+    "trigger": "Om",
     "title": "Om Læsemakker",
     "close": "Luk",
+    "illustrationAlt": "Barn der ligger og læser i en bog",
     "intro": [
-      "Hej! Jeg lavede Læsemakker i min fritid, fordi jeg ville gøre det sjovere for mit barn at læse lidt hver dag.",
-      "Den er gratis, uden reklamer, og alt bliver kun gemt på din egen enhed."
+      "Hej! Jeg byggede Læsemakker oprindeligt, fordi jeg ville gøre det sjovere for mine børn at læse i sommerferien. Den viste sig at være så populær, at jeg havde lyst til også at dele den med andre familier. Den er helt gratis, uden reklamer, bygget i min fritid.",
+      "God fornøjelse :-)"
     ],
+    "signature": "- Kriszta, mor og udvikler",
     "support": {
-      "heading": "Kan du lide appen?",
-      "sub": "Du kan give en kop kaffe — helt frivilligt.",
-      "cta": "Køb mig en kaffe"
+      "heading": "Vil du støtte Læsemakker?",
+      "sub": "Synes du appen er værd at beholde, kan du \"give en kop kaffe\" - helt frivilligt.",
+      "cta": "Støt projektet"
     },
-    "thanks": "Tak fordi I læser med."
+    "thanks": "Tak fordi du læser med ♡"
   }
 }

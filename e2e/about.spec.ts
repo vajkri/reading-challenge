@@ -45,10 +45,17 @@ test("header info icon opens the About drawer with the coffee CTA", async ({ pag
 
   await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
   await expect(
-    page.getByText("Jeg lavede Læsemakker i min fritid", { exact: false }),
+    page.getByText("Jeg byggede Læsemakker oprindeligt", { exact: false }),
   ).toBeVisible();
 
-  const cta = page.getByRole("link", { name: "Køb mig en kaffe" });
+  // The hero illustration: asserted on src + alt only, deliberately NOT on
+  // whether the bitmap loads. naturalWidth would couple this suite to the
+  // asset being present in ./out, which is a separate concern.
+  const illustration = page.getByRole("dialog").locator("img");
+  await expect(illustration).toHaveAttribute("src", "/laeser-pige.png");
+  await expect(illustration).toHaveAttribute("alt", "Barn der ligger og læser i en bog");
+
+  const cta = page.getByRole("link", { name: "Støt projektet" });
   await expect(cta).toHaveAttribute("href", SUPPORT_URL);
   await expect(cta).toHaveAttribute("target", "_blank");
   // Exact, not /noopener/: this is the app's only external link, and a regex on
@@ -190,8 +197,9 @@ test("the bottom nav stays at 4 tabs — About never becomes one", async ({ page
   await expect(tabs).toHaveText(["Fremgang", "Læselog", "Indstillinger", "Bingo"]);
 });
 
-// Testid, not name: copy.settings.about and copy.about.navAria are both "Om appen",
-// so a name-based selector would match the header ⓘ button too (strict-mode violation).
+// Testid, not name: the Settings row and the header pill are both About entry
+// points, and the row's own label ("Om appen") is not guaranteed to stay distinct
+// from the pill's ("Om") — a testid keeps this test about placement, not copy.
 test("Settings 'Om appen' row opens the About drawer", async ({ page }) => {
   await page.goto("./");
   await page.getByRole("button", { name: "Indstillinger" }).click();
@@ -239,7 +247,7 @@ test("About fires nav_screen(about) and the CTA fires support_click", async ({ p
   await page.getByTestId("header-about").click();
   await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
 
-  const cta = page.getByRole("link", { name: "Køb mig en kaffe" });
+  const cta = page.getByRole("link", { name: "Støt projektet" });
   const [popup] = await Promise.all([page.waitForEvent("popup"), cta.click()]);
   await popup.waitForURL(SUPPORT_URL);
   await popup.close();

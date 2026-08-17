@@ -72,23 +72,25 @@ export default function AppShell() {
           {copy.app.name}
         </h1>
 
-        {/* Right-hand header cluster. Today it holds only the About (ⓘ) button;
+        {/* Right-hand header cluster. Today it holds only the About pill;
             it is laid out as a flex row because the language pill will sit here
             later (separate issue) — see spec. */}
         <div className="ml-auto flex items-center gap-2">
+          {/* ⓘ + visible "Om": the label IS the accessible name, so no aria-label.
+              44px tall, which also clears the WCAG 2.5.5 target size the old
+              36×36 icon-only button missed. Hover/active live in globals.css
+              (.about-trigger) — they can't be inline styles. */}
           <button
             type="button"
             data-testid="header-about"
             onClick={actions.openAbout}
-            aria-label={copy.about.navAria}
             aria-haspopup="dialog"
             aria-expanded={state.aboutOpen}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-ink-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            style={{ boxShadow: "0 0 0 1.5px #F0DBB4 inset" }}
+            className="about-trigger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <svg
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -97,10 +99,11 @@ export default function AppShell() {
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 11 V16" />
-              <path d="M12 8 H12.01" />
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
             </svg>
+            {copy.about.trigger}
           </button>
         </div>
       </header>
