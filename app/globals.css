@@ -307,14 +307,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Grab handle — the visual of the close button that wraps it (see AboutDrawer),
    and the only hint that the sheet is draggable. Purely graphical: the button
    carries aria-label="Luk", and the panel is also dismissible by Escape,
-   backdrop press, and swipe, so nothing depends on seeing the bar. Colour is
-   the design handoff's #DFCEB2 on the #fff6e9 panel (1.44:1) — softer than the
-   #C9B79C it replaced (1.83:1). Spacing comes from the button's padding. */
+   backdrop press, and swipe, so nothing depends on seeing the bar. But it is
+   the only *visible* close control and the only hint the sheet is draggable,
+   so it keeps #C9B79C (--color-nav-inactive, 1.83:1 on the #fff6e9 panel)
+   rather than the design handoff's #DFCEB2 (1.44:1), which read as a smudge.
+   Spacing comes from the button's padding. */
 .about-drawer-handle {
   width: 52px;
   height: 5px;
   border-radius: 999px;
-  background: #dfceb2;
+  background: #c9b79c;
 }
 
 /* ---------------------------------------------------------------------------
