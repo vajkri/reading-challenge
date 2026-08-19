@@ -45,7 +45,7 @@ test("header info icon opens the About drawer with the coffee CTA", async ({ pag
 
   await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
   await expect(
-    page.getByText("Jeg byggede Læsemakker oprindeligt", { exact: false }),
+    page.getByText("Jeg byggede oprindeligt Læsemakker", { exact: false }),
   ).toBeVisible();
 
   // The hero illustration: asserted on src + alt only, deliberately NOT on
@@ -55,7 +55,7 @@ test("header info icon opens the About drawer with the coffee CTA", async ({ pag
   await expect(illustration).toHaveAttribute("src", "/reading-girl.svg");
   await expect(illustration).toHaveAttribute("alt", "Barn der ligger og læser i en bog");
 
-  const cta = page.getByRole("link", { name: "Støt projektet" });
+  const cta = page.getByRole("link", { name: "Giv til kaffekassen" });
   await expect(cta).toHaveAttribute("href", SUPPORT_URL);
   await expect(cta).toHaveAttribute("target", "_blank");
   // Exact, not /noopener/: this is the app's only external link, and a regex on
@@ -247,7 +247,7 @@ test("About fires nav_screen(about) and the CTA fires support_click", async ({ p
   await page.getByTestId("header-about").click();
   await expect(page.getByRole("heading", { name: "Om Læsemakker" })).toBeVisible();
 
-  const cta = page.getByRole("link", { name: "Støt projektet" });
+  const cta = page.getByRole("link", { name: "Giv til kaffekassen" });
   const [popup] = await Promise.all([page.waitForEvent("popup"), cta.click()]);
   await popup.waitForURL(SUPPORT_URL);
   await popup.close();

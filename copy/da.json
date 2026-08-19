@@ -171,14 +171,14 @@
     "close": "Luk",
     "illustrationAlt": "Barn der ligger og læser i en bog",
     "intro": [
-      "Hej! Jeg byggede Læsemakker oprindeligt, fordi jeg ville gøre det sjovere for mine børn at læse i sommerferien. Den viste sig at være så populær, at jeg havde lyst til også at dele den med andre familier. Den er helt gratis, uden reklamer, bygget i min fritid.",
-      "God fornøjelse :-)"
+      "Hej! Jeg byggede oprindeligt Læsemakker, fordi jeg ville gøre det sjovere for mine børn at læse i sommerferien. De virkede til at være så glade for den, at jeg havde lyst til også at dele den med andre familier.",
+      "Den er bygget i min fritid. God fornøjelse :-)"
     ],
-    "signature": "- Kriszta, mor og udvikler",
+    "signature": "– Kriszta, mor og udvikler",
     "support": {
-      "heading": "Vil du støtte Læsemakker?",
-      "sub": "Synes du appen er værd at beholde, kan du \"give en kop kaffe\" - helt frivilligt.",
-      "cta": "Støt projektet"
+      "heading": "Har Læsemakker været en hjælp?",
+      "sub": "Den er gratis og uden reklamer, og det bliver den ved med at være. Vil du sige tak, kan du give et lille beløb til kaffekassen – helt frivilligt.",
+      "cta": "Giv til kaffekassen"
     },
     "thanks": "Tak fordi du læser med ♡"
   }

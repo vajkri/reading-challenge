@@ -144,6 +144,7 @@ export default function AboutDrawer() {
                     color: "#B0A08A",
                     textAlign: "center",
                     lineHeight: 1.6,
+                    textWrap: "pretty",
                   }}
                 >
                   {copy.about.support.sub}
