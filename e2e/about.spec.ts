@@ -319,3 +319,33 @@ test("a failed About chunk does not take down the app", async ({ page, context }
   await expect(page.getByRole("navigation")).toBeVisible();
   await expect(page.locator('[data-screen-label="Fremgang"]')).toBeVisible();
 });
+
+// The close handle is a sibling of Drawer.Content *inside* the scrolling popup,
+// so before it was made sticky, scrolling to the coffee CTA on a short viewport
+// carried the only visible close control off-screen (y = -284 at 320x568). The
+// panel was still dismissible by Escape, backdrop and swipe, but the stated
+// design is "the grab handle IS the close button" and at the CTA it was gone.
+//
+// Also pins the target size: 12px top + 5px handle + 7px bottom = 24px, the WCAG
+// 2.2 SC 2.5.8 minimum. It was 23px — one pixel under — which is exactly the kind
+// of value that drifts back.
+test("the close handle stays reachable and meets the 24px target", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("./");
+  await page.getByTestId("header-about").click();
+
+  const handle = page.getByRole("button", { name: "Luk" });
+  const popup = page.getByTestId("about-drawer");
+  await expect(handle).toBeVisible();
+
+  const box = await handle.boundingBox();
+  expect(box!.height).toBeGreaterThanOrEqual(24);
+
+  // Scroll the panel to the CTA and confirm the handle came along.
+  await popup.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  await expect(page.getByRole("link", { name: "Giv til kaffekassen" })).toBeVisible();
+
+  const after = await handle.boundingBox();
+  expect(after!.y).toBeGreaterThanOrEqual(0);
+  await expect(handle).toBeInViewport();
+});

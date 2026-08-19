@@ -36,12 +36,27 @@ export default function AboutDrawer() {
             {/* The grab handle IS the close button — one affordance, not a
                 decorative bar plus a redundant "Luk" row at the bottom. Its
                 accessible name comes from aria-label (Base UI spreads it onto
-                the <button> it renders). Escape / backdrop / swipe still work. */}
+                the <button> it renders). Escape / backdrop / swipe still work.
+
+                Sticky because this row is a sibling of Drawer.Content *inside*
+                the scrolling popup: on short viewports reaching the CTA scrolled
+                the only visible close control off-screen entirely (measured at
+                390x667: y = -126; at 320x568: y = -284). Pinning it keeps the
+                one affordance available wherever the user has scrolled to. The
+                opaque background matches .about-drawer-popup so content scrolls
+                under it, and the popup's overflow clips to its rounded top.
+
+                12 + 5 (handle) + 7 = a 24px-tall target, the WCAG 2.2 SC 2.5.8
+                minimum. The bottom padding is 7px, not 6px, for exactly that. */}
             <Drawer.Close
               aria-label={copy.about.close}
               className={FOCUS_RING}
               style={{
-                padding: "12px 0 6px",
+                position: "sticky",
+                top: 0,
+                zIndex: 1,
+                background: "#fff6e9",
+                padding: "12px 0 7px",
                 display: "flex",
                 justifyContent: "center",
                 width: "100%",
