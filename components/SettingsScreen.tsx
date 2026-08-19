@@ -388,6 +388,7 @@ export default function SettingsScreen() {
         type="button"
         data-testid="settings-about"
         onClick={actions.openAbout}
+        aria-haspopup="dialog"
         className={FOCUS_RING}
         style={{
           width: "100%",

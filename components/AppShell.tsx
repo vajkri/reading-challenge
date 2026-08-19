@@ -93,13 +93,18 @@ export default function AppShell() {
           {/* ⓘ + visible "Om": the label IS the accessible name, so no aria-label.
               44px tall, which also clears the WCAG 2.5.5 target size the old
               36×36 icon-only button missed. Hover/active live in globals.css
-              (.about-trigger) — they can't be inline styles. */}
+              (.about-trigger) — they can't be inline styles.
+
+              No aria-expanded: the drawer has two triggers sharing one piece of
+              state, so binding it here announced "expanded" on this button even
+              when the Settings row was what opened it. aria-haspopup="dialog"
+              already conveys the behaviour, and a modal dialog does not require
+              aria-expanded — there is no correct single value for it. */}
           <button
             type="button"
             data-testid="header-about"
             onClick={actions.openAbout}
             aria-haspopup="dialog"
-            aria-expanded={state.aboutOpen}
             className="about-trigger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <svg
