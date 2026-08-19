@@ -234,7 +234,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding: 0 16px;
   border-radius: 999px;
   background: #fff1dd;
-  color: #8a7355;
+  color: #806b4f; /* 4.57:1 on #fff1dd (was #8a7355, 4.05:1) */
   font-weight: 800;
   font-size: 15px;
   transition:

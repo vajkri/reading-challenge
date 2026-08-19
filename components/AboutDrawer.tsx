@@ -113,7 +113,7 @@ export default function AboutDrawer() {
                   textAlign: "center",
                   fontSize: 16,
                   lineHeight: 1.6,
-                  color: "#8A7761",
+                  color: "#806F5A", // 4.52:1 on the #fff6e9 panel (was #8A7761, 4.01:1)
                   textWrap: "pretty",
                   margin: 0,
                 }}
@@ -156,7 +156,7 @@ export default function AboutDrawer() {
                 <div
                   style={{
                     fontSize: 14,
-                    color: "#B0A08A",
+                    color: "#7F7363", // 4.56:1 on the #FFFDF8 card (was #B0A08A, 2.51:1)
                     textAlign: "center",
                     lineHeight: 1.6,
                     textWrap: "pretty",
