@@ -1,3 +1,5 @@
+import { readFile, readdir } from "node:fs/promises";
+
 import { test, expect, type BrowserContext } from "@playwright/test";
 
 const SUPPORT_URL = "https://buymeacoffee.com/kriszta.vajda";
@@ -274,4 +276,46 @@ test("About fires nav_screen(about) and the CTA fires support_click", async ({ p
   expect(paramsFor("nav_screen").map((p) => p?.screen)).toContain("about");
   // The platform param is what makes support_click useful in GA4 — assert it.
   expect(paramsFor("support_click")).toEqual([{ platform: "buymeacoffee" }]);
+});
+
+// The About drawer is lazy-loaded. If its chunk fails to arrive the app must
+// survive: before the .catch() in AppShell an aborted fetch unmounted the whole
+// React root and left a blank page — and with NO user interaction, because the
+// idle callback requests the chunk on every page load. So a flaky network on a
+// first visit (before the SW has cached it) took down the reading app because an
+// optional overlay's code didn't load.
+//
+// The chunk is found by content rather than by its hashed filename, and from the
+// build output rather than from index.html — index.html deliberately does not
+// reference it, which is the whole point of the lazy import. Discovering it up
+// front and then aborting that one URL avoids intercepting every chunk: reading
+// a route's body mid-flight and re-fulfilling it disposes the response under
+// concurrent requests ("Response has been disposed").
+test("a failed About chunk does not take down the app", async ({ page, context }) => {
+  const chunkDir = "out/_next/static/chunks";
+  const names = (await readdir(chunkDir)).filter((f) => f.endsWith(".js"));
+  const bodies = await Promise.all(names.map((f) => readFile(`${chunkDir}/${f}`, "utf8")));
+  const drawerChunk = names[bodies.findIndex((b) => b.includes("about-drawer-popup"))];
+  // Guards against this test silently passing if the marker string ever changes.
+  expect(drawerChunk, "no built chunk contains the drawer markup").toBeTruthy();
+
+  await context.route(`**/_next/static/chunks/${drawerChunk}`, (route) => route.abort("failed"));
+
+  // Wait for the request to actually be attempted and rejected before asserting
+  // survival. The chunk is only fetched when the idle callback fires, so asserting
+  // straight after goto() passes before the failure has even happened — and would
+  // stay green with no error handling at all.
+  const chunkFailed = page.waitForEvent("requestfailed", (r) => r.url().includes(drawerChunk));
+  await page.goto("./");
+  await chunkFailed;
+  // Then hold for a window before asserting. This is proving a negative — that
+  // nothing tears the app down later — so it needs real elapsed time, not a
+  // retrying matcher: toBeVisible() would pass on the first poll and the unmount
+  // would land after the test ended. Without the .catch() the root is gone 303ms
+  // after this point (measured), so 1000ms is ~3x the observed teardown.
+  await page.waitForTimeout(1000);
+
+  await expect(page.getByTestId("app-shell")).toBeVisible();
+  await expect(page.getByRole("navigation")).toBeVisible();
+  await expect(page.locator('[data-screen-label="Fremgang"]')).toBeVisible();
 });

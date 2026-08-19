@@ -18,7 +18,21 @@ import BingoScreen from "@/components/BingoScreen";
 // The About drawer drags in Base UI — real weight (~35 KB gzipped) for an
 // overlay most sessions never open, so it is code-split out of the first load:
 // index.html no longer references that chunk and startup never parses it.
-const AboutDrawer = dynamic(() => import("@/components/AboutDrawer"));
+//
+// Both options below are load-bearing, and neither is about performance:
+//  - `loading` gives the lazy import its own Suspense boundary. Without one the
+//    suspension propagates to the root, so tapping "Om" while the chunk is still
+//    in flight freezes the ENTIRE app at its last committed state (measured) and
+//    drops the tap if the user navigates during the freeze.
+//  - `.catch` is the missing error boundary. An uncaught chunk-load rejection
+//    unmounts the React root — a failed fetch of this one optional chunk blanked
+//    the whole app (measured), with no user interaction needed, because the idle
+//    callback below requests the chunk on every page load. Degrading to a no-op
+//    drawer is the right trade: the reading log matters, the coffee ask does not.
+const AboutDrawer = dynamic(
+  () => import("@/components/AboutDrawer").catch(() => ({ default: () => null })),
+  { loading: () => null },
+);
 
 export default function AppShell() {
   const { state, actions } = useApp();
