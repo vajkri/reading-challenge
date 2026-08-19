@@ -93,6 +93,15 @@ interface UIState {
   editing: boolean;
   // Destructive "start a new challenge" confirm dialog
   newChallengeOpen: boolean;
+  // "Om appen" drawer — an overlay, not a screen: it must never displace
+  // whatever the user was looking at.
+  // Cleared by SET_SCREEN and GO_SETTINGS only. The four other cases that write
+  // `screen` (START_CHALLENGE, UPDATE_CHALLENGE, CONFIRM_NEW_CHALLENGE, SAVE_ENTRY)
+  // are all pointer-driven from background chrome, so they're unreachable while the
+  // drawer is open — but that safety comes from Drawer.Root's `modal`, not from here.
+  // If the drawer ever becomes non-modal, or gains a control that navigates, clear
+  // `aboutOpen` in those cases too.
+  aboutOpen: boolean;
   // Parental unlock modal
   unlockOpen: boolean;
   unlockInput: string;
@@ -119,6 +128,7 @@ const INITIAL: State = {
   mascotDraft: DEFAULTS.mascot,
   editing: false,
   newChallengeOpen: false,
+  aboutOpen: false,
   unlockOpen: false,
   unlockInput: "",
   unlockError: false,
@@ -202,6 +212,8 @@ type Action =
   | { type: "OPEN_NEW_CHALLENGE" }
   | { type: "CONFIRM_NEW_CHALLENGE" }
   | { type: "CLOSE_NEW_CHALLENGE" }
+  | { type: "OPEN_ABOUT" }
+  | { type: "CLOSE_ABOUT" }
   | { type: "OPEN_ADD"; today: string }
   | { type: "OPEN_EDIT"; entry: Entry }
   | { type: "CLOSE_FORM" }
@@ -240,8 +252,9 @@ function reducer(state: State, action: Action): State {
       };
 
     case "SET_SCREEN":
-      // Any navigation ends a transient edit session (re-locks the running challenge).
-      return { ...state, screen: action.screen, editing: false };
+      // Any navigation ends a transient edit session (re-locks the running challenge)
+      // and dismisses the About drawer, which is never tied to a specific screen.
+      return { ...state, screen: action.screen, editing: false, aboutOpen: false };
 
     case "GO_SETTINGS":
       // Entering Settings always starts locked; seed drafts from current values
@@ -250,6 +263,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         screen: "settings",
         editing: false,
+        aboutOpen: false,
         ...seedDrafts(state.challenge, state.goal, state.deadline, state.name, state.mascot),
       };
 
@@ -300,6 +314,12 @@ function reducer(state: State, action: Action): State {
 
     case "CLOSE_NEW_CHALLENGE":
       return { ...state, newChallengeOpen: false };
+
+    case "OPEN_ABOUT":
+      return { ...state, aboutOpen: true };
+
+    case "CLOSE_ABOUT":
+      return { ...state, aboutOpen: false };
 
     case "CONFIRM_NEW_CHALLENGE":
       // Destructive reset: wipe the log + reset persisted config to fresh-install
@@ -810,6 +830,8 @@ export interface Actions {
   setUnlockInput: (value: string) => void;
   submitUnlock: () => void;
   closeUnlock: () => void;
+  openAbout: () => void;
+  closeAbout: () => void;
 }
 
 interface AppContextValue {
@@ -920,6 +942,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setUnlockInput: (value) => dispatch({ type: "SET_UNLOCK_INPUT", value }),
       submitUnlock: () => dispatch({ type: "SUBMIT_UNLOCK", nextA: rnd(), nextB: rnd() }),
       closeUnlock: () => dispatch({ type: "CLOSE_UNLOCK" }),
+      // About is an overlay, not a screen — but it stays a `nav_screen` event so the
+      // GA4 series is continuous across this change and "how many people opened
+      // About" remains one query rather than two.
+      openAbout: () => {
+        track("nav_screen", { screen: "about" });
+        dispatch({ type: "OPEN_ABOUT" });
+      },
+      closeAbout: () => dispatch({ type: "CLOSE_ABOUT" }),
     }),
     [],
   );

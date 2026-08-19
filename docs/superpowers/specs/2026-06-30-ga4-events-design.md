@@ -11,10 +11,13 @@
 | `challenge_started` | `state.challenge` transitions `→ "ongoing"` | `goal` (number, target minutes) |
 | `reading_logged` | a **new** entry is saved (`entries.length` increases) | `minutes` (number) |
 | `challenge_completed` | `state.challenge` transitions `→ "completed"` | — |
-| `nav_screen` | user taps a bottom-nav tab | `screen` (`"progress"`/`"log"`/`"settings"`/`"bingo"`) |
+| `nav_screen` | user taps a bottom-nav tab, **or** opens the About drawer | `screen` (`"progress"`/`"log"`/`"settings"`/`"bingo"`/`"about"`) |
 | `bingo_feat_completed` | a feat is crossed off (total completed count increases) | `season` (season id string) |
+| `support_click` | the "Buy me a coffee" CTA in the About drawer is clicked | `platform` (`"buymeacoffee"`) |
 
 All names are **custom/non-reserved** — deliberately avoiding GA4's reserved `screen_view` / `page_view`. No PII in any param (screen names + minute counts only).
+
+> **`screen: "about"` is not a screen transition.** Corrected 2026-08-15 (issue #3). About has never been a bottom-nav tab — it fires from the header ⓘ and the Settings row — and since it became a **bottom drawer** it is an *overlay*: the underlying screen does not change, and there is no matching `nav_screen` event when it closes. We kept the `nav_screen` name deliberately, because renaming would split the GA4 series in two and GA4 cannot union event names outside BigQuery. **Consequence for analysis:** any navigation funnel, screens-per-session, or screen-to-screen path built on `nav_screen` must **exclude `screen == "about"`**, or it will count a transition the user never made. Treat `"about"` as an engagement event that happens *on* whatever screen was already showing.
 
 ## Architecture
 
@@ -28,7 +31,8 @@ type EventName =
   | "reading_logged"
   | "challenge_completed"
   | "nav_screen"
-  | "bingo_feat_completed";
+  | "bingo_feat_completed"
+  | "support_click"; // added by issue #3
 
 type EventParams = Record<string, string | number>;
 

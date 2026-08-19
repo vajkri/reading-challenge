@@ -72,6 +72,11 @@ async function main() {
     ...(await fileIfPresent(join(ROOT, "apple-icon.png"))),
     ...(await fileIfPresent(join(ROOT, "icon.svg"))),
     ...(await matchTopLevel(/^(icon|apple-icon)\..+\.(svg|png)$/)), // hashed icon variants
+    // The About drawer's illustration. Precached deliberately: it is the only
+    // in-app artwork served from the root, and at ~39 KB (vector) it is cheap
+    // enough that a cold offline first launch showing alt text instead of the
+    // drawing is the worse trade.
+    ...(await fileIfPresent(join(ROOT, "reading-girl.svg"))),
     ...(await fileIfPresent(join(ROOT, "manifest.webmanifest"))),
     ...(await fileIfPresent(join(ROOT, "index.html"))),
     ...(await fileIfPresent(join(ROOT, "404.html"))),

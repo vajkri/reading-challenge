@@ -215,6 +215,111 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* ---------------------------------------------------------------------------
+   "Om appen" drawer (Base UI Drawer). Geometry mirrors BingoModal's bottom
+   sheet; the transition + gesture rules must be CSS because they key off Base
+   UI's data-* attributes and --drawer-swipe-* variables.
+   --bleed extends the panel below the viewport so an over-drag never reveals
+   the page behind it.
+   z-index 50 matches BingoModal/NewChallengeModal; it must clear BottomNav's
+   sticky z-20 or the nav paints over the sheet and swallows its taps.
+--------------------------------------------------------------------------- */
+/* Header entry point — a 44px pill with a visible "Om" label (the accessible
+   name), so it clears the WCAG 2.5.5 target size. Hover/active have to be CSS;
+   the focus ring stays the house focus-visible utility on the element. */
+.about-trigger {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #fff1dd;
+  color: #806b4f; /* 4.57:1 on #fff1dd (was #8a7355, 4.05:1) */
+  font-weight: 800;
+  font-size: 15px;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    transform 0.12s;
+}
+@media (hover: hover) {
+  .about-trigger:hover {
+    background: #f8e4c6;
+    color: #7a6446;
+  }
+}
+.about-trigger:active {
+  background: #f2d9b2;
+  color: #6e5a3e;
+  transform: scale(0.96);
+}
+
+.about-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(58, 42, 24, 0.42);
+  opacity: calc(1 - var(--drawer-swipe-progress, 0));
+  transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.about-drawer-backdrop[data-swiping] {
+  transition-duration: 0s;
+}
+.about-drawer-backdrop[data-starting-style],
+.about-drawer-backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.about-drawer-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.about-drawer-popup {
+  --bleed: 3rem;
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(88dvh + var(--bleed));
+  margin-bottom: calc(var(--bleed) * -1);
+  padding: 0 0 calc(env(safe-area-inset-bottom) + var(--bleed));
+  background: #fff6e9;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -12px 40px rgba(58, 42, 24, 0.28);
+  outline: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: auto;
+  transform: translateY(var(--drawer-swipe-movement-y, 0px));
+  transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.about-drawer-popup[data-swiping] {
+  user-select: none;
+}
+.about-drawer-popup[data-starting-style],
+.about-drawer-popup[data-ending-style] {
+  transform: translateY(calc(100% - var(--bleed) + 2px));
+}
+
+/* Grab handle — the visual of the close button that wraps it (see AboutDrawer),
+   and the only hint that the sheet is draggable. Purely graphical: the button
+   carries aria-label="Luk", and the panel is also dismissible by Escape,
+   backdrop press, and swipe, so nothing depends on seeing the bar. But it is
+   the only *visible* close control and the only hint the sheet is draggable,
+   so it keeps #C9B79C (--color-nav-inactive, 1.83:1 on the #fff6e9 panel)
+   rather than the design handoff's #DFCEB2 (1.44:1), which read as a smudge.
+   Spacing comes from the button's padding. */
+.about-drawer-handle {
+  width: 52px;
+  height: 5px;
+  border-radius: 999px;
+  background: #c9b79c;
+}
+
+/* ---------------------------------------------------------------------------
    TABLET LAYOUT (issue #25)
    At >=768px the shell cap is lifted (see AppShell). Each screen reflows for
    the wider canvas. The 440px Playwright viewport and real phones never match

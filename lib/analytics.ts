@@ -8,7 +8,8 @@ type EventName =
   | "reading_logged"
   | "challenge_completed"
   | "nav_screen"
-  | "bingo_feat_completed";
+  | "bingo_feat_completed"
+  | "support_click";
 
 type EventParams = Record<string, string | number>;
 
