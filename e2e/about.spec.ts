@@ -63,6 +63,16 @@ test("header info icon opens the About drawer with the coffee CTA", async ({ pag
   await expect(cta).toHaveAttribute("rel", "noopener noreferrer");
 });
 
+// The illustration is the only in-app artwork served from the root, so it must be
+// named explicitly in the precache allowlist in scripts/inject-sw-assets.mjs —
+// that list is not a full walk of out/. Without it the drawer falls back to alt
+// text on a cold offline launch, and the failure is silent: every other test here
+// still passes. No page load needed; this reads the built service worker directly.
+test("the drawer illustration is precached for offline use", async ({ request }) => {
+  const sw = await (await request.get("sw.js")).text();
+  expect(sw).toContain('"/reading-girl.svg"');
+});
+
 // --- Overlay semantics + dismissal -----------------------------------------
 // About is a drawer, not a screen: it overlays whatever the user was on and
 // closing returns them there. The closed assertions all use toHaveCount(0)
